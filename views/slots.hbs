@@ -1,0 +1,84 @@
+<table class="t_center align_top display_inline_block bordered">
+  <tr>
+    <td class="align_top w100pct selectable" colspan="5">
+      Owner: <span id="owner"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable" colspan="5">
+      Account: <span id="account"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Balance: <span id="accountBalance"></span> Cache Balance: <span id="accountCacheBalance"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Pool Balance: <span id="centralAccountBalance"></span></span> Pool Cache Balance: <span id="centralAccountCacheBalance"></span>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Gameplay: draw 1 of {{templateCount}} cards, three times. Only 1 of {{templateCount}} cards needed to win!.
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Nonce: <span id="nonce"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Nonce Hash: <span id="nonceHash"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Last Nonce Hash: <span id="lastNonceHash"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable small" colspan="5">
+      Last Nonce Tx Id: <span id="transaction_id"></span>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable" colspan="5">
+      <button id="play" class="w100pct bg_light_green" onclick="play();return false;" disabled>
+        Play!
+      </button>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w20pct selectable">&nbsp;</td>
+    <td id="card1" class="align_top w20pct selectable">&nbsp;</td>
+    <td id="card2" class="align_top w20pct selectable">&nbsp;</td>
+    <td id="card3" class="align_top w20pct selectable">&nbsp;</td>
+    <td class="align_top w20pct selectable">&nbsp;</td>
+  </tr>
+  <tr>
+    <td id="score" class="align_top w100pct selectable" colspan="5">
+      No Score
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct selectable" colspan="5">
+      <form>
+        Bet :
+        <input id="bet" type="number" oninput="this.value=(parseInt(this.value)||0)" placeholder="0-9" autofocus='' value='1' />
+      </form>
+    </td>
+  </tr>
+  <tr>
+    <td class="align_top w100pct" colspan="5">
+      <button class="w100pct" onclick="resetNonceAndOwner();return false;">
+        Log In Again
+      </button>
+    </td>
+  </tr>
+</table>
+<div id="burnAccount" class="display_none">{{burnAccount}}</div>
+<script type="module" src="js/views/slots.js"></script>

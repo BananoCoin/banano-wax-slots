@@ -1,0 +1,210 @@
+/*
+ * https://coolors.co/50514f-d6f49d-909cc2-e54f6d-ca1551
+ */
+html {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 24px;
+  overflow-y: scroll;
+  text-align: center;
+}
+
+body {
+  background-color: #FCECC9;
+  color: #2E3532;
+  margin: 0;
+  height: 600px;
+}
+
+input, textarea, button {
+  background-color: #3A7CA5;
+  -webkit-appearance: none;
+  border-radius: 0;
+  padding: 5px;
+  margin: 0;
+  border: 2px solid #2E3532;
+}
+
+button {
+  width: 60px;
+  height: 60px;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+.t_left {
+  text-align: left;
+}
+
+.t_center {
+  text-align: center;
+}
+
+.monospace {
+  font-family: monospace;
+}
+
+.align_top {
+  vertical-align: top;
+}
+
+.align_center {
+  vertical-align: middle;
+}
+
+.float_left {
+  float: left;
+}
+
+.display_inline {
+  display: inline;
+}
+
+.display_inline_block {
+  display: inline-block;
+}
+
+.display_none {
+  display: none;
+}
+
+.w20pct {
+  width: 20%;
+}
+
+.w30pct {
+  width: 30%;
+}
+
+.w40pct {
+  width: 40%;
+}
+
+.w50pct {
+  width: 50%;
+}
+
+.w60pct {
+  width: 60%;
+}
+
+.w70pct {
+  width: 70%;
+}
+
+.w80pct {
+  width: 80%;
+}
+
+.w100pct {
+  width: 100%;
+}
+
+.h270px {
+  height: 270px;
+}
+
+.exit_link {
+  text-decoration: none;
+  color: #000;
+}
+
+.exit_link:visited {
+  color: #000;
+}
+
+.exit_link:active {
+  color: #333;
+}
+
+.exit_link:hover {
+  color: #333;
+}
+
+.button {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: #000;
+}
+
+.not_selectable {
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.selectable {
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.word_wrap_break_word {
+  word-wrap: break-word;
+}
+
+.small {
+  font-size: 10px;
+}
+
+.bordered {
+  border-radius: 4px;
+  border: solid;
+  border-width: 1px;
+}
+
+.bordered2px {
+  border-radius: 4px;
+  border: solid;
+  border-width: 2px;
+}
+
+.rounded {
+  border-radius: 3px;
+  padding: 3px;
+  margin: 3px;
+  display: inline-block;
+}
+
+.bg_light_green {
+  background-color: #4aad52;
+}
+
+.bg_pink {
+  background-color: #f1db4b;
+}

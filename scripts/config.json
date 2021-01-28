@@ -1,0 +1,17 @@
+{
+  "bananodeApiUrl": "https://kaliumapi.appditto.com/api",
+  "assetDataDir": "data/frozenAssets",
+  "bananojsCacheDataDir": "data/bananojsCache",
+  "burnAccount": "",
+  "centralWalletReceivePendingIntervalMs": 10000,
+  "centralWalletSeed": "",
+  "cookieSecret": "",
+  "maxPendingBananos": 10,
+  "payoutMultiplier": 1.0,
+  "thawTimeMs": 28800000,
+  "walletSeedIx": 0,
+  "waxIdSeed": "",
+  "web": {
+    "port": "8686"
+  }
+}
