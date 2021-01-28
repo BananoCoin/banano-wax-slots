@@ -9,6 +9,9 @@ html {
 }
 
 body {
+  background-image: url("936f0a3623354519cf12daa9dd0d80714e686dc6240d14cec0b7e66a084e2bb6.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
   background-color: #FCECC9;
   color: #2E3532;
   margin: 0;
@@ -102,6 +105,22 @@ h1, h2, h3 {
   display: none;
 }
 
+.w2pct {
+  width: 2%;
+}
+
+.w5pct {
+  width: 5%;
+}
+
+.w10pct {
+  width: 10%;
+}
+
+.w15pct {
+  width: 15%;
+}
+
 .w20pct {
   width: 20%;
 }
@@ -132,6 +151,10 @@ h1, h2, h3 {
 
 .w100pct {
   width: 100%;
+}
+
+.w1000px {
+  width: 1000px;
 }
 
 .h270px {
@@ -179,6 +202,7 @@ h1, h2, h3 {
 }
 
 .small {
+  margin: 0px;
   font-size: 10px;
 }
 
@@ -199,6 +223,14 @@ h1, h2, h3 {
   padding: 3px;
   margin: 3px;
   display: inline-block;
+}
+
+.bg_tan {
+  background-color: #FCECC9;
+}
+
+.bg_orange {
+  background-color: orange;
 }
 
 .bg_light_green {

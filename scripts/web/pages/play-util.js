@@ -273,8 +273,16 @@ const postWithoutCatch = async (context, req, res) => {
 
   const ownerActions = await waxRpc.history_get_actions(owner, -1, -2);
   const ownerAction = ownerActions.actions[0];
-  const lastNonceHash = ownerAction.action_trace.act.data.assoc_id;
-  if (lastNonceHash != nonceHash) {
+  let badNonce = false;
+  if (ownerAction == undefined) {
+    badNonce = true;
+  } else {
+    const lastNonceHash = ownerAction.action_trace.act.data.assoc_id;
+    if (lastNonceHash != nonceHash) {
+      badNonce = true;
+    }
+  }
+  if (badNonce) {
     const resp = {};
     resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
     resp.ready = false;
@@ -296,7 +304,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.accountInfo = accountInfo;
   resp.centralAccountInfo = centralAccountInfo;
   resp.cards = [];
-  resp.score = `No Current Bet, Pres the 'Play' button to continue.`;
+  resp.score = `No Current Bet, Press the 'Play' button to continue.`;
   resp.scoreError = false;
   resp.cardCount = 0;
   resp.templateCount = getTemplateCount();

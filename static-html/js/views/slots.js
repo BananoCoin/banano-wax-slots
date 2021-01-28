@@ -216,16 +216,17 @@ const addCards = async () => {
     } else {
       border = 'border-width:2px;border-color:black;background-color:white;';
     }
-    innerHTML += `<div class="bordered" style="${border}">`;
+    innerHTML += `<span class="bordered" style="${border}">`;
     let filter = '';
     if (cardDataElt.grayscale) {
       filter = 'filter: grayscale(100%);';
     }
     innerHTML += `<a target="_blank" href="https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX">`;
-    innerHTML += `<img style="width:300px;height:400px;${filter}" src="/ipfs/${cardDataElt.ipfs}.png">`;
+    innerHTML += `<img style="width:290px;height:400px;${filter}" src="/ipfs/${cardDataElt.ipfs}.png">`;
     innerHTML += '</a>';
-    innerHTML += `<h1>${cardDataElt.name}</h1>`;
-    innerHTML += `</div>`;
+    innerHTML += '<br>';
+    innerHTML += `<span>${cardDataElt.name}</span>`;
+    innerHTML += `</span>`;
     // innerHTML += `</br>`;
     cardElt.innerHTML = innerHTML;
   };
