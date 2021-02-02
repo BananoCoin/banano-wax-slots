@@ -41,6 +41,9 @@ const init = async () => {
   if (config.centralWalletSeed == '') {
     throw Error('centralWalletSeed is required in ./config.json');
   }
+  if (config.houseWalletSeed == '') {
+    throw Error('houseWalletSeed is required in ./config.json');
+  }
 
   modules.push(assetUtil);
   modules.push(bananojsCacheUtil);

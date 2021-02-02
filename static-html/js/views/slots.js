@@ -27,15 +27,15 @@ const play = async (bet) => {
   const accountElt = document.querySelector('#account');
   const accountBalanceElt = document.querySelector('#accountBalance');
   const accountCacheBalanceElt = document.querySelector('#accountCacheBalance');
-  const centralAccountBalanceElt = document.querySelector('#centralAccountBalance');
-  const centralAccountCacheBalanceElt = document.querySelector('#centralAccountCacheBalance');
+  const houseAccountBalanceElt = document.querySelector('#houseAccountBalance');
+  const houseAccountCacheBalanceElt = document.querySelector('#houseAccountCacheBalance');
 
   scoreElt.innerText = 'pending...';
   accountElt.innerText = 'pending...';
   accountBalanceElt.innerText = 'pending...';
   accountCacheBalanceElt.innerText = 'pending...';
-  centralAccountBalanceElt.innerText = 'pending...';
-  centralAccountCacheBalanceElt.innerText = 'pending...';
+  houseAccountBalanceElt.innerText = 'pending...';
+  houseAccountCacheBalanceElt.innerText = 'pending...';
 
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -200,8 +200,8 @@ const addCards = async () => {
   const accountElt = document.querySelector('#account');
   const accountBalanceElt = document.querySelector('#accountBalance');
   const accountCacheBalanceElt = document.querySelector('#accountCacheBalance');
-  const centralAccountBalanceElt = document.querySelector('#centralAccountBalance');
-  const centralAccountCacheBalanceElt = document.querySelector('#centralAccountCacheBalance');
+  const houseAccountBalanceElt = document.querySelector('#houseAccountBalance');
+  const houseAccountCacheBalanceElt = document.querySelector('#houseAccountCacheBalance');
 
   const card1Elt = document.querySelector('#card1');
   const card2Elt = document.querySelector('#card2');
@@ -234,8 +234,8 @@ const addCards = async () => {
     accountElt.innerText = '';
     accountBalanceElt.innerText = '';
     accountCacheBalanceElt.innerText = '';
-    centralAccountBalanceElt.innerText = '';
-    centralAccountCacheBalanceElt.innerText = '';
+    houseAccountBalanceElt.innerText = '';
+    houseAccountCacheBalanceElt.innerText = '';
     card1Elt.innerHTML = '';
     card2Elt.innerHTML = '';
     card3Elt.innerHTML = '';
@@ -248,12 +248,12 @@ const addCards = async () => {
     }
   } else {
     accountElt.innerText = cardData.account;
-    if (cardData.centralAccountInfo.error) {
-      centralAccountBalanceElt.innerText = cardData.centralAccountInfo.error;
-      centralAccountCacheBalanceElt.innerText = cardData.centralAccountInfo.error;
+    if (cardData.houseAccountInfo.error) {
+      houseAccountBalanceElt.innerText = cardData.houseAccountInfo.error;
+      houseAccountCacheBalanceElt.innerText = cardData.houseAccountInfo.error;
     } else {
-      centralAccountBalanceElt.innerText = cardData.centralBalanceDescription;
-      centralAccountCacheBalanceElt.innerText = cardData.cacheCentralBalanceDescription;
+      houseAccountBalanceElt.innerText = cardData.houseBalanceDescription;
+      houseAccountCacheBalanceElt.innerText = cardData.cacheHouseBalanceDescription;
     }
     if (cardData.accountInfo.error) {
       accountBalanceElt.innerText = cardData.accountInfo.error;

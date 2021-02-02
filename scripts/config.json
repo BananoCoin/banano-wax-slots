@@ -5,6 +5,7 @@
   "burnAccount": "",
   "centralWalletReceivePendingIntervalMs": 10000,
   "centralWalletSeed": "",
+  "houseWalletSeed": "",
   "cookieSecret": "",
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
