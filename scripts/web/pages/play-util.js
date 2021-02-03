@@ -383,7 +383,7 @@ const postWithoutCatch = async (context, req, res) => {
   }
 
   if (play) {
-    const banano = parseInt(resp.cacheHouseBalanceParts[resp.cacheBalanceParts.majorName], 10);
+    const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseInt(req.body.bet, 10);
     loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'payout', resp.payoutOdds * bet, 'house balance', houseBanano, houseAccount);

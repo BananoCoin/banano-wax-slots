@@ -47,5 +47,6 @@ check out minting here:
 
 ### todo
 
+0.  figure out why you can still play with a zero balance.
 1.  add withdraw button
 2.  add anchor login <https://github.com/greymass/anchor-link>
