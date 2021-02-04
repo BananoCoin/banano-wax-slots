@@ -144,10 +144,11 @@ const getAccountInfo = async (account, representativeFlag) => {
 };
 
 const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBananos) => {
+  const fromAccount = await bananojs.getBananoAccountFromSeed(seed, seedIx);
+  // console.log(dateUtil.getDate(), 'withdraw from account', fromAccount, 'toAccount', toAccount, 'amountBananos', amountBananos);
   if (trackedSeedSet.has(seed)) {
     const mutexRelease = await mutex.acquire();
     try {
-      const fromAccount = await bananojs.getBananoAccountFromSeed(seed, seedIx);
       if (fromAccount == toAccount) {
         return 'cannot send to yourself';
       }
@@ -161,15 +162,20 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
         const amountBalanceMajorAmount = amountBalanceParts[amountBalanceParts.majorName];
         throw Error(`Error: The server's account balance of ${fromAccountMajorAmount} bananos is too small, cannot withdraw ${amountBalanceMajorAmount} bananos. In raw ${fromAccountBalance} < ${amountRaw}.`);
       }
-      fromAccountData.balance = (fromAccountBalance - amountRaw).toString();
       const toAccountData = getAccountData(toAccount);
+
+      // console.log(dateUtil.getDate(), 'withdraw from account', fromAccount, 'toAccount', toAccount, 'amountRaw', amountRaw, 'old pool balance', fromAccountData.balance, 'old account balance', toAccountData.balance);
+
+      fromAccountData.balance = (fromAccountBalance - amountRaw).toString();
+
       let message;
       if (trackedAccountSet.has(toAccount)) {
         toAccountData.balance = (BigInt(toAccountData.balance) + amountRaw).toString();
+        // console.log(dateUtil.getDate(), 'transfer from pool wallet', fromAccount, 'toAccount', toAccount, 'amountRaw', amountRaw, 'new pool balance', fromAccountData.balance, 'new account balance', toAccountData.balance);
         message = 'success';
       } else {
         const account = await getBananoAccountFromSeed(config.centralWalletSeed, config.walletSeedIx);
-        console.log('withdraw from central wallet', account, 'toAccount', toAccount, 'amountBananos', amountBananos);
+        console.log(dateUtil.getDate(), 'withdraw from central wallet', account, 'toAccount', toAccount, 'amountBananos', amountBananos);
         message = await bananojs.sendBananoWithdrawalFromSeed(config.centralWalletSeed, config.walletSeedIx, toAccount, amountBananos);
       }
       saveAccountDataJson(fromAccount, fromAccountData);

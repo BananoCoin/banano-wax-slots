@@ -80,6 +80,12 @@ const isBadNonce = async (owner, nonce) => {
   let badNonce = false;
   if (ownerAction == undefined) {
     badNonce = true;
+  } else if (ownerAction.action_trace == undefined) {
+    badNonce = true;
+  } else if (ownerAction.action_trace.act == undefined) {
+    badNonce = true;
+  } else if (ownerAction.action_trace.act.data == undefined) {
+    badNonce = true;
   } else {
     const lastNonceHash = ownerAction.action_trace.act.data.assoc_id;
     if (lastNonceHash != nonceHash) {

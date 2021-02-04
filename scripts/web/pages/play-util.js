@@ -213,13 +213,11 @@ const postWithoutCatch = async (context, req, res) => {
     res.send(resp);
     return;
   }
-  loggingUtil.log(dateUtil.getDate(), 'STARTED play');
+  // loggingUtil.log(dateUtil.getDate(), 'STARTED play');
   const nonce = req.body.nonce;
   // loggingUtil.log(dateUtil.getDate(), 'nonce');// , owner);
 
   const houseAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.houseWalletSeed, config.walletSeedIx);
-  const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
-  // loggingUtil.log(dateUtil.getDate(), 'houseAccountInfo');// , houseAccountInfo);
 
   const owner = req.body.owner;
   // loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
@@ -238,20 +236,42 @@ const postWithoutCatch = async (context, req, res) => {
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
   // loggingUtil.log(dateUtil.getDate(), 'account');// , account);
   checkPendingSeeds.add(seed);
-  const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
-  // loggingUtil.log(dateUtil.getDate(), 'accountInfo');// , accountInfo);
 
   const resp = {};
   resp.ready = true;
   resp.account = account;
-  resp.accountInfo = accountInfo;
-  resp.houseAccountInfo = houseAccountInfo;
   resp.cards = [];
   resp.score = `No Current Bet, Press the 'Play' button to continue.`;
   resp.scoreError = false;
   resp.cardCount = 0;
   resp.templateCount = getTemplateCount();
 
+  const updateBalances = async () => {
+    const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
+    // loggingUtil.log(dateUtil.getDate(), 'houseAccountInfo', houseAccountInfo);
+
+    const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
+    // loggingUtil.log(dateUtil.getDate(), 'accountInfo', accountInfo);
+
+    resp.accountInfo = accountInfo;
+    resp.houseAccountInfo = houseAccountInfo;
+
+    if (!resp.houseAccountInfo.error) {
+      resp.houseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.balance);
+      resp.houseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.houseBalanceParts);
+      resp.houseBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.houseBalanceParts);
+      resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
+      resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
+    }
+    if (!resp.accountInfo.error) {
+      resp.balanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(accountInfo.balance);
+      resp.balanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.balanceParts);
+      resp.balanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.balanceParts);
+      resp.cacheBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(resp.accountInfo.cacheBalance);
+      resp.cacheBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheBalanceParts);
+    }
+  };
+  await updateBalances();
 
   // loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
   const ownedCards = await getOwnedCards(owner);
@@ -294,21 +314,6 @@ const postWithoutCatch = async (context, req, res) => {
   resp.payoutOdds = parseInt((1./winningOdds).toFixed(0), 10);
   resp.payoutMultiplier = config.payoutMultiplier;
 
-  if (!resp.houseAccountInfo.error) {
-    resp.houseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.balance);
-    resp.houseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.houseBalanceParts);
-    resp.houseBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.houseBalanceParts);
-    resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
-    resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
-  }
-  if (!resp.accountInfo.error) {
-    resp.balanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(accountInfo.balance);
-    resp.balanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.balanceParts);
-    resp.balanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.balanceParts);
-    resp.cacheBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(resp.accountInfo.cacheBalance);
-    resp.cacheBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheBalanceParts);
-  }
-
   let play = true;
   if (req.body.bet === undefined) {
     play = false;
@@ -329,6 +334,7 @@ const postWithoutCatch = async (context, req, res) => {
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseInt(req.body.bet, 10);
     loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'payout', resp.payoutOdds * bet, 'house balance', houseBanano, houseAccount);
+    const winPayment = resp.payoutOdds * bet * resp.payoutMultiplier;
     if (!Number.isFinite(bet)) {
       resp.score = `Bad Bet '${bet}'`;
       resp.scoreError = true;
@@ -341,8 +347,8 @@ const postWithoutCatch = async (context, req, res) => {
     } else if (bet > 1000) {
       resp.score = 'Max Bet 1000 Ban';
       resp.scoreError = true;
-    } else if ((resp.payoutOdds * bet) > houseBanano) {
-      resp.score = `Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' greater than house balance '${houseBanano}' of account '${houseAccount}'`;
+    } else if (winPayment > houseBanano) {
+      resp.score = `Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`;
       resp.scoreError = true;
     } else {
       resp.score = 'Won';
@@ -395,16 +401,17 @@ const postWithoutCatch = async (context, req, res) => {
       const payout = async () => {
         try {
           if (resp.score == 'Won') {
-            await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.centralWalletSeed, 0, account, resp.payoutOdds * bet * resp.payoutMultiplier);
+            await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
           } else {
-            await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, 0, houseAccount, bet);
+            await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, houseAccount, bet);
           }
+          await updateBalances();
         } catch (error) {
           console.log('payout error', error.message);
           console.trace(error);
         }
       };
-      payout();
+      await payout();
     }
   }
 
