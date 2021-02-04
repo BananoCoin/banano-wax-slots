@@ -94,13 +94,22 @@ const postWithoutCatch = async (context, req, res) => {
   await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
 
   // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
-  const message = await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, account, amount);
+  try {
+    const message = await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, account, amount);
 
-  const resp = {}; ;
-  resp.message = message;
-  resp.success = true;
-  // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
-  loggingUtil.log(dateUtil.getDate(), 'SUCCESS withdraw', message);
+    const resp = {}; ;
+    resp.message = message;
+    resp.success = true;
+    // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
+    loggingUtil.log(dateUtil.getDate(), 'SUCCESS withdraw', message);
+  } catch (error) {
+    const resp = {};
+    resp.message = `error '${error.message}'`;
+    resp.success = false;
+    res.send(resp);
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'error', error.message);
+    return;
+  }
 
   res.send(resp);
 };
