@@ -5,8 +5,11 @@
 const assetUtil = require('./util/asset-util.js');
 const bananojsCacheUtil = require('./util/bananojs-cache-util.js');
 const dateUtil = require('./util/date-util.js');
+const seedUtil = require('./util/seed-util.js');
+const nonceUtil = require('./util/nonce-util.js');
 const randomUtil = require('./util/random-util.js');
 const webPagePlayUtil = require('./web/pages/play-util.js');
+const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
 
 // constants
@@ -48,8 +51,11 @@ const init = async () => {
   modules.push(assetUtil);
   modules.push(bananojsCacheUtil);
   modules.push(dateUtil);
+  modules.push(seedUtil);
+  modules.push(nonceUtil);
   modules.push(randomUtil);
   modules.push(webPagePlayUtil);
+  modules.push(webPageWithdrawUtil);
   modules.push(webServerUtil);
 
   for (let moduleIx = 0; moduleIx < modules.length; moduleIx++) {

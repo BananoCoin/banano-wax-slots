@@ -276,3 +276,34 @@ const addCards = async () => {
     }
   }
 };
+
+const withdraw = () => {
+  const scoreElt = document.querySelector('#score');
+  const accountElt = document.querySelector('#withdrawAccount');
+  const amountElt = document.querySelector('#withdrawAmount');
+  const withdrawButtonElt = document.querySelector('#withdrawButton');
+
+  const xmlhttp = new XMLHttpRequest();
+  const parms = {};
+  parms.owner = window.localStorage.owner;
+  parms.nonce = window.localStorage.nonce;
+  parms.account = accountElt.value;
+  parms.amount = amountElt.value;
+
+  scoreElt.innerText = 'pending...';
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      withdrawButton.disabled = false;
+      const response = JSON.parse(this.responseText);
+      scoreElt.innerText = response.message;
+      if(response.success) {
+        play();
+      }
+    }
+  };
+  xmlhttp.open('POST', '/withdraw', true);
+  xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xmlhttp.send(JSON.stringify(parms));
+  withdrawButton.disabled = true;
+};
+window.withdraw = withdraw;

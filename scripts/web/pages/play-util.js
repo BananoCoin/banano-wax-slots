@@ -1,15 +1,15 @@
 'use strict';
 // libraries
-const crypto = require('crypto');
 const fetch = require('node-fetch');
 const {ExplorerApi} = require('atomicassets');
 const fs = require('fs');
 const request = require('request');
-const blake = require('blakejs');
 
 // modules
 const randomUtil = require('../../util/random-util.js');
 const dateUtil = require('../../util/date-util.js');
+const seedUtil = require('../../util/seed-util.js');
+const nonceUtil = require('../../util/nonce-util.js');
 const assetUtil = require('../../util/asset-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 
@@ -21,7 +21,6 @@ const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 let config;
 let loggingUtil;
 let waxApi;
-let waxRpc;
 const templates = [];
 let ready = false;
 const checkPendingSeeds = new Set();
@@ -49,24 +48,6 @@ const init = async (_config, _loggingUtil) => {
 const setWaxApiAndAddTemplates = async () => {
   try {
     waxApi = new ExplorerApi('https://wax.api.atomicassets.io', 'atomicassets', {fetch});
-    waxRpc = {};
-    waxRpc.history_get_actions = async (t, e, r) => {
-      return new Promise((resolve, reject) => {
-        const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
-        // console.log('history_get_actions', 'req', req);
-        fetch('https://wax.greymass.com/v1/history/get_actions', {
-          method: 'post',
-          body: req,
-          headers: {'Content-Type': 'application/json'},
-        })
-            .catch((err) => reject(err))
-            .then((res) => res.json())
-            .then((json) => {
-              // console.log('history_get_actions', 'json', json);
-              resolve(json);
-            });
-      });
-    };
   } catch (error) {
     console.log('INTERIM setWaxApiAndAddTemplates', error.message);
     setTimeout(setWaxApiAndAddTemplates, 1000);
@@ -82,7 +63,6 @@ const deactivate = async () => {
   config = undefined;
   loggingUtil = undefined;
   waxApi = undefined;
-  waxRpc = undefined;
   templates.length = 0;
   ready = false;
   /* eslint-enable no-unused-vars */
@@ -179,15 +159,6 @@ const ownerHasCard = async (owner, template_id) => {
   return assets.length > 0;
 };
 
-const getSeedFromOwner = (owner) => {
-  const seedHash = crypto.createHash('sha256')
-      .update(config.waxIdSeed)
-      .update(`${owner}`)
-      .digest();
-  return seedHash.toString('hex');
-};
-
-
 const receivePending = async (representative, seed) => {
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
   const pendingList = [];
@@ -233,24 +204,6 @@ const centralAccountReceivePending = async () => {
   }
 };
 
-const getNonceHash = (nonce) => {
-  const context = blake.blake2bInit(32, null);
-  blake.blake2bUpdate(context, nonce);
-  const nonceHash = getInt64StrFromUint8Array(blake.blake2bFinal(context));
-  return nonceHash;
-};
-
-const bytesToHex = (bytes) => {
-  return Array.prototype.map.call(bytes, (x) => ('00' + x.toString(16)).slice(-2)).join('').toUpperCase();
-};
-
-const getInt64StrFromUint8Array = (ba) => {
-  const hex = bytesToHex(ba);
-  const bi = BigInt('0x' + hex);
-  const max = BigInt('0x7FFFFFFFFFFFFFFF');
-  return (bi%max).toString();
-};
-
 const postWithoutCatch = async (context, req, res) => {
   if (!ready) {
     loggingUtil.log(dateUtil.getDate(), 'not ready');
@@ -262,27 +215,16 @@ const postWithoutCatch = async (context, req, res) => {
   }
   loggingUtil.log(dateUtil.getDate(), 'STARTED play');
   const nonce = req.body.nonce;
-  loggingUtil.log(dateUtil.getDate(), 'nonce');// , owner);
-  const nonceHash = getNonceHash(nonce);
+  // loggingUtil.log(dateUtil.getDate(), 'nonce');// , owner);
 
   const houseAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.houseWalletSeed, config.walletSeedIx);
   const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
-  loggingUtil.log(dateUtil.getDate(), 'houseAccountInfo');// , houseAccountInfo);
+  // loggingUtil.log(dateUtil.getDate(), 'houseAccountInfo');// , houseAccountInfo);
 
   const owner = req.body.owner;
-  loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
+  // loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
 
-  const ownerActions = await waxRpc.history_get_actions(owner, -1, -2);
-  const ownerAction = ownerActions.actions[0];
-  let badNonce = false;
-  if (ownerAction == undefined) {
-    badNonce = true;
-  } else {
-    const lastNonceHash = ownerAction.action_trace.act.data.assoc_id;
-    if (lastNonceHash != nonceHash) {
-      badNonce = true;
-    }
-  }
+  const badNonce = await nonceUtil.isBadNonce(owner, nonce);
   if (badNonce) {
     const resp = {};
     resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
@@ -291,13 +233,13 @@ const postWithoutCatch = async (context, req, res) => {
     return;
   }
 
-  const seed = getSeedFromOwner(owner);
-  loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
+  const seed = seedUtil.getSeedFromOwner(owner);
+  // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-  loggingUtil.log(dateUtil.getDate(), 'account');// , account);
+  // loggingUtil.log(dateUtil.getDate(), 'account');// , account);
   checkPendingSeeds.add(seed);
   const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
-  loggingUtil.log(dateUtil.getDate(), 'accountInfo');// , accountInfo);
+  // loggingUtil.log(dateUtil.getDate(), 'accountInfo');// , accountInfo);
 
   const resp = {};
   resp.ready = true;
@@ -311,7 +253,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.templateCount = getTemplateCount();
 
 
-  loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
+  // loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
   const ownedCards = await getOwnedCards(owner);
   const frozenAssetByTemplateMap = {};
   const unfrozenAssetByTemplateMap = {};
@@ -345,7 +287,7 @@ const postWithoutCatch = async (context, req, res) => {
     // resp.cardCount++;
     // }
   }
-  loggingUtil.log(dateUtil.getDate(), 'SUCCESS countCards');
+  // loggingUtil.log(dateUtil.getDate(), 'SUCCESS countCards');
 
   const winningOneCardOdds = resp.cardCount/resp.templateCount;
   const winningOdds = winningOneCardOdds * winningOneCardOdds * winningOneCardOdds;
@@ -409,7 +351,7 @@ const postWithoutCatch = async (context, req, res) => {
       const card2 = randomUtil.getRandomArrayElt(templates);
       const card3 = randomUtil.getRandomArrayElt(templates);
       const cards = [card1, card2, card3];
-      loggingUtil.log(dateUtil.getDate(), 'STARTED checkCards');
+      // loggingUtil.log(dateUtil.getDate(), 'STARTED checkCards');
       for (let cardIx = 0; cardIx < cards.length; cardIx++) {
         const card = cards[cardIx];
         const cardData = {};
@@ -449,7 +391,7 @@ const postWithoutCatch = async (context, req, res) => {
           }
         }
       }
-      loggingUtil.log(dateUtil.getDate(), 'SUCCESS checkCards');
+      // loggingUtil.log(dateUtil.getDate(), 'SUCCESS checkCards');
       const payout = async () => {
         try {
           if (resp.score == 'Won') {

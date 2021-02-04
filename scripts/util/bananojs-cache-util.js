@@ -56,19 +56,37 @@ const getAssetFileNm = (assetId) => {
 };
 
 const getBananoAccountFromSeed = async (seed, seedIx) => {
+  if (seed === undefined) {
+    throw new Error('seed is required.');
+  };
+  if (seedIx === undefined) {
+    throw new Error('seedIx is required.');
+  };
   const account = await bananojs.getBananoAccountFromSeed(seed, seedIx);
   // if (seed !== config.centralWalletSeed) {
-    trackedSeedSet.add(seed);
-    trackedAccountSet.add(account);
+  trackedSeedSet.add(seed);
+  trackedAccountSet.add(account);
   // }
   return account;
 };
 
 const getAccountsPending = async (accounts, count, source) => {
+  if (accounts === undefined) {
+    throw new Error('accounts is required.');
+  };
+  if (count === undefined) {
+    throw new Error('count is required.');
+  };
+  if (source === undefined) {
+    throw new Error('source is required.');
+  };
   return await bananojs.getAccountsPending(accounts, count, source);
 };
 
 const getAccountFile = (account) => {
+  if (account === undefined) {
+    throw new Error('account is required.');
+  };
   return path.join(config.bananojsCacheDataDir, account);
 };
 
@@ -124,11 +142,15 @@ const getAccountInfo = async (account, representativeFlag) => {
   }
   return accountInfo;
 };
+
 const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBananos) => {
-  if (trackedAccountSet.has(toAccount) && trackedSeedSet.has(seed)) {
+  if (trackedSeedSet.has(seed)) {
     const mutexRelease = await mutex.acquire();
     try {
       const fromAccount = await bananojs.getBananoAccountFromSeed(seed, seedIx);
+      if (fromAccount == toAccount) {
+        return 'cannot send to yourself';
+      }
       const fromAccountData = getAccountData(fromAccount);
       const fromAccountBalance = BigInt(fromAccountData.balance);
       const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amountBananos.toString()));
@@ -141,14 +163,23 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
       }
       fromAccountData.balance = (fromAccountBalance - amountRaw).toString();
       const toAccountData = getAccountData(toAccount);
-      toAccountData.balance = (BigInt(toAccountData.balance) + amountRaw).toString();
+      let message;
+      if (trackedAccountSet.has(toAccount)) {
+        toAccountData.balance = (BigInt(toAccountData.balance) + amountRaw).toString();
+        message = 'success';
+      } else {
+        const account = await getBananoAccountFromSeed(config.centralWalletSeed, config.walletSeedIx);
+        console.log('withdraw from central wallet', account, 'toAccount', toAccount, 'amountBananos', amountBananos);
+        message = await bananojs.sendBananoWithdrawalFromSeed(config.centralWalletSeed, config.walletSeedIx, toAccount, amountBananos);
+      }
       saveAccountDataJson(fromAccount, fromAccountData);
       saveAccountDataJson(toAccount, toAccountData);
+      return message;
     } finally {
       mutexRelease();
     }
   } else {
-    return await bananojs.sendBananoWithdrawalFromSeed(seed, seedIx, toAccount, amountBananos);
+    return 'failure, untracked seed';
   }
 };
 

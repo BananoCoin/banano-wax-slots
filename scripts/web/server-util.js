@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser');
 // modules
 const dateUtil = require('../util/date-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
+const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 
 // constants
 
@@ -83,6 +84,12 @@ const initWebServer = async () => {
     const context = {};
     await webPagePlayUtil.post(context, req, res);
   });
+
+  app.post('/withdraw', async (req, res) => {
+    const context = {};
+    await webPageWithdrawUtil.post(context, req, res);
+  });
+
 
   app.get('/favicon.ico', async (req, res) => {
     res.redirect(302, '/favicon-16x16.png');
