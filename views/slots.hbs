@@ -64,8 +64,11 @@
     <tr>
       <td class="align_top w20pct">&nbsp;</td>
       <td class="align_top w20pct selectable">
-        <button style="width:350px" onclick="resetNonceAndOwner();return false;">
-          Log In Again
+        <button style="width:175px" onclick="waxjsWallet();return false;">
+          Log In Again (Cloud Wallet)
+        </button>
+        <button style="width:175px" onclick="anchorWallet();return false;">
+          Log In Again (Anchor Wallet)
         </button>
       </td>
       <td class="align_top w20pct">
@@ -135,4 +138,6 @@
   </tbody>
 </table>
 <div id="burnAccount" class="display_none">{{burnAccount}}</div>
+<script src="https://unpkg.com/anchor-link"></script>
+<script src="https://unpkg.com/anchor-link-browser-transport"></script>
 <script type="module" src="js/views/slots.js"></script>

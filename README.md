@@ -46,6 +46,3 @@ check out minting here:
   npm run screenrestart;
 
 ### todo
-
-1.  add withdraw button
-2.  add anchor login <https://github.com/greymass/anchor-link>

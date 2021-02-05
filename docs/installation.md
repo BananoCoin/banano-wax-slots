@@ -68,3 +68,7 @@ type control-a d to exit screen.
 if you want to run it in the background without checking if it started correctly, run the screen command headless
 
     screen -dmSL banano_wax_slots npm start
+
+## anchor desktop
+
+    if you can't figure out how to create an ancor account, log in with your cloud wallet to https://wax.bloks.io/wallet/create-account and create an account using your public key.

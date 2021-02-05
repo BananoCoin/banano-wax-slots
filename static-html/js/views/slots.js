@@ -7,6 +7,17 @@ const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 
 let owner;
 let cardData;
+let walletKind;
+
+window.waxjsWallet = async () => {
+  walletKind = 'waxjs';
+  resetNonceAndOwner();
+};
+
+window.anchorWallet = async () => {
+  walletKind = 'anchor';
+  resetNonceAndOwner();
+};
 
 window.resetNonceAndOwner = async () => {
   delete window.localStorage.nonce;
@@ -110,7 +121,12 @@ window.onLoad = async () => {
 
   try {
     if (owner === undefined) {
-      autoLogin();
+      if (walletKind == 'waxjs') {
+        autoLogin();
+      }
+      if (walletKind == 'anchor') {
+        anchorLogin();
+      }
       owner = burnAccount;
     }
 
@@ -122,6 +138,51 @@ window.onLoad = async () => {
     // if owner set, get tempate with owner.
     // otherwise get with burn address, to show 'bad nonce' message.
     getLastNonceAndAddTemplates();
+
+    async function anchorLogin() {
+      const transport = new AnchorLinkBrowserTransport();
+      const waxChainId = '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4';
+      const waxRpcUrl = 'https://chain.wax.io';
+      const link = new AnchorLink({transport: transport, chainId: waxChainId, rpc: waxRpcUrl});
+      console.log('link', link);
+      try {
+        const session = await link.login('waxslots');
+        console.log('session', session);
+        const userAccount = session.account.account_name;
+        ownerElt.innerHTML = userAccount;
+        owner = userAccount;
+        window.localStorage.owner = owner;
+
+        const result = await session.session.transact({
+          actions: [{
+            account: 'orng.wax',
+            name: 'requestrand',
+            authorization: [{
+              actor: userAccount,
+              permission: 'active',
+            }],
+            data: {
+              caller: userAccount,
+              signing_value: nonceHash,
+              assoc_id: nonceHash,
+            },
+          }],
+        }, {
+          blocksBehind: 3,
+          expireSeconds: 30,
+        });
+        console.log('result', result);
+        document.getElementById('transaction_id').innerHTML = result.transaction_id;
+        const scoreElt = document.querySelector('#score');
+        const scoreHtml = `Please wait 30 seconds past <span class="monospace">${getDate()}</span> for blockchain to update before trying again.`;
+        scoreElt.innerHTML = scoreHtml;
+        setTimeout(getLastNonceAndAddTemplates, 5000);
+      } catch (error) {
+        console.log('error', error.message);
+        ownerElt.innerHTML = error.message;
+      }
+    };
+
 
     async function autoLogin() {
       const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
@@ -296,7 +357,7 @@ const withdraw = () => {
       withdrawButton.disabled = false;
       const response = JSON.parse(this.responseText);
       scoreElt.innerText = response.message;
-      if(response.success) {
+      if (response.success) {
         play();
       }
     }
