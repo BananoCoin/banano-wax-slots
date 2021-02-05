@@ -14,5 +14,6 @@
   "waxIdSeed": "",
   "web": {
     "port": "8686"
-  }
+  },
+  "disableWithdraw":false
 }

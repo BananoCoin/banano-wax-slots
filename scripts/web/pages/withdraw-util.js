@@ -55,6 +55,15 @@ const post = async (context, req, res) => {
 
 const postWithoutCatch = async (context, req, res) => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED withdraw');
+
+  if (config.disableWithdraw) {
+    const resp = {};
+    resp.message = 'demo mode only, withdrawal is disabled';
+    resp.success = false;
+    res.send(resp);
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'disabled');
+    return;
+  }
   const nonce = req.body.nonce;
   // loggingUtil.log(dateUtil.getDate(), 'nonce');// , nonce);
   const owner = req.body.owner;
@@ -65,8 +74,8 @@ const postWithoutCatch = async (context, req, res) => {
     resp.message = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
     resp.success = false;
     res.send(resp);
-    return;
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad nonce');
+    return;
   }
   const amount = req.body.amount;
   const account = req.body.account;
@@ -75,8 +84,8 @@ const postWithoutCatch = async (context, req, res) => {
     resp.message = `bad account '${account}'`;
     resp.success = false;
     res.send(resp);
-    return;
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad account', account);
+    return;
   }
   const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
   if (amountRaw <= BigInt(0)) {
@@ -84,8 +93,8 @@ const postWithoutCatch = async (context, req, res) => {
     resp.message = `bad amount '${amount}'`;
     resp.success = false;
     res.send(resp);
-    return;
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad amount', amount);
+    return;
   }
 
   const seed = seedUtil.getSeedFromOwner(owner);
