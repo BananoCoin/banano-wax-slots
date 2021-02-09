@@ -9,6 +9,20 @@ let owner;
 let cardData;
 let walletKind;
 
+const sounds = ['start', 'wheel', 'winner', 'loser'];
+
+const startSound = (id) => {
+  document.getElementById(id).play();
+};
+
+const stopSounds = () => {
+  for (let ix = 0; ix < sounds.length; ix++) {
+    const id = sounds[ix];
+    document.getElementById(id).pause();
+    document.getElementById(id).currentTime = 0;
+  }
+};
+
 window.waxjsWallet = async () => {
   walletKind = 'waxjs';
   resetNonceAndOwner();
@@ -35,18 +49,9 @@ const play = async (bet) => {
     parms.bet = document.querySelector('#bet').value;
   }
   const scoreElt = document.querySelector('#score');
-  const accountElt = document.querySelector('#account');
-  const accountBalanceElt = document.querySelector('#accountBalance');
-  const accountCacheBalanceElt = document.querySelector('#accountCacheBalance');
-  const houseAccountBalanceElt = document.querySelector('#houseAccountBalance');
-  const houseAccountCacheBalanceElt = document.querySelector('#houseAccountCacheBalance');
 
   scoreElt.innerText = 'pending...';
-  accountElt.innerText = 'pending...';
-  accountBalanceElt.innerText = 'pending...';
-  accountCacheBalanceElt.innerText = 'pending...';
-  houseAccountBalanceElt.innerText = 'pending...';
-  houseAccountCacheBalanceElt.innerText = 'pending...';
+  setAllTopTo(`<span class="rounded small">pending...</span>`);
 
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -56,8 +61,20 @@ const play = async (bet) => {
       const scoreElt = document.querySelector('#score');
       scoreElt.innerText = 'Ready to begin. Press Play!';
       addCards();
+      stopSounds();
+      if (cardData.score == 'Lost') {
+        startSound('loser');
+      }
+      if (cardData.score == 'Won') {
+        startSound('winner');
+      }
     }
   };
+  if (bet) {
+    stopSounds();
+    startSound('start');
+    startSound('wheel');
+  }
   xmlhttp.open('POST', '/play', true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xmlhttp.send(JSON.stringify(parms));
@@ -110,9 +127,19 @@ window.onLoad = async () => {
   if (window.localStorage.owner !== undefined) {
     owner = window.localStorage.owner;
   }
-  ownerElt.innerHTML = owner;
+  if (owner !== undefined) {
+    ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
+  } else {
+    ownerElt.innerHTML = `<span class="rounded">&nbsp;</span>`;
+  }
   const nonce = window.localStorage.nonce;
-  nonceElt.innerText = nonce;
+
+  if (nonce !== undefined) {
+    nonceElt.innerText = nonce;
+  } else {
+    nonceElt.innerText = '';
+  }
+  setAllTopTo('');
 
   const context = blake2bInit(32, null);
   blake2bUpdate(context, nonce);
@@ -149,9 +176,9 @@ window.onLoad = async () => {
         const session = await link.login('waxslots');
         console.log('session', session);
         const userAccount = session.account.account_name;
-        ownerElt.innerHTML = userAccount;
         owner = userAccount;
         window.localStorage.owner = owner;
+        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
 
         const result = await session.session.transact({
           actions: [{
@@ -179,7 +206,7 @@ window.onLoad = async () => {
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (error) {
         console.log('error', error.message);
-        ownerElt.innerHTML = error.message;
+        ownerElt.innerHTML = `<span class="rounded">${error.message}</span>`;
       }
     };
 
@@ -188,13 +215,12 @@ window.onLoad = async () => {
       const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
       if (isAutoLoginAvailable) {
         const userAccount = wax.userAccount;
-        const str = 'AutoLogin enabled for account: ' + userAccount;
-        ownerElt.innerHTML = str;
         owner = userAccount;
         window.localStorage.owner = owner;
+        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
         setTimeout(nonceTx, 0);
       } else {
-        ownerElt.innerHTML = 'Not auto-logged in';
+        ownerElt.innerHTML = `<span class="rounded">Not auto-logged in</span>`;
         login();
       }
     }
@@ -202,14 +228,13 @@ window.onLoad = async () => {
     async function login() {
       try {
         const userAccount = await wax.login();
-        const str = 'Account: ' + userAccount;
-        ownerElt.innerHTML = str;
         owner = userAccount;
         window.localStorage.owner = owner;
+        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
         setTimeout(nonceTx, 0);
       } catch (e) {
         console.log(e.message);
-        ownerElt.innerHTML = e.message;
+        ownerElt.innerHTML = `<span class="rounded">${e.message}</span>`;
       }
     }
 
@@ -245,8 +270,16 @@ window.onLoad = async () => {
     };
   } catch (e) {
     console.log(e.message);
-    document.getElementById('owner').innerHTML = e.message;
+    document.getElementById('owner').innerHTML = `<span class="rounded">${e.message}</span>`;
   }
+};
+
+const setAllTopTo = (logInHtml) => {
+  document.getElementById('account').innerHTML = logInHtml;
+  document.getElementById('accountBalance').innerHTML = logInHtml;
+  document.getElementById('accountCacheBalance').innerHTML = logInHtml;
+  document.getElementById('houseAccountBalance').innerHTML = logInHtml;
+  document.getElementById('houseAccountCacheBalance').innerHTML = logInHtml;
 };
 
 const addCards = async () => {
@@ -255,7 +288,10 @@ const addCards = async () => {
 
   const scoreElt = document.querySelector('#score');
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
-    scoreElt.innerHTML = '<span class="bg_pink">Need to log in again, local nonce hash has does not match blockchain nonce hash.</span>';
+    scoreElt.innerHTML = '<span class="bg_pink rounded">Need to log in again, local nonce hash has does not match blockchain nonce hash.</span>';
+    const logInHtml = '<span class="bg_pink rounded">Log In</span>';
+    document.getElementById('owner').innerHTML = logInHtml;
+    setAllTopTo(logInHtml);
     return;
   }
   const accountElt = document.querySelector('#account');

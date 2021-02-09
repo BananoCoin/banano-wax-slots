@@ -20,11 +20,12 @@ body {
 
 input, textarea, button {
   background-color: #3A7CA5;
+  color: white;
   -webkit-appearance: none;
-  border-radius: 0;
-  padding: 5px;
-  margin: 0;
   border: 2px solid #2E3532;
+  border-radius: 3px;
+  padding: 3px;
+  margin: 3px;
 }
 
 button {
@@ -238,5 +239,10 @@ h1, h2, h3 {
 }
 
 .bg_pink {
-  background-color: #f1db4b;
+  background-color: red;
+  color: white;
+}
+
+.fg_transparent {
+  color: rgba(255, 255, 255, 0.0)
 }
