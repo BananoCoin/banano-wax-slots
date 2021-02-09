@@ -160,7 +160,7 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
         const fromAccountMajorAmount = fromAccountBalanceParts[fromAccountBalanceParts.majorName];
         const amountBalanceParts = await bananojs.getBananoPartsFromRaw(amountRaw);
         const amountBalanceMajorAmount = amountBalanceParts[amountBalanceParts.majorName];
-        throw Error(`Error: The server's account balance of ${fromAccountMajorAmount} bananos is too small, cannot withdraw ${amountBalanceMajorAmount} bananos. In raw ${fromAccountBalance} < ${amountRaw}.`);
+        throw Error(`Error: The server's account balance of ${fromAccountMajorAmount} bananos in ${fromAccount} is too small, cannot withdraw ${amountBalanceMajorAmount} bananos. In raw ${fromAccountBalance} < ${amountRaw}.`);
       }
       const toAccountData = getAccountData(toAccount);
 

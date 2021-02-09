@@ -343,6 +343,7 @@ const withdraw = () => {
   const accountElt = document.querySelector('#withdrawAccount');
   const amountElt = document.querySelector('#withdrawAmount');
   const withdrawButtonElt = document.querySelector('#withdrawButton');
+  const withdrawResponseElt = document.querySelector('#withdrawResponse');
 
   const xmlhttp = new XMLHttpRequest();
   const parms = {};
@@ -356,12 +357,15 @@ const withdraw = () => {
     if (this.readyState == 4 && this.status == 200) {
       withdrawButton.disabled = false;
       const response = JSON.parse(this.responseText);
+      console.log('withdraw', response);
       scoreElt.innerText = response.message;
+      withdrawResponseElt.innerText = response.message;
       if (response.success) {
         play();
       }
     }
   };
+  withdrawResponseElt.innerText = '';
   xmlhttp.open('POST', '/withdraw', true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xmlhttp.send(JSON.stringify(parms));
