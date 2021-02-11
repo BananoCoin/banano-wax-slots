@@ -9,7 +9,7 @@ let owner;
 let cardData;
 let walletKind;
 
-const sounds = ['start', 'wheel', 'winner', 'loser'];
+const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
 const startSound = (id) => {
   document.getElementById(id).play();
@@ -67,6 +67,7 @@ const play = async (bet) => {
       }
       if (cardData.score == 'Won') {
         startSound('winner');
+        startSound('money');
       }
     }
   };
