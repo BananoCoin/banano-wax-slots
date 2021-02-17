@@ -55,6 +55,24 @@ then edit the file (vi config.json or nano config.json) and paste the new config
     }
     ```
 
+## if you are using the captcha, add the site key and secret key form hcaptcha.command
+
+    ```js
+    "hcaptcha": {
+      "enabled": true,
+      "sitekey": "<string>",
+      "secret": "<string>"
+    }
+    ```
+
+## otherwise turn it off
+
+```js
+"hcaptcha": {
+  "enabled": false,
+}
+```
+
 ## run the bot
 
 run the bot inside screen (so it won't die when you log out)

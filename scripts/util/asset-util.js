@@ -1,6 +1,5 @@
 'use strict';
 // libraries
-// libraries
 const fs = require('fs');
 const path = require('path');
 

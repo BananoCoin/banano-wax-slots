@@ -308,11 +308,11 @@ const addCards = async () => {
     let innerHTML = '';
     let border = '';
     if (cardDataElt.frozen) {
-      border = 'border-width:2px;border-color:blue;background-color:lightblue;';
+      border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;';
     } else if (cardData.score == 'Won') {
-      border = 'border-width:2px;border-color:green;background-color:lightblue;';
+      border = 'border-width:0.2vh;border-color:green;background-color:lightblue;';
     } else {
-      border = 'border-width:2px;border-color:black;background-color:white;';
+      border = 'border-width:0.2vh;border-color:black;background-color:white;';
     }
     innerHTML += `<span class="bordered" style="${border}">`;
     let filter = '';
@@ -320,7 +320,7 @@ const addCards = async () => {
       filter = 'filter: grayscale(100%);';
     }
     innerHTML += `<a target="_blank" href="https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX">`;
-    innerHTML += `<img style="width:290px;height:400px;${filter}" src="/ipfs/${cardDataElt.ipfs}.png">`;
+    innerHTML += `<img style="width:100%;height:auto;${filter}" src="/ipfs/${cardDataElt.ipfs}.png">`;
     innerHTML += '</a>';
     innerHTML += '<br>';
     innerHTML += `<span>${cardDataElt.name}</span>`;
@@ -416,11 +416,20 @@ window.submitHcaptcha = () => {
   const xmlhttp = new XMLHttpRequest();
   const parms = {};
   parms['h-captcha-response'] = hcaptchaElt.value;
+  parms.owner = window.localStorage.owner;
+  parms.nonce = window.localStorage.nonce;
+  const scoreElt = document.querySelector('#score');
+  scoreElt.innerText = 'pending...';
 
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
+      scoreElt.innerText = response.message;
       console.log('hcaptcha', response);
+      if (response.success) {
+        hcaptcha.reset();
+        play();
+      }
     }
   };
   xmlhttp.open('POST', '/hcaptcha', true);

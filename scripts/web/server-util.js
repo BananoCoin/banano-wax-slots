@@ -12,6 +12,10 @@ const cookieParser = require('cookie-parser');
 
 // modules
 const dateUtil = require('../util/date-util.js');
+const atomicassetsUtil = require('../util/atomicassets-util.js');
+const bananojsCacheUtil = require('../util/bananojs-cache-util.js');
+const nonceUtil = require('../util/nonce-util.js');
+const seedUtil = require('../util/seed-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
 const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 
@@ -76,8 +80,9 @@ const initWebServer = async () => {
 
   app.get('/', async (req, res) => {
     const data = {};
-    data.templateCount = webPagePlayUtil.getTemplateCount();
+    data.templateCount = atomicassetsUtil.getTemplateCount();
     data.burnAccount = config.burnAccount;
+    data.hcaptchaEnabled = config.hcaptcha.enabled;
     data.hcaptchaSiteKey = config.hcaptcha.sitekey;
 
     res.render('slots', data);
@@ -101,8 +106,45 @@ const initWebServer = async () => {
       resp.success = false;
       res.send(resp);
     }
+    if (req.body.nonce === undefined) {
+      const resp = {};
+      resp.message = 'no nonce';
+      resp.success = false;
+      res.send(resp);
+    }
+    if (req.body.owner === undefined) {
+      const resp = {};
+      resp.message = 'no owner';
+      resp.success = false;
+      res.send(resp);
+    }
+    const nonce = req.body.nonce;
+    const owner = req.body.owner;
+    const badNonce = await nonceUtil.isBadNonce(owner, nonce);
+    if (badNonce) {
+      const resp = {};
+      resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
+      resp.ready = false;
+      res.send(resp);
+      return;
+    }
+
     const ip = getIp(req);
-    const response = await getCaptchaResponse(config,req,ip);
+    const response = await getCaptchaResponse(config, req, ip);
+    console.log(dateUtil.getDate(), 'hcaptcha', response);
+    const responseJson = JSON.parse(response);
+    if (!responseJson.success) {
+      const resp = {};
+      resp.message = 'hcaptcha failed';
+      resp.success = false;
+      res.send(resp);
+    }
+    const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
+    const seed = seedUtil.getSeedFromOwner(owner);
+    const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
+    const captchaAmount = 1/parseInt(payoutInformation.payoutOdds);
+    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', account, payoutInformation.payoutOdds, captchaAmount);
+    await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
     const resp = {};
     resp.message = '';
     resp.success = true;

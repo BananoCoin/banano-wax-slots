@@ -1,9 +1,5 @@
 'use strict';
 // libraries
-const fetch = require('node-fetch');
-const {ExplorerApi} = require('atomicassets');
-const fs = require('fs');
-const request = require('request');
 
 // modules
 const randomUtil = require('../../util/random-util.js');
@@ -11,6 +7,7 @@ const dateUtil = require('../../util/date-util.js');
 const seedUtil = require('../../util/seed-util.js');
 const nonceUtil = require('../../util/nonce-util.js');
 const assetUtil = require('../../util/asset-util.js');
+const atomicassetsUtil = require('../../util/atomicassets-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 
 // constants
@@ -20,9 +17,6 @@ const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
-let waxApi;
-const templates = [];
-let ready = false;
 const checkPendingSeeds = new Set();
 /* eslint-enable no-unused-vars */
 
@@ -40,21 +34,7 @@ const init = async (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   bananojsCacheUtil.setBananodeApiUrl(config.bananodeApiUrl);
-
-  ready = false;
-  setTimeout(setWaxApiAndAddTemplates, 0);
-};
-
-const setWaxApiAndAddTemplates = async () => {
-  try {
-    waxApi = new ExplorerApi('https://wax.api.atomicassets.io', 'atomicassets', {fetch});
-  } catch (error) {
-    console.log('INTERIM setWaxApiAndAddTemplates', error.message);
-    setTimeout(setWaxApiAndAddTemplates, 1000);
-    return;
-  }
-  setTimeout(addAllTemplates, 0);
-  await centralAccountReceivePending();
+  setTimeout(centralAccountReceivePending, 0);
   setInterval(centralAccountReceivePending, config.centralWalletReceivePendingIntervalMs);
 };
 
@@ -62,9 +42,6 @@ const deactivate = async () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
-  waxApi = undefined;
-  templates.length = 0;
-  ready = false;
   /* eslint-enable no-unused-vars */
 };
 
@@ -79,84 +56,6 @@ const post = async (context, req, res) => {
     resp.errorMessage = error.message;
     res.send(resp);
   }
-};
-
-const addAllTemplates = async () => {
-  loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
-  let page = 1;
-  const max = 100;
-
-  const addTemplates = async () => {
-    loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates page', page);
-    let lessThanMax = false;
-    const worked = false;
-    try {
-      const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys'}, page, max);
-      lessThanMax = templates.length < max;
-
-      for (let pageTemplateIx = 0; pageTemplateIx < pageTemplates.length; pageTemplateIx++) {
-        const pageTemplate = pageTemplates[pageTemplateIx];
-        const pageTemplateData = {};
-        pageTemplateData.template_id = pageTemplate.template_id;
-        pageTemplateData.name = pageTemplate.immutable_data.name;
-        pageTemplateData.img = pageTemplate.immutable_data.img;
-        pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
-        templates.push(pageTemplateData);
-      }
-
-      if (lessThanMax) {
-        loggingUtil.log(dateUtil.getDate(), 'SUCCESS addAllTemplates');
-        setTimeout(cacheAllCardImages, 0);
-      } else {
-        loggingUtil.log(dateUtil.getDate(), 'SUCCESS addTemplates page' + page);
-        page++;
-        setTimeout(addTemplates, 1000);
-      }
-    } catch (error) {
-      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page' + page, error.message);
-      setTimeout(addTemplates, 1000);
-    }
-  };
-  addTemplates();
-};
-
-const cacheAllCardImages = async () => {
-  loggingUtil.log(dateUtil.getDate(), 'STARTED cacheAllCardImages');
-
-  const getFile = async (ipfs) => {
-    const url = `https://wax.atomichub.io/preview?ipfs=${ipfs}&size=185&output=png&animated=false`;
-    const fileName = `static-html/ipfs/${ipfs}.png`;
-    if (!fs.existsSync(fileName)) {
-      return new Promise((resolve, reject) => {
-        request(url).pipe(fs.createWriteStream(fileName)).on('close', resolve);
-      });
-    }
-  };
-
-  for (let templateIx = 0; templateIx < templates.length; templateIx++) {
-    loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', (templateIx+1), templates.length);
-    const card = templates[templateIx];
-    await getFile(card.img);
-    await getFile(card.backimg);
-  }
-  ready = true;
-  loggingUtil.log(dateUtil.getDate(), 'SUCCESS cacheAllCardImages');
-};
-
-const getTemplateCount = () => {
-  return templates.length;
-};
-
-const getOwnedCards = async (owner) => {
-  const assetOptions = {'collection_name': 'crptomonkeys', 'owner': owner};
-  const assets = await waxApi.getAssets(assetOptions);
-  return assets;
-};
-
-const ownerHasCard = async (owner, template_id) => {
-  const assetOptions = {'collection_name': 'crptomonkeys', 'owner': owner, 'template_id': template_id};
-  const assets = await waxApi.getAssets(assetOptions);
-  return assets.length > 0;
 };
 
 const receivePending = async (representative, seed) => {
@@ -205,7 +104,7 @@ const centralAccountReceivePending = async () => {
 };
 
 const postWithoutCatch = async (context, req, res) => {
-  if (!ready) {
+  if (!atomicassetsUtil.isReady()) {
     loggingUtil.log(dateUtil.getDate(), 'not ready');
     const resp = {};
     resp.errorMessage = error.message;
@@ -243,8 +142,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.cards = [];
   resp.score = `No Current Bet, Press the 'Play' button to continue.`;
   resp.scoreError = false;
-  resp.cardCount = 0;
-  resp.templateCount = getTemplateCount();
+  resp.templateCount = atomicassetsUtil.getTemplateCount();
 
   const updateBalances = async () => {
     const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
@@ -273,45 +171,9 @@ const postWithoutCatch = async (context, req, res) => {
   };
   await updateBalances();
 
-  // loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
-  const ownedCards = await getOwnedCards(owner);
-  const frozenAssetByTemplateMap = {};
-  const unfrozenAssetByTemplateMap = {};
-  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
-    const ownedCard = ownedCards[ownedCardIx];
-    const assetId = ownedCard.asset_id;
-    assetUtil.thawAssetIfItIsTime(assetId);
-    const template_id = ownedCard.template.template_id.toString();
-    if (assetUtil.isAssetFrozen(assetId)) {
-      if (frozenAssetByTemplateMap[template_id] === undefined) {
-        frozenAssetByTemplateMap[template_id] = [];
-      }
-      frozenAssetByTemplateMap[template_id].push(assetId);
-    } else {
-      if (unfrozenAssetByTemplateMap[template_id] === undefined) {
-        unfrozenAssetByTemplateMap[template_id] = [];
-      }
-      unfrozenAssetByTemplateMap[template_id].push(assetId);
-    }
-  }
-  // loggingUtil.log(dateUtil.getDate(), 'ownedCards', ownedCards);
-  // loggingUtil.log(dateUtil.getDate(), 'ownedCardTemplateSet', ownedCardTemplateSet);
-  for (let templateIx = 0; templateIx < templates.length; templateIx++) {
-    const card = templates[templateIx];
-    const hasCard = unfrozenAssetByTemplateMap[card.template_id] !== undefined;
-    // loggingUtil.log(dateUtil.getDate(), 'template_id', card.template_id, 'hasCard', hasCard);
-    if (hasCard) {
-      resp.cardCount++;
-    }
-    // if (await ownerHasCard(owner, card.template_id)) {
-    // resp.cardCount++;
-    // }
-  }
-  // loggingUtil.log(dateUtil.getDate(), 'SUCCESS countCards');
-
-  const winningOneCardOdds = resp.cardCount/resp.templateCount;
-  const winningOdds = winningOneCardOdds * winningOneCardOdds * winningOneCardOdds;
-  resp.payoutOdds = parseInt((1./winningOdds).toFixed(0), 10);
+  const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
+  resp.payoutOdds = payoutInformation.payoutOdds;
+  resp.cardCount = payoutInformation.cardCount;
   resp.payoutMultiplier = config.payoutMultiplier;
 
   let play = true;
@@ -353,16 +215,16 @@ const postWithoutCatch = async (context, req, res) => {
     } else {
       resp.score = 'Won';
       resp.scoreError = false;
-      const card1 = randomUtil.getRandomArrayElt(templates);
-      const card2 = randomUtil.getRandomArrayElt(templates);
-      const card3 = randomUtil.getRandomArrayElt(templates);
+      const card1 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
+      const card2 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
+      const card3 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
       const cards = [card1, card2, card3];
       // loggingUtil.log(dateUtil.getDate(), 'STARTED checkCards');
       for (let cardIx = 0; cardIx < cards.length; cardIx++) {
         const card = cards[cardIx];
         const cardData = {};
-        const unfrozenAssets = unfrozenAssetByTemplateMap[card.template_id];
-        const frozenAssets = frozenAssetByTemplateMap[card.template_id];
+        const unfrozenAssets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
+        const frozenAssets = payoutInformation.frozenAssetByTemplateMap[card.template_id];
 
         cardData.name = card.name;
         cardData.ipfs = card.img;
@@ -391,7 +253,7 @@ const postWithoutCatch = async (context, req, res) => {
       if (resp.score == 'Won') {
         for (let cardIx = 0; cardIx < cards.length; cardIx++) {
           const card = cards[cardIx];
-          const assets = unfrozenAssetByTemplateMap[card.template_id];
+          const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
           if (assets !== undefined) {
             assetUtil.freezeAsset(assets[0]);
           }
@@ -424,4 +286,3 @@ const postWithoutCatch = async (context, req, res) => {
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.post = post;
-module.exports.getTemplateCount = getTemplateCount;

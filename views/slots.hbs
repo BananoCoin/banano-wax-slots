@@ -1,4 +1,4 @@
-<table class="t_center align_top display_inline_block w1200px">
+<table class="t_center align_top display_inline_block h20_0vw">
   <tbody>
     <tr>
       <td colspan="1">
@@ -38,37 +38,37 @@
       </td>
     </tr>
     <tr>
-      <td class="align_top w100pct selectable small fg_transparent" colspan="5">
+      <td class="align_top w100pct selectable small display_none" colspan="5">
         Nonce: <span id="nonce"></span>
       </td>
     </tr>
     <tr>
-      <td class="align_top w100pct selectable small fg_transparent" colspan="5">
+      <td class="align_top w100pct selectable small display_none" colspan="5">
         Nonce Hash: <span id="nonceHash"></span>
       </td>
     </tr>
     <tr>
-      <td class="align_top w100pct selectable small fg_transparent" colspan="5">
+      <td class="align_top w100pct selectable small display_none" colspan="5">
         Last Nonce Hash: <span id="lastNonceHash"></span>
       </td>
     </tr>
     <tr>
-      <td class="align_top w100pct selectable small fg_transparent" colspan="5">
+      <td class="align_top w100pct selectable small display_none" colspan="5">
         Last Nonce Tx Id: <span id="transaction_id"></span>
       </td>
     </tr>
-    <tr>
+    <tr class="h5_0vw">
       <td class="align_top w20pct">&nbsp;</td>
       <td class="align_top w20pct selectable">
-        <button style="width:170px" onclick="waxjsWallet();return false;">
-          Log In Again (Cloud Wallet)
+        <button class="w40pct font_size_50pct" onclick="waxjsWallet();return false;">
+          Log In Again<br>(Cloud Wallet)
         </button>
-        <button style="width:170px" onclick="anchorWallet();return false;">
-          Log In Again (Anchor Wallet)
+        <button class="w40pct font_size_50pct" onclick="anchorWallet();return false;">
+          Log In Again<br>(Anchor Wallet)
         </button>
       </td>
       <td class="align_top w20pct">
-        <form class="bg_orange rounded small monospace" style="width:350px">
+        <form class="bg_orange rounded small monospace w100pct">
           Bet :
           <input id="bet" type="number" oninput="this.value=(parseInt(this.value)||0)" placeholder="0-9" autofocus='' value='1' />
           <br>
@@ -76,7 +76,7 @@
         </form>
       </td>
       <td class="align_top w20pct selectable">
-        <button id="play" style="width:350px" class="bg_light_green" onclick="play();return false;" disabled>
+        <button id="play" class="bg_light_green w80pct" onclick="play();return false;" disabled>
           Play!
         </button>
       </td>
@@ -84,29 +84,21 @@
     </tr>
   </tbody>
 </table>
-<table class="t_center align_top display_inline_block w1200px">
+<table class="t_center align_top display_inline_block">
   <tbody>
     <tr>
       <td class="align_top w100pct" colspan="5">
-        <div style="height:50px"></div>
+        <div class="w5_0vh"></div>
       </td>
     </tr>
     <tr>
-      <td class="align_top" style="width:18%">
-        <div style="width:250px"></div>
-      </td>
-      <td id="card1" class="align_top w20pct selectable">&nbsp;</td>
-      <td class="align_top w2pct">
-        <div style="width:1px"></div>
-      </td>
-      <td id="card2" class="align_top w10pct selectable">&nbsp;</td>
-      <td class="align_top w5pct">
-        <div style="width:1px"></div>
-      </td>
-      <td id="card3" class="align_top w10pct selectable">&nbsp;</td>
-      <td class="align_top w25pct">
-        <div style="width:250px"></div>
-      </td>
+      <td class="align_top w13pct">&nbsp;</td>
+      <td id="card1" class="align_top w12pct selectable">&nbsp;</td>
+      <td class="align_top w2pct">&nbsp;</td>
+      <td id="card2" class="align_top w12pct selectable">&nbsp;</td>
+      <td class="align_top w3pct">&nbsp;</td>
+      <td id="card3" class="align_top w12pct selectable">&nbsp;</td>
+      <td class="align_top w15pct">&nbsp;</td>
     </tr>
     <tr>
       <td colspan="5" class="align_top">
@@ -115,23 +107,25 @@
   </tbody>
 </table>
 <hr>
-<form action="/hcaptcha" method="POST">
-  <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
-  <br />
-</form>
-<script>
-  function dataCallback() {
-    submitHcaptcha();
-  }
+{{#if hcaptchaEnabled}}
+  <form action="/hcaptcha" method="POST">
+    <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
+    <br />
+  </form>
+  <script>
+    function dataCallback() {
+      submitHcaptcha();
+    }
 
-  function dataExpiredCallback() {
-    submitHcaptcha();
-  }
+    function dataExpiredCallback() {
+      submitHcaptcha();
+    }
 
-  function dataErrorCallback() {
-    submitHcaptcha();
-  }
-</script>
+    function dataErrorCallback() {
+      submitHcaptcha();
+    }
+  </script>
+{{/if}}
 <table class="t_center align_top display_inline_block w1200px">
   <tbody>
     <tr>
@@ -160,5 +154,7 @@
 <div id="burnAccount" class="display_none">{{burnAccount}}</div>
 <script src="https://unpkg.com/anchor-link"></script>
 <script src="https://unpkg.com/anchor-link-browser-transport"></script>
-<script src="https://hcaptcha.com/1/api.js" async defer></script>
+{{#if hcaptchaEnabled}}
+  <script src="https://hcaptcha.com/1/api.js" async defer></script>
+{{/if}}
 <script type="module" src="js/views/slots.js"></script>

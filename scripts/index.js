@@ -8,6 +8,7 @@ const dateUtil = require('./util/date-util.js');
 const seedUtil = require('./util/seed-util.js');
 const nonceUtil = require('./util/nonce-util.js');
 const randomUtil = require('./util/random-util.js');
+const atomicassetsUtil = require('./util/atomicassets-util.js');
 const webPagePlayUtil = require('./web/pages/play-util.js');
 const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
@@ -65,6 +66,7 @@ const init = async () => {
   modules.push(seedUtil);
   modules.push(nonceUtil);
   modules.push(randomUtil);
+  modules.push(atomicassetsUtil);
   modules.push(webPagePlayUtil);
   modules.push(webPageWithdrawUtil);
   modules.push(webServerUtil);
