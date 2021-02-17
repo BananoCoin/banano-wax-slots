@@ -115,6 +115,23 @@
   </tbody>
 </table>
 <hr>
+<form action="/hcaptcha" method="POST">
+  <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
+  <br />
+</form>
+<script>
+  function dataCallback() {
+    submitHcaptcha();
+  }
+
+  function dataExpiredCallback() {
+    submitHcaptcha();
+  }
+
+  function dataErrorCallback() {
+    submitHcaptcha();
+  }
+</script>
 <table class="t_center align_top display_inline_block w1200px">
   <tbody>
     <tr>
@@ -143,4 +160,5 @@
 <div id="burnAccount" class="display_none">{{burnAccount}}</div>
 <script src="https://unpkg.com/anchor-link"></script>
 <script src="https://unpkg.com/anchor-link-browser-transport"></script>
+<script src="https://hcaptcha.com/1/api.js" async defer></script>
 <script type="module" src="js/views/slots.js"></script>

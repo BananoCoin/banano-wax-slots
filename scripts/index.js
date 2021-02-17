@@ -47,6 +47,17 @@ const init = async () => {
   if (config.houseWalletSeed == '') {
     throw Error('houseWalletSeed is required in ./config.json');
   }
+  if (config.hcaptcha === undefined) {
+    throw Error('hcaptcha is required in ./config.json');
+  }
+  if(config.hcaptcha.enabled) {
+    if (config.hcaptcha.sitekey == '') {
+      throw Error('hcaptcha sitekey is required in ./config.json');
+    }
+    if (config.hcaptcha.sitekey == '') {
+      throw Error('hcaptcha secret is required in ./config.json');
+    }
+  }
 
   modules.push(assetUtil);
   modules.push(bananojsCacheUtil);

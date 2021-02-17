@@ -1,6 +1,7 @@
 'use strict';
 // libraries
 const http = require('http');
+const request = require('request');
 // const https = require('https');
 // const cors = require('cors');
 const express = require('express');
@@ -77,6 +78,8 @@ const initWebServer = async () => {
     const data = {};
     data.templateCount = webPagePlayUtil.getTemplateCount();
     data.burnAccount = config.burnAccount;
+    data.hcaptchaSiteKey = config.hcaptcha.sitekey;
+
     res.render('slots', data);
   });
 
@@ -88,6 +91,22 @@ const initWebServer = async () => {
   app.post('/withdraw', async (req, res) => {
     const context = {};
     await webPageWithdrawUtil.post(context, req, res);
+  });
+
+  app.post('/hcaptcha', async (req, res) => {
+    const context = {};
+    if (req.body['h-captcha-response'] === undefined) {
+      const resp = {};
+      resp.message = 'no h-captcha-response';
+      resp.success = false;
+      res.send(resp);
+    }
+    const ip = getIp(req);
+    const response = await getCaptchaResponse(config,req,ip);
+    const resp = {};
+    resp.message = '';
+    resp.success = true;
+    res.send(resp);
   });
 
 
@@ -125,6 +144,66 @@ const initWebServer = async () => {
 
 const setCloseProgramFunction = (fn) => {
   closeProgramFn = fn;
+};
+
+const getIp = (req) => {
+  let ip;
+  if (req.headers['x-forwarded-for'] !== undefined) {
+    ip = req.headers['x-forwarded-for'];
+  } else if (req.connection.remoteAddress == '::ffff:127.0.0.1') {
+    ip = '::ffff:127.0.0.1';
+  } else if (req.connection.remoteAddress == '::1') {
+    ip = '::ffff:127.0.0.1';
+  } else {
+    ip = req.connection.remoteAddress;
+  }
+  // console.log('ip', ip);
+  return ip;
+};
+
+const getCaptchaResponse = async (config, req, ip) => {
+  return new Promise((resolve) => {
+    // console.log('config', config);
+    /*
+      Send a http POST to  with the following parameters:
+    secret
+        Your verification key
+    token
+        The user's answer from the form field h-captcha-response
+    remoteip
+        The user's IP address
+      */
+    const token = req.body['h-captcha-response'];
+    // const body = `{ 'secret': ${config.secretKey}, 'response': ${token} }`;
+
+    let body = '';
+    body += `secret=${config.hcaptcha.secret}`;
+    body += '&';
+    body += `response=${token}`;
+    body += '&';
+    body += `remoteip=${ip}`;
+
+    // console.log('submitting', body);
+
+    request({
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        // 'content-type': 'application/json',
+      },
+      uri: ' https://hcaptcha.com/siteverify',
+      body: body,
+      method: 'POST',
+      timeout: 30000,
+    }, (err, httpResponse, response) => {
+      // console.log('sendRequest body', body);
+      // console.log('sendRequest err', err);
+      // console.log('sendRequest httpResponse', httpResponse);
+      // if (response.includes('credit')) {
+      // console.log('sendRequest', ip, response);
+      // }
+      resolve(response);
+    });
+  });
 };
 
 // exports

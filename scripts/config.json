@@ -15,5 +15,10 @@
   "web": {
     "port": "8686"
   },
-  "disableWithdraw":false
+  "disableWithdraw": false,
+  "hcaptcha": {
+    "enabled": true,
+    "sitekey": "",
+    "secret": ""
+  }
 }

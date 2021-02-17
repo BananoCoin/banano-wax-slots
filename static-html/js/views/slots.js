@@ -409,3 +409,21 @@ const withdraw = () => {
   withdrawButton.disabled = true;
 };
 window.withdraw = withdraw;
+
+window.submitHcaptcha = () => {
+  const hcaptchaElts = [...document.getElementsByName('h-captcha-response')];
+  const hcaptchaElt = hcaptchaElts[0];
+  const xmlhttp = new XMLHttpRequest();
+  const parms = {};
+  parms['h-captcha-response'] = hcaptchaElt.value;
+
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      const response = JSON.parse(this.responseText);
+      console.log('hcaptcha', response);
+    }
+  };
+  xmlhttp.open('POST', '/hcaptcha', true);
+  xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xmlhttp.send(JSON.stringify(parms));
+}
