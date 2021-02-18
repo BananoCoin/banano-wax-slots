@@ -134,7 +134,7 @@ const getOwnedCards = async (owner) => {
 };
 
 const getPayoutInformation = async (owner) => {
-  const resp = {}
+  const resp = {};
   resp.cardCount = 0;
   resp.templateCount = templates.length;
   // loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
@@ -180,20 +180,24 @@ const getPayoutInformation = async (owner) => {
   const winningOneCardOdds = resp.cardCount/resp.templateCount;
   const winningOdds = winningOneCardOdds * winningOneCardOdds * winningOneCardOdds;
 
-  resp.payoutOdds = parseInt((1./winningOdds).toFixed(0), 10);
+  if (winningOdds == 0) {
+    resp.payoutOdds = 0;
+  } else {
+    resp.payoutOdds = parseInt((1./winningOdds).toFixed(0), 10);
+  }
 
   // loggingUtil.log(dateUtil.getDate(), 'SUCCESS getPayoutInformation', resp);
 
   return resp;
-}
+};
 
 const isReady = () => {
   return ready;
-}
+};
 
 const getTemplates = () => {
   return templates;
-}
+};
 
 module.exports.init = init;
 module.exports.deactivate = deactivate;
