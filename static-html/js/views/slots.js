@@ -173,11 +173,7 @@ window.onLoad = async () => {
       const transport = new AnchorLinkBrowserTransport();
       const waxChainId = '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4';
       const waxRpcUrl = 'https://chain.wax.io';
-      const chains = [{
-        chainId: waxChainId,
-        nodeUrl: waxRpcUrl,
-      }];
-      const link = new AnchorLink({transport: transport, chainId: waxChainId, rpc: waxRpcUrl, chains});
+      const link = new AnchorLink({transport: transport, chainId: waxChainId, rpc: waxRpcUrl});
       console.log('link', link);
       try {
         const session = await link.login('waxslots');
