@@ -73,8 +73,10 @@ const play = async (bet) => {
   };
   if (bet) {
     stopSounds();
-    startSound('start');
-    startSound('wheel');
+    if (window.localStorage.owner !== undefined) {
+      startSound('start');
+      startSound('wheel');
+    }
   }
   xmlhttp.open('POST', '/play', true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -171,7 +173,11 @@ window.onLoad = async () => {
       const transport = new AnchorLinkBrowserTransport();
       const waxChainId = '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4';
       const waxRpcUrl = 'https://chain.wax.io';
-      const link = new AnchorLink({transport: transport, chainId: waxChainId, rpc: waxRpcUrl});
+      const chains = [{
+        chainId: waxChainId,
+        nodeUrl: waxRpcUrl,
+      }];
+      const link = new AnchorLink({transport: transport, chainId: waxChainId, rpc: waxRpcUrl, chains});
       console.log('link', link);
       try {
         const session = await link.login('waxslots');
@@ -435,4 +441,4 @@ window.submitHcaptcha = () => {
   xmlhttp.open('POST', '/hcaptcha', true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xmlhttp.send(JSON.stringify(parms));
-}
+};
