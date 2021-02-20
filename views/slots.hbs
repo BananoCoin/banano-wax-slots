@@ -108,6 +108,9 @@
 </table>
 <hr>
 {{#if hcaptchaEnabled}}
+  <p>
+    Don't have any bananos? Do a captcha! You will be credited a small amount of bananos.
+  </p>
   <form action="/hcaptcha" method="POST">
     <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
     <br />
@@ -152,6 +155,12 @@
 <audio id="loser" src="sounds/69699__lukaso__slotloser.wav" preload="auto"></audio>
 <audio id="money" src="sounds/69693__lukaso__5gokkasttrekarms.wav" preload="auto"></audio>
 <div id="burnAccount" class="display_none">{{burnAccount}}</div>
+<br>
+<span class="align_top selectable small" colspan="5">
+  <span class="bg_tan rounded">
+    <span class="rounded">House Account: </span><span id="houseAccount"></span>
+  </span>
+</span>
 <script src="https://unpkg.com/anchor-link@2"></script>
 <script src="https://unpkg.com/anchor-link-browser-transport@2"></script>
 {{#if hcaptchaEnabled}}

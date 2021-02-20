@@ -298,6 +298,7 @@ const addCards = async () => {
     return;
   }
   const accountElt = document.querySelector('#account');
+  const houseAccountElt = document.querySelector('#houseAccount');
   const accountBalanceElt = document.querySelector('#accountBalance');
   const accountCacheBalanceElt = document.querySelector('#accountCacheBalance');
   const houseAccountBalanceElt = document.querySelector('#houseAccountBalance');
@@ -332,6 +333,7 @@ const addCards = async () => {
   };
   if ((cardData === undefined) || (!cardData.ready)) {
     accountElt.innerText = '';
+    houseAccountElt.innerText = '';
     accountBalanceElt.innerText = '';
     accountCacheBalanceElt.innerText = '';
     houseAccountBalanceElt.innerText = '';
@@ -348,19 +350,18 @@ const addCards = async () => {
     }
   } else {
     accountElt.innerText = cardData.account;
+    houseAccountElt.innerText = cardData.houseAccount;
+    accountCacheBalanceElt.innerText = cardData.cacheBalanceDescription;
+    houseAccountCacheBalanceElt.innerText = cardData.cacheHouseBalanceDescription;
     if (cardData.houseAccountInfo.error) {
       houseAccountBalanceElt.innerText = cardData.houseAccountInfo.error;
-      houseAccountCacheBalanceElt.innerText = cardData.houseAccountInfo.error;
     } else {
       houseAccountBalanceElt.innerText = cardData.houseBalanceDescription;
-      houseAccountCacheBalanceElt.innerText = cardData.cacheHouseBalanceDescription;
     }
     if (cardData.accountInfo.error) {
       accountBalanceElt.innerText = cardData.accountInfo.error;
-      accountCacheBalanceElt.innerText = cardData.accountInfo.error;
     } else {
       accountBalanceElt.innerText = cardData.balanceDescription;
-      accountCacheBalanceElt.innerText = cardData.cacheBalanceDescription;
     }
     if ((cardData.cards !== undefined) && (cardData.cards.length == 3)) {
       setCard(card1Elt, cardData.cards[0]);

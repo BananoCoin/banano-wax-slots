@@ -139,6 +139,7 @@ const postWithoutCatch = async (context, req, res) => {
   const resp = {};
   resp.ready = true;
   resp.account = account;
+  resp.houseAccount = houseAccount;
   resp.cards = [];
   resp.score = `No Current Bet, Press the 'Play' button to continue.`;
   resp.scoreError = false;
@@ -158,16 +159,16 @@ const postWithoutCatch = async (context, req, res) => {
       resp.houseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.balance);
       resp.houseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.houseBalanceParts);
       resp.houseBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.houseBalanceParts);
-      resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
-      resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
     }
+    resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
+    resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
     if (!resp.accountInfo.error) {
       resp.balanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(accountInfo.balance);
       resp.balanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.balanceParts);
       resp.balanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.balanceParts);
-      resp.cacheBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(resp.accountInfo.cacheBalance);
-      resp.cacheBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheBalanceParts);
     }
+    resp.cacheBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(resp.accountInfo.cacheBalance);
+    resp.cacheBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheBalanceParts);
   };
   await updateBalances();
 
@@ -182,7 +183,7 @@ const postWithoutCatch = async (context, req, res) => {
   }
   if (resp.accountInfo.error) {
     play = false;
-    resp.score = `Account '${account}' has zero balance. Please send at least one banano to the account.`;
+    resp.score = `Account '${account}' has zero balance. Please send at least one banano to the account, or do the captcha until you have 1 ban in the account.`;
     resp.scoreError = true;
   }
   if (resp.houseAccountInfo.error) {
