@@ -45,8 +45,10 @@ const play = async (bet) => {
   const parms = {};
   parms.owner = window.localStorage.owner;
   parms.nonce = window.localStorage.nonce;
+
+  const betElt = document.querySelector('input[name=\'bet\']:checked');
   if (bet) {
-    parms.bet = document.querySelector('#bet').value;
+    parms.bet = parseInt(betElt.value,10);
   }
   const scoreElt = document.querySelector('#score');
 
@@ -323,7 +325,7 @@ const addCards = async () => {
       filter = 'filter: grayscale(100%);';
     }
     innerHTML += `<a target="_blank" href="https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX">`;
-    innerHTML += `<img style="width:100%;height:auto;${filter}" src="/ipfs/${cardDataElt.ipfs}.png">`;
+    innerHTML += `<img style="width:100%;height:auto;${filter}" src="/ipfs/${cardDataElt.ipfs}.gif">`;
     innerHTML += '</a>';
     innerHTML += '<br>';
     innerHTML += `<span>${cardDataElt.name}</span>`;

@@ -3,4 +3,5 @@
 .nyc_output
 /config.json
 /static-html/ipfs/*.png
+/static-html/ipfs/*.gif
 /data/

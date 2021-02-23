@@ -107,7 +107,7 @@ const postWithoutCatch = async (context, req, res) => {
   if (!atomicassetsUtil.isReady()) {
     loggingUtil.log(dateUtil.getDate(), 'not ready');
     const resp = {};
-    resp.errorMessage = error.message;
+    resp.errorMessage = 'not ready';
     resp.ready = false;
     res.send(resp);
     return;
