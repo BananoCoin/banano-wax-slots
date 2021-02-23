@@ -104,8 +104,8 @@ const cacheAllCardImages = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED cacheAllCardImages');
 
   const getFile = async (ipfs) => {
-    const url = `https://wax.atomichub.io/preview?ipfs=${ipfs}&size=185&output=gif&animated=true`;
-    const fileName = `static-html/ipfs/${ipfs}.gif`;
+    const url = `https://wax.atomichub.io/preview?ipfs=${ipfs}&size=185&output=webp&animated=true`;
+    const fileName = `static-html/ipfs/${ipfs}.webp`;
     if (!fs.existsSync(fileName)) {
       return new Promise((resolve, reject) => {
         request(url).pipe(fs.createWriteStream(fileName)).on('close', resolve);

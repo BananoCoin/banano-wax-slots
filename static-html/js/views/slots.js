@@ -325,7 +325,7 @@ const addCards = async () => {
       filter = 'filter: grayscale(100%);';
     }
     innerHTML += `<a target="_blank" href="https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX">`;
-    innerHTML += `<img style="width:100%;height:auto;${filter}" src="/ipfs/${cardDataElt.ipfs}.gif">`;
+    innerHTML += `<img style="width:100%;height:auto;${filter}" src="/ipfs/${cardDataElt.ipfs}.webp">`;
     innerHTML += '</a>';
     innerHTML += '<br>';
     innerHTML += `<span>${cardDataElt.name}</span>`;

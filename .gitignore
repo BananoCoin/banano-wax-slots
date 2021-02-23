@@ -4,4 +4,5 @@
 /config.json
 /static-html/ipfs/*.png
 /static-html/ipfs/*.gif
+/static-html/ipfs/*.webp
 /data/
