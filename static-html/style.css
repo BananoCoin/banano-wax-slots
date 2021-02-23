@@ -19,7 +19,8 @@ li {
 }
 
 span, form, ul, li, p {
-  background-color: white;
+  background-color: black;
+  color: white;
 }
 
 html {
@@ -30,12 +31,6 @@ body {
   padding: 0;
   margin: 0;
   background-image: url("forest-background.png");
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.slot_machine {
-  background-image: url("936f0a3623354519cf12daa9dd0d80714e686dc6240d14cec0b7e66a084e2bb6.svg");
   background-size: cover;
   background-repeat: no-repeat;
 }

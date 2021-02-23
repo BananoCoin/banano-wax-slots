@@ -3,133 +3,88 @@
     <tr>
       <td>&nbsp;</td>
       <td class="w100vmin h90vmin">
-        <table class="w100pct h90vmin bg_color_white slot_machine">
-          <tbody>
-            <tr>
-              <td class="w66pct h15vmin" colspan="1">
-                <button class="w40pct font_size_50pct" onclick="waxjsWallet();return false;">
-                  Log In Again<br>(Cloud Wallet)
-                </button>
-                <button class="w40pct font_size_50pct" onclick="anchorWallet();return false;">
-                  Log In Again<br>(Anchor Wallet)
-                </button>
-                <span>Logged in with <span class="selectable" id="owner"></span></span>
-              </td>
-              <td class="w33pct" colspan="1">
-                <span class="rounded">House Account: </span><span class="selectable overflow_wrap_anywhere" id="houseAccount"></span>
-                <span class="rounded">House Pending Balance: </span><span class="selectable" id="houseAccountBalance"></span>
-                <span class="rounded">House Balance: </span><span class="selectable" id="houseAccountCacheBalance"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <span>
-                  <span class="rounded">Your Pending Balance: </span><span class="selectable" id="accountBalance"></span>
-                  <span class="rounded">Your Balance: </span><span class="selectable" id="accountCacheBalance"></span>
-                </span>
-              </td>
-              <td class="w100pct" colspan="1" rowspan="6">
-                <span>
-                  Gameplay: draw 1 of {{templateCount}} cards, three times.
+        <span class="w100pct h90vmin">
+          <table>
+            <tbody>
+              <tr>
+                <td class="w66pct h15vmin" colspan="1">
+                  <button class="w40pct font_size_50pct" onclick="waxjsWallet();return false;">
+                    Log In Again<br>(Cloud Wallet)
+                  </button>
+                  <button class="w40pct font_size_50pct" onclick="anchorWallet();return false;">
+                    Log In Again<br>(Anchor Wallet)
+                  </button>
+                  <span>Logged in with <span class="selectable" id="owner"></span></span>
+                </td>
+                <td class="w33pct" colspan="1">
+                  <span class="rounded">House Account: </span><span class="selectable overflow_wrap_anywhere" id="houseAccount"></span>
                   <br>
-                  Only 1 of {{templateCount}} cards needed to win!.
-                </span>
-                <br>
-                {{#if hcaptchaEnabled}}
-                  <p>
-                    Don't have any bananos? Do a captcha! You will be credited a small amount of bananos.
-                  </p>
-                  <form action="/hcaptcha" method="POST">
-                    <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-size="compact" data-theme="dark" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
-                    <br />
-                  </form>
-                  <script>
-                    function dataCallback() {
-                      submitHcaptcha();
-                    }
-
-                    function dataExpiredCallback() {
-                      submitHcaptcha();
-                    }
-
-                    function dataErrorCallback() {
-                      submitHcaptcha();
-                    }
-                  </script>
-                {{/if}}
-                <br>
-                <button id="play" class="bg_light_green w80pct" onclick="play();return false;" disabled>Play!</button>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <table class="w100pct h35vmin">
-                  <tbody>
-                    <tr>
-                      <td class="w33pct" id="card1">
-                      </td>
-                      <td class="w33pct" id="card2">
-                      </td>
-                      <td class="w33pct" id="card3">
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <form class="bg_orange rounded small monospace w100pct">
-                  Bet :
-                  <ul class="bet">
-                    <li>
-                      <input type="radio" id="ban01" name="bet" value="1" checked="checked" />
-                      <label for="ban01">1 ban</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="ban05" name="bet" value="5" />
-                      <label for="ban05">5 ban</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="ban10" name="bet" value="10" />
-                      <label for="ban10">10 ban</label>
-                    </li>
-                    <li>
-                      <input type="radio" id="ban50" name="bet" value="50" />
-                      <label for="ban50">50 ban</label>
-                    </li>
-                  </ul>
-                </form>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <span id="score" class="selectable">No Score</span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <form method="POST" class="t_center">
-                  <span class="bg_tan rounded">
-                    Withdraw To Account<br>
-                    <input id="withdrawAccount" class="bg_light_green monospace small" type="text" size="66" max_length="64" value="" defaultValue="To Account">
-                    Withdraw Amount (Bananos)<br>
-                    <input id="withdrawAmount" class="bg_light_green monospace small" type="monospace" size="66" max_length="64" min="0" step="any" value="0.0">
-                    <p>
-                      <button id="withdrawButton" class="bg_light_green" style="width:350px" title="Withdraw" onclick="withdraw(); return false;">Withdraw</button>
-                      <hr>
-                      <span id="withdrawResponse" class="selectable small">No Score</span>
+                  <span class="rounded">House Pending Balance: </span><span class="selectable" id="houseAccountBalance"></span>
+                  <br>
+                  <span class="rounded">House Balance: </span><span class="selectable" id="houseAccountCacheBalance"></span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="1" rowspan="2">
+                  <object id="slotMachine" class="w100pct" type="image/svg+xml" data="slot-machine.svg"></object>
+                </td>
+                <td colspan="1">
+                  <span>
+                    Gameplay: draw 1 of {{templateCount}} cards, three times.
+                    <br>
+                    Only 1 of {{templateCount}} cards needed to win!.
                   </span>
-                </form>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="1">
-                <span>Banano Account: <span class="selectable" id="account"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  <br>
+                  {{#if hcaptchaEnabled}}
+                    <p>
+                      Don't have any bananos? Do a captcha! You will be credited a small amount of bananos.
+                    </p>
+                    <form action="/hcaptcha" method="POST">
+                      <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-size="compact" data-theme="dark" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
+                      <br />
+                    </form>
+                    <script>
+                      function dataCallback() {
+                        submitHcaptcha();
+                      }
+
+                      function dataExpiredCallback() {
+                        submitHcaptcha();
+                      }
+
+                      function dataErrorCallback() {
+                        submitHcaptcha();
+                      }
+                    </script>
+                  {{/if}}
+                  <br>
+                  <button id="play" class="bg_light_green w80pct" onclick="play();return false;" disabled>Play!</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="w33pct" colspan="1">
+                  <form method="POST" class="t_center">
+                    <span class="bg_tan rounded">
+                      Withdraw To Account<br>
+                      <input id="withdrawAccount" class="bg_light_green monospace small" type="text" size="66" max_length="64" value="" defaultValue="To Account">
+                      Withdraw Amount (Bananos)<br>
+                      <input id="withdrawAmount" class="bg_light_green monospace small" type="monospace" size="66" max_length="64" min="0" step="any" value="0.0">
+                      <p>
+                        <button id="withdrawButton" class="bg_light_green" style="width:350px" title="Withdraw" onclick="withdraw(); return false;">Withdraw</button>
+                        <hr>
+                        <span id="withdrawResponse" class="selectable small">No Score</span>
+                    </span>
+                  </form>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="1">
+                  <span>Banano Account: <span class="selectable" id="account"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </span>
       </td>
       <td>&nbsp;</td>
     </tr>

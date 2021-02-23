@@ -141,7 +141,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.account = account;
   resp.houseAccount = houseAccount;
   resp.cards = [];
-  resp.score = `No Current Bet, Press the 'Play' button to continue.`;
+  resp.score = ['No Current Bet.','Press the \'Play\' button to continue.'];
   resp.scoreError = false;
   resp.templateCount = atomicassetsUtil.getTemplateCount();
 
@@ -183,12 +183,12 @@ const postWithoutCatch = async (context, req, res) => {
   }
   if (resp.accountInfo.error) {
     play = false;
-    resp.score = `Account '${account}' has zero balance. Please send at least one banano to the account, or do the captcha until you have 1 ban in the account.`;
+    resp.score = [`Account '${account}' has zero balance. Please send at least one banano to the account, or do the captcha until you have 1 ban in the account.`];
     resp.scoreError = true;
   }
   if (resp.houseAccountInfo.error) {
     play = false;
-    resp.score = `House Account '${houseAccount}' has zero balance. Please send at least one banano to the account.`;
+    resp.score = [`House Account '${houseAccount}' has zero balance. Please send at least one banano to the account.`];
     resp.scoreError = true;
   }
 
@@ -199,22 +199,22 @@ const postWithoutCatch = async (context, req, res) => {
     loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'payout', resp.payoutOdds * bet, 'house balance', houseBanano, houseAccount);
     const winPayment = resp.payoutOdds * bet * resp.payoutMultiplier;
     if (!Number.isFinite(bet)) {
-      resp.score = `Bad Bet '${bet}'`;
+      resp.score = [`Bad Bet '${bet}'`];
       resp.scoreError = true;
     } else if (bet > banano) {
-      resp.score = `Low Balance. Bet '${bet}' greater than balance '${banano}'`;
+      resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano}'`];
       resp.scoreError = true;
     } else if (bet < 1) {
-      resp.score = 'Min Bet 1 Ban';
+      resp.score = ['Min Bet 1 Ban'];
       resp.scoreError = true;
     } else if (bet > 1000) {
-      resp.score = 'Max Bet 1000 Ban';
+      resp.score = ['Max Bet 1000 Ban'];
       resp.scoreError = true;
     } else if (winPayment > houseBanano) {
-      resp.score = `Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`;
+      resp.score = [`Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`];
       resp.scoreError = true;
     } else {
-      resp.score = 'Won';
+      resp.score = ['Won'];
       resp.scoreError = false;
       const card1 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
       const card2 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
@@ -247,11 +247,11 @@ const postWithoutCatch = async (context, req, res) => {
 
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
         if (cardData.grayscale || cardData.frozen) {
-          resp.score = 'Lost';
+          resp.score = ['Lost'];
         }
         resp.cards.push(cardData);
       }
-      if (resp.score == 'Won') {
+      if (resp.score == ['Won']) {
         for (let cardIx = 0; cardIx < cards.length; cardIx++) {
           const card = cards[cardIx];
           const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
@@ -263,7 +263,7 @@ const postWithoutCatch = async (context, req, res) => {
       // loggingUtil.log(dateUtil.getDate(), 'SUCCESS checkCards');
       const payout = async () => {
         try {
-          if (resp.score == 'Won') {
+          if (resp.score == ['Won']) {
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
           } else {
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, houseAccount, bet);
