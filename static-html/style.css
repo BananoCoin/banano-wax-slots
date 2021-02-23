@@ -44,6 +44,10 @@ body {
   background-color: white;
 }
 
+.display_none {
+  display: none;
+}
+
 .overflow_wrap_anywhere {
   overflow-wrap: anywhere;
 }
