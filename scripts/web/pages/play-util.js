@@ -144,6 +144,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.score = ['No Current Bet.','Press the \'Play\' button to continue.'];
   resp.scoreError = false;
   resp.templateCount = atomicassetsUtil.getTemplateCount();
+  let won = false;
 
   const updateBalances = async () => {
     const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
@@ -214,6 +215,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = [`Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`];
       resp.scoreError = true;
     } else {
+      won = true;
       resp.score = ['Won'];
       resp.scoreError = false;
       const card1 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
@@ -248,10 +250,11 @@ const postWithoutCatch = async (context, req, res) => {
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
         if (cardData.grayscale || cardData.frozen) {
           resp.score = ['Lost'];
+            won = false;
         }
         resp.cards.push(cardData);
       }
-      if (resp.score == ['Won']) {
+      if (won) {
         for (let cardIx = 0; cardIx < cards.length; cardIx++) {
           const card = cards[cardIx];
           const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
@@ -263,7 +266,7 @@ const postWithoutCatch = async (context, req, res) => {
       // loggingUtil.log(dateUtil.getDate(), 'SUCCESS checkCards');
       const payout = async () => {
         try {
-          if (resp.score == ['Won']) {
+          if (won) {
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
           } else {
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, houseAccount, bet);
