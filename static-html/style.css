@@ -79,6 +79,10 @@ body {
   height: 90vmin;
 }
 
+.h72vmin {
+  height: 72vmin;
+}
+
 .h35vmin {
   height: 35vmin;
 }
