@@ -118,6 +118,23 @@ const synchBetButtons = (selectedId) => {
   getSvgSlotMachineElementById(selectedId).setAttribute('fill', '#000000');
 };
 
+const addPlayArmListeners = (id) => {
+  const elt = getSvgSlotMachineElementById(id);
+  elt.addEventListener('click', () => {
+    if (document.querySelector('#play').disabled) {
+      return false;
+    }
+    window.play();
+    return false;
+  });
+  elt.addEventListener('mouseleave', () => {
+    elt.setAttribute('stroke', '#000000');
+  });
+  elt.addEventListener('mouseenter', () => {
+    elt.setAttribute('stroke', '#AAAAAA');
+  });
+};
+
 const addBetListeners = (selectedId) => {
   const elt = getSvgSlotMachineElementById(selectedId);
   elt.addEventListener('click', () => {
@@ -137,6 +154,7 @@ window.onLoad = async () => {
   addBetListeners('10ban');
   addBetListeners('50ban');
   synchBetButtons('1ban');
+  addPlayArmListeners('playArm');
 
   const burnAccount = document.querySelector('#burnAccount').innerText;
   // const collection = await api.getCollection("crptomonkeys", false);
@@ -309,6 +327,14 @@ const setAllTopTo = (logInHtml, accountBalance, accountBalanceTooltip) => {
   document.getElementById('houseAccountCacheBalance').innerHTML = logInHtml;
 };
 
+const truncate = (number) => {
+  const ix = number.indexOf('.');
+  if (ix < 0) {
+    return number;
+  }
+  return number.substring(0, ix+3);
+};
+
 const addCards = async () => {
   const lastNonceHashElt = document.querySelector('#lastNonceHash');
   const nonceHashElt = document.querySelector('#nonceHash');
@@ -403,7 +429,7 @@ const addCards = async () => {
     } else {
       balanceTooltip += cardData.balanceDescription;
     }
-    setAccountCacheBalance(cardData.cacheBalanceDescription, balanceTooltip);
+    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal), balanceTooltip);
 
     if ((cardData.cards !== undefined) && (cardData.cards.length == 3)) {
       setCard(card1Elt, cardData.cards[0]);
@@ -560,4 +586,18 @@ window.submitHcaptcha = () => {
   xmlhttp.open('POST', '/hcaptcha', true);
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xmlhttp.send(JSON.stringify(parms));
+};
+
+window.showSlotMachine = () => {
+  document.querySelector('#additionlDetailsButton').disabled = false;
+  document.querySelector('#slotMachineButton').disabled = true;
+  document.querySelector('#additionlDetailsTable').className = 'display_none';
+  document.querySelector('#slotMachineTable').className = 'w100pct';
+};
+
+window.showAdditionalDetails = () => {
+  document.querySelector('#additionlDetailsButton').disabled = true;
+  document.querySelector('#slotMachineButton').disabled = false;
+  document.querySelector('#additionlDetailsTable').className = 'w100pct';
+  document.querySelector('#slotMachineTable').className = 'display_none';
 };

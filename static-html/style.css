@@ -26,6 +26,13 @@ button {
   border-color: white;
 }
 
+button:disabled,
+button[disabled] {
+  background-color: darkgray;
+  color: gray;
+  border-color: gray;
+}
+
 html {
   background-color: green;
 }
@@ -40,6 +47,15 @@ body {
 
 .bg_color_white {
   background-color: white;
+}
+
+.bg_color_black {
+  background-color: black;
+}
+
+.rounded {
+  border-radius: 4vmin;
+  padding: 4vmin;
 }
 
 .display_none {
@@ -76,6 +92,10 @@ body {
 
 .w100vmin {
   width: 100vmin;
+}
+
+.w40vmin {
+  width: 40vmin;
 }
 
 .h90vmin {

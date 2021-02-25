@@ -141,7 +141,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.account = account;
   resp.houseAccount = houseAccount;
   resp.cards = [];
-  resp.score = ['No Current Bet.','Press the \'Play\' button to continue.'];
+  resp.score = ['No Current Bet.', 'Press the \'Play\' button to continue.'];
   resp.scoreError = false;
   resp.templateCount = atomicassetsUtil.getTemplateCount();
   let won = false;
@@ -170,6 +170,7 @@ const postWithoutCatch = async (context, req, res) => {
     }
     resp.cacheBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(resp.accountInfo.cacheBalance);
     resp.cacheBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheBalanceParts);
+    resp.cacheBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.cacheBalanceParts);
   };
   await updateBalances();
 
@@ -250,7 +251,7 @@ const postWithoutCatch = async (context, req, res) => {
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
         if (cardData.grayscale || cardData.frozen) {
           resp.score = ['Lost'];
-            won = false;
+          won = false;
         }
         resp.cards.push(cardData);
       }
