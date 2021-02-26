@@ -142,15 +142,7 @@ const initWebServer = async () => {
     const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
     const seed = seedUtil.getSeedFromOwner(owner);
     const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-    let captchaAmount;
-    if (payoutInformation.payoutOdds == 0) {
-      const winningOneCardOdds = 1/(payoutInformation.templateCount+1);
-      const winningOdds = winningOneCardOdds * winningOneCardOdds * winningOneCardOdds;
-      captchaAmount = winningOdds;
-    } else {
-      captchaAmount = 1/parseInt(payoutInformation.payoutOdds);
-    }
-
+    const captchaAmount = config.hcaptcha.bananos;
     loggingUtil.log(dateUtil.getDate(), 'hcaptcha', account, payoutInformation.payoutOdds, captchaAmount);
     await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
     const resp = {};

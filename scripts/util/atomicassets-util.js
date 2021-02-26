@@ -21,7 +21,7 @@ let ready = false;
 /* eslint-enable no-unused-vars */
 
 // functions
-const init = (_config, _loggingUtil, _seed, _entropyList) => {
+const init = (_config, _loggingUtil) => {
   /* istanbul ignore if */
   if (_config === undefined) {
     throw new Error('config is required.');

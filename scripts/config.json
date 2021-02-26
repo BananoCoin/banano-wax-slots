@@ -19,6 +19,7 @@
   "hcaptcha": {
     "enabled": true,
     "sitekey": "",
-    "secret": ""
+    "secret": "",
+    "bananos": 0.05
   }
 }
