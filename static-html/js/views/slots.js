@@ -58,7 +58,7 @@ const play = async (bet) => {
       cardData = JSON.parse(this.responseText);
       console.log('cardData', cardData);
       document.querySelector('#play').disabled = false;
-      setScore('Ready to begin. Press Play!');
+      setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
       if (cardData.score[0] == 'Lost') {
@@ -450,7 +450,12 @@ const addCards = async () => {
     }
     scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutAmount}:1`);
     scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
-    setScore(scoreText);
+    if (cardData.score[0] == 'Won') {
+      winConfetti();
+      setScore(scoreText, 'lightgreen', 'green');
+    } else {
+      setScore(scoreText);
+    }
   }
 };
 
@@ -494,15 +499,22 @@ const getSvgSlotMachineElementById = (id) => {
   return elt;
 };
 
-const setScore = (scoreText) => {
+const setScore = (scoreText, fill, stroke) => {
   const scoreElt = getSvgSlotMachineElementById('score');
   clear(scoreElt);
+
+
+  if ((fill != undefined) && (stroke != undefined)) {
+    addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 285, 'height': 70, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
+  }
+
   let y = 750;
+
   const addTextElt = (text) => {
     // console.log('addTextElt', text);
     const textElt = addChildSvgElement(scoreElt, 'text', {
-      'x': 120, 'y': y, 'font-family': 'monospace', 'font-size': 12, 'stroke': 'white',
-      'fill': 'black', 'pointer-events': 'none',
+      'x': 120, 'y': y, 'font-family': 'monospace', 'font-size': 12, 'stroke': 'black',
+      'fill': 'transparent', 'pointer-events': 'none',
     });
     setText(textElt, text);
     y += 10;
@@ -595,4 +607,40 @@ window.showAdditionalDetails = () => {
   document.querySelector('#slotMachineButton').disabled = false;
   document.querySelector('#additionlDetailsTable').className = 'w100pct';
   document.querySelector('#slotMachineTable').className = 'display_none';
+};
+
+const winConfetti = () => {
+  const count = 200;
+  const defaults = {
+    origin: {y: 0.7},
+  };
+
+  function fire(particleRatio, opts) {
+    confetti(Object.assign({}, defaults, opts, {
+      particleCount: Math.floor(count * particleRatio),
+    }));
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+  fire(0.2, {
+    spread: 60,
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
 };
