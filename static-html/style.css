@@ -53,9 +53,14 @@ body {
   background-color: black;
 }
 
+.bg_color_red {
+  background-color: red;
+}
+
 .rounded {
   border-radius: 4vmin;
   padding: 4vmin;
+  margin: 4vmin;
 }
 
 .display_none {

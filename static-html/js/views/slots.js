@@ -51,7 +51,7 @@ const play = async (bet) => {
     parms.bet = betFromSvg;
   }
   setScore('pending...');
-  setAllTopTo(`<span class="rounded small">pending...</span>`, 'pending...', 'pending...');
+  setAllTopTo(`<span class="small">pending...</span>`, 'pending...', 'pending...');
 
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -61,10 +61,10 @@ const play = async (bet) => {
       setScore('Ready to begin. Press Play!');
       addCards();
       stopSounds();
-      if (cardData.score == 'Lost') {
+      if (cardData.score[0] == 'Lost') {
         startSound('loser');
       }
-      if (cardData.score == 'Won') {
+      if (cardData.score[0] == 'Won') {
         startSound('winner');
         startSound('money');
       }
@@ -176,9 +176,9 @@ window.onLoad = async () => {
     owner = window.localStorage.owner;
   }
   if (owner !== undefined) {
-    ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
+    ownerElt.innerHTML = `<span>${owner}</span>`;
   } else {
-    ownerElt.innerHTML = `<span class="rounded">&nbsp;</span>`;
+    ownerElt.innerHTML = `<span>&nbsp;</span>`;
   }
   const nonce = window.localStorage.nonce;
 
@@ -226,7 +226,7 @@ window.onLoad = async () => {
         const userAccount = session.account.account_name;
         owner = userAccount;
         window.localStorage.owner = owner;
-        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
+        ownerElt.innerHTML = `<span>${owner}</span>`;
 
         const result = await session.session.transact({
           actions: [{
@@ -248,12 +248,12 @@ window.onLoad = async () => {
         });
         console.log('result', result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
-        const scoreText = `Please wait 30 seconds past ${getDate()} for blockchain to update before trying again.`;
+        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (error) {
         console.log('error', error.message);
-        ownerElt.innerHTML = `<span class="rounded">${error.message}</span>`;
+        ownerElt.innerHTML = `<span>${error.message}</span>`;
       }
     };
 
@@ -264,10 +264,10 @@ window.onLoad = async () => {
         const userAccount = wax.userAccount;
         owner = userAccount;
         window.localStorage.owner = owner;
-        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
+        ownerElt.innerHTML = `<span>${owner}</span>`;
         setTimeout(nonceTx, 0);
       } else {
-        ownerElt.innerHTML = `<span class="rounded">Not auto-logged in</span>`;
+        ownerElt.innerHTML = `<span>Not auto-logged in</span>`;
         login();
       }
     }
@@ -277,11 +277,11 @@ window.onLoad = async () => {
         const userAccount = await wax.login();
         owner = userAccount;
         window.localStorage.owner = owner;
-        ownerElt.innerHTML = `<span class="rounded">${owner}</span>`;
+        ownerElt.innerHTML = `<span>${owner}</span>`;
         setTimeout(nonceTx, 0);
       } catch (e) {
         console.log(e.message);
-        ownerElt.innerHTML = `<span class="rounded">${e.message}</span>`;
+        ownerElt.innerHTML = `<span>${e.message}</span>`;
       }
     }
 
@@ -307,7 +307,7 @@ window.onLoad = async () => {
         });
         console.log(result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
-        const scoreText = `Please wait 30 seconds past ${getDate()} for blockchain to update before trying again.`;
+        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (e) {
@@ -316,7 +316,7 @@ window.onLoad = async () => {
     };
   } catch (e) {
     console.log(e.message);
-    document.getElementById('owner').innerHTML = `<span class="rounded">${e.message}</span>`;
+    document.getElementById('owner').innerHTML = `<span>${e.message}</span>`;
   }
 };
 
@@ -342,7 +342,7 @@ const addCards = async () => {
   const scoreElt = document.querySelector('#score');
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     setScore('Need to log in again, local nonce hash has does not match blockchain nonce hash.');
-    const logInHtml = '<span class="bg_pink rounded">Log In</span>';
+    const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
     setAllTopTo(logInHtml, 'Log In', 'Log In');
     return;
@@ -360,8 +360,8 @@ const addCards = async () => {
     let border = '';
     if (cardDataElt.frozen) {
       border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;';
-    } else if (cardData.score == 'Won') {
-      border = 'border-width:0.2vh;border-color:green;background-color:lightblue;';
+    } else if (cardData.score[0] == 'Won') {
+      border = 'border-width:0.2vh;border-color:green;background-color:lightgreen;';
     } else {
       border = 'border-width:0.2vh;border-color:black;background-color:white;';
     }
@@ -383,8 +383,13 @@ const addCards = async () => {
     clear(cardElt);
     cardElt.setAttribute('class', 'bordered');
     cardElt.setAttribute('style', border);
+    if (cardDataElt.frozen) {
+      addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightblue', 'stroke': 'blue'});
+    } else if (cardData.score[0] == 'Won') {
+      addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightgreen', 'stroke': 'green'});
+    }
     // const a = addChildSvgElement(cardElt, 'a', {'target': '_blank', 'xlink:href': href});
-    const image = addChildSvgElement(cardElt, 'image', {filter: filter, href: src, x: 0, y: 2, width: 86, height: 107});
+    const image = addChildSvgElement(cardElt, 'image', {filter: filter, href: src, x: 0, y: 2, width: 84, height: 105});
     addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardDataElt.name);
     addText(cardElt, cardDataElt.name);
     // const inner = addChildSvgElement(cardElt, 'foreignObject');
@@ -405,10 +410,11 @@ const addCards = async () => {
     clear(card2Elt);
     clear(card3Elt);
     if (cardData === undefined) {
-      const scoreText = `Wax Account Ready, An unknown error occurred server side.\nPlease wait 30 seconds past ${getDate()} before trying again.`;
+      const scoreText = ['Wax Account Ready, An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
       setScore(scoreText);
     } else {
-      const scoreText = `Wax Account Ready, An error occurred server side ${cardData.errorMessage}.\nPlease wait 30 seconds past ${getDate()} before trying again.`;
+      const scoreText = ['Wax Account Ready, An error error occurred server side',
+        cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
       setScore(scoreText);
     }
   } else {
@@ -429,7 +435,7 @@ const addCards = async () => {
     } else {
       balanceTooltip += cardData.balanceDescription;
     }
-    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal), balanceTooltip);
+    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal) + ' ban', balanceTooltip);
 
     if ((cardData.cards !== undefined) && (cardData.cards.length == 3)) {
       setCard(card1Elt, cardData.cards[0]);
@@ -453,7 +459,7 @@ const addCards = async () => {
         scoreText.push('Score:' + cardData.score);
       }
     }
-    scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutOdds}:1`);
+    scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutAmount}:1`);
     scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
     setScore(scoreText);
   }

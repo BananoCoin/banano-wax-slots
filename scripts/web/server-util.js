@@ -143,7 +143,7 @@ const initWebServer = async () => {
     const seed = seedUtil.getSeedFromOwner(owner);
     const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
     const captchaAmount = config.hcaptcha.bananos;
-    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', account, payoutInformation.payoutOdds, captchaAmount);
+    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', account, captchaAmount);
     await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
     const resp = {};
     resp.message = '';

@@ -64,7 +64,9 @@ const receivePending = async (representative, seed) => {
   let noPending = false;
   while (!noPending) {
     const pending = await bananojsCacheUtil.getAccountsPending([account], config.maxPendingBananos, true);
-    loggingUtil.log(dateUtil.getDate(), 'account', account, 'pending', pending.blocks[account]);
+    if (config.centralWalletReceivePendingLoggingOn) {
+      loggingUtil.log(dateUtil.getDate(), 'account', account, 'pending', pending.blocks[account]);
+    }
     // loggingUtil.log(dateUtil.getDate(), 'pending', pending);
     if (pending.error) {
       noPending = true;
@@ -85,7 +87,9 @@ const receivePending = async (representative, seed) => {
 
 const centralAccountReceivePending = async () => {
   try {
-    loggingUtil.log(dateUtil.getDate(), 'STARTED centralAccountReceivePending');
+    if (config.centralWalletReceivePendingLoggingOn) {
+      loggingUtil.log(dateUtil.getDate(), 'STARTED centralAccountReceivePending');
+    }
     const centralAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.centralWalletSeed, config.walletSeedIx);
     const centralPendingList = await receivePending(centralAccount, config.centralWalletSeed);
     const seeds = [...checkPendingSeeds];
@@ -93,10 +97,14 @@ const centralAccountReceivePending = async () => {
     for (let seedIx = 0; seedIx < seeds.length; seedIx++) {
       const seed = seeds[seedIx];
       const pendingList = await receivePending(centralAccount, seed);
-      loggingUtil.log(dateUtil.getDate(), 'pendingList');// , pendingList);
+      if (config.centralWalletReceivePendingLoggingOn) {
+        loggingUtil.log(dateUtil.getDate(), 'pendingList');// , pendingList);
+      }
       checkPendingSeeds.delete(seed);
     }
-    loggingUtil.log(dateUtil.getDate(), 'SUCCESS centralAccountReceivePending');// , centralPendingList);
+    if (config.centralWalletReceivePendingLoggingOn) {
+      loggingUtil.log(dateUtil.getDate(), 'SUCCESS centralAccountReceivePending');// , centralPendingList);
+    }
   } catch (error) {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE centralAccountReceivePending', error.message);
     console.trace(error);
@@ -175,7 +183,7 @@ const postWithoutCatch = async (context, req, res) => {
   await updateBalances();
 
   const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
-  resp.payoutOdds = payoutInformation.payoutOdds;
+  resp.payoutAmount = payoutInformation.payoutAmount;
   resp.cardCount = payoutInformation.cardCount;
   resp.payoutMultiplier = config.payoutMultiplier;
 
@@ -198,8 +206,7 @@ const postWithoutCatch = async (context, req, res) => {
     const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseInt(req.body.bet, 10);
-    loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'payout', resp.payoutOdds * bet, 'house balance', houseBanano, houseAccount);
-    const winPayment = resp.payoutOdds * bet * resp.payoutMultiplier;
+    const winPayment = (resp.payoutAmount * bet * resp.payoutMultiplier).toFixed(2);
     if (!Number.isFinite(bet)) {
       resp.score = [`Bad Bet '${bet}'`];
       resp.scoreError = true;
@@ -213,7 +220,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = ['Max Bet 1000 Ban'];
       resp.scoreError = true;
     } else if (winPayment > houseBanano) {
-      resp.score = [`Low Central Balance. Bet '${bet}' times payout '${resp.payoutOdds}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`];
+      resp.score = [`Low Central Balance. Bet '${bet}' times payout '${resp.payoutAmount}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`];
       resp.scoreError = true;
     } else {
       won = true;
@@ -278,6 +285,8 @@ const postWithoutCatch = async (context, req, res) => {
           console.trace(error);
         }
       };
+
+      loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won);
       await payout();
     }
   }

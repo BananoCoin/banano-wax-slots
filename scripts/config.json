@@ -4,6 +4,7 @@
   "bananojsCacheDataDir": "data/bananojsCache",
   "burnAccount": "",
   "centralWalletReceivePendingIntervalMs": 10000,
+  "centralWalletReceivePendingLoggingOn": false,
   "centralWalletSeed": "",
   "houseWalletSeed": "",
   "cookieSecret": "",
