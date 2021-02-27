@@ -91,10 +91,14 @@ window.getLastNonce = async () => {
   const lastNonceElt = document.querySelector('#lastNonceHash');
   const ownerActions = await wax.rpc.history_get_actions(owner, -1, -2);
   const ownerAction = ownerActions.actions[0];
-  const lastNonce = ownerAction.action_trace.act.data.assoc_id;
-  lastNonceElt.innerText = lastNonce;
-  setScore('');
-  addCards();
+  try {
+    const lastNonce = ownerAction.action_trace.act.data.assoc_id;
+    lastNonceElt.innerText = lastNonce;
+    setScore('');
+    addCards();
+  } catch (error) {
+    setScore('Nonce Error:' + error.message);
+  }
 };
 
 const bytesToHex = (bytes) => {
