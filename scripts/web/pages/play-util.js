@@ -239,12 +239,15 @@ const postWithoutCatch = async (context, req, res) => {
 
         cardData.name = card.name;
         cardData.ipfs = card.img;
+        cardData.frozenCardCount = 0;
+        cardData.totalCardCount = 0;
 
         if (unfrozenAssets === undefined) {
           cardData.grayscale = true;
         } else if (unfrozenAssets.length == 0) {
           cardData.grayscale = true;
         } else {
+          cardData.totalCardCount += unfrozenAssets.length;
           cardData.grayscale = false;
         }
         if (frozenAssets === undefined) {
@@ -252,6 +255,8 @@ const postWithoutCatch = async (context, req, res) => {
         } else if (frozenAssets.length == 0) {
           cardData.frozen = false;
         } else {
+          cardData.totalCardCount += frozenAssets.length;
+          cardData.frozenCardCount += frozenAssets.length;
           cardData.frozen = true;
         }
 

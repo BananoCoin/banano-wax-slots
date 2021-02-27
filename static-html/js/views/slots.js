@@ -377,13 +377,6 @@ const addCards = async () => {
     const href = `https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX`;
 
     const src = `/ipfs/${cardDataElt.ipfs}.webp`;
-    // innerHTML += `<a target="_blank" href="${href}">`;
-    // innerHTML += `<img style="" src="${src}"/>`;
-    // innerHTML += '</a>';
-    // innerHTML += '<br/>';
-    // innerHTML += `<span>${cardDataElt.name}</span>`;
-    // innerHTML += `</span>`;
-    // innerHTML += `</br>`;
     clear(cardElt);
     cardElt.setAttribute('class', 'bordered');
     cardElt.setAttribute('style', border);
@@ -392,17 +385,9 @@ const addCards = async () => {
     } else if (cardData.score[0] == 'Won') {
       addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightgreen', 'stroke': 'green'});
     }
-    // const a = addChildSvgElement(cardElt, 'a', {'target': '_blank', 'xlink:href': href});
+    const cardTitle = `${cardDataElt.name} (${cardDataElt.totalCardCount-cardDataElt.frozenCardCount}/${cardDataElt.totalCardCount})`;
     const image = addChildSvgElement(cardElt, 'image', {filter: filter, href: src, x: 0, y: 2, width: 84, height: 105});
-    addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardDataElt.name);
-    addText(cardElt, cardDataElt.name);
-    // const inner = addChildSvgElement(cardElt, 'foreignObject');
-    // const span = addChildSvgElement(inner, 'span', {class: 'bordered', style: border});
-    // const a = addChildSvgElement(span, 'a', {target: '_blank', href: href});
-    // const img = addChildSvgElement(a, 'img', {style: style, src: src});
-    // addChildSvgElement(span, 'br');
-    // addText(addChildSvgElement(span, 'span'), cardDataElt.name);
-    // inner.innerHTML = innerHTML;
+    addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
   };
   if ((cardData === undefined) || (!cardData.ready)) {
     accountElt.innerText = '';
