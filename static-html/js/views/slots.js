@@ -386,7 +386,8 @@ const addCards = async () => {
       addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightgreen', 'stroke': 'green'});
     }
     const cardTitle = `${cardDataElt.name} (${cardDataElt.totalCardCount-cardDataElt.frozenCardCount}/${cardDataElt.totalCardCount})`;
-    const image = addChildSvgElement(cardElt, 'image', {filter: filter, href: src, x: 0, y: 2, width: 84, height: 105});
+    const anchorElt = addChildSvgElement(cardElt, 'a', {'href': href, 'target': '__blank'});
+    const image = addChildSvgElement(anchorElt, 'image', {'filter': filter, 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
     addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
   };
   if ((cardData === undefined) || (!cardData.ready)) {
