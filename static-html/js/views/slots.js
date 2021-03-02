@@ -252,7 +252,7 @@ window.onLoad = async () => {
         });
         console.log('result', result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
-        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
+        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (error) {
@@ -311,7 +311,7 @@ window.onLoad = async () => {
         });
         console.log(result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
-        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
+        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (e) {
@@ -401,11 +401,11 @@ const addCards = async () => {
     clear(card2Elt);
     clear(card3Elt);
     if (cardData === undefined) {
-      const scoreText = ['Wax Account Ready, An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update', 'before trying again.'];
+      const scoreText = ['Wax Account Ready, An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
     } else {
       const scoreText = ['Wax Account Ready, An error error occurred server side',
-        cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update', 'before trying again.'];
+        cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
     }
   } else {
