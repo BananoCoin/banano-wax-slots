@@ -325,6 +325,7 @@ window.onLoad = async () => {
 };
 
 const setAllTopTo = (logInHtml, accountBalance, accountBalanceTooltip) => {
+  console.trace('setAllTopTo');
   document.getElementById('account').innerHTML = logInHtml;
   setAccountCacheBalance(accountBalance, accountBalanceTooltip);
   document.getElementById('houseAccountBalance').innerHTML = logInHtml;
@@ -345,7 +346,7 @@ const addCards = async () => {
 
   const scoreElt = document.querySelector('#score');
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
-    setScore('Need to log in again, local nonce hash has does not match blockchain nonce hash.');
+    setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
     const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
     setAllTopTo(logInHtml, 'Log In', 'Log In');
@@ -400,11 +401,11 @@ const addCards = async () => {
     clear(card2Elt);
     clear(card3Elt);
     if (cardData === undefined) {
-      const scoreText = ['Wax Account Ready, An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
+      const scoreText = ['Wax Account Ready, An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update', 'before trying again.'];
       setScore(scoreText);
     } else {
       const scoreText = ['Wax Account Ready, An error error occurred server side',
-        cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update before trying again.'];
+        cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update', 'before trying again.'];
       setScore(scoreText);
     }
   } else {
@@ -434,13 +435,16 @@ const addCards = async () => {
     }
     const scoreText = [];
     if (Array.isArray(cardData.score)) {
-      if (cardData.scoreError) {
-        scoreText.push('Error:');
-      } else {
-        scoreText.push('Score:');
-      }
-      cardData.score.forEach((scoreElt) => {
-        scoreText.push(scoreElt);
+      cardData.score.forEach((scoreElt, scoreEltIx) => {
+        if (scoreEltIx == 0) {
+          if (cardData.scoreError) {
+            scoreText.push('Error:' + scoreElt);
+          } else {
+            scoreText.push('Score:' + scoreElt);
+          }
+        } else {
+          scoreText.push(scoreElt);
+        }
       });
     } else {
       if (cardData.scoreError) {
@@ -530,9 +534,12 @@ const setScore = (scoreText, fill, stroke) => {
 };
 
 const setAccountCacheBalance = (balanceText, balanceTooltip) => {
+  const secondAccountCacheBalanceElt = document.querySelector('#accountCacheBalance');
+
   const accountCacheBalanceElt = getSvgSlotMachineElementById('accountCacheBalance');
   const accountCacheBalanceTooltipElt = getSvgSlotMachineElementById('accountCacheBalanceTooltip');
 
+  setText(secondAccountCacheBalanceElt, balanceText);
   setText(accountCacheBalanceElt, balanceText);
   setText(accountCacheBalanceTooltipElt, balanceTooltip);
 };

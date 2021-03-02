@@ -187,23 +187,23 @@ const postWithoutCatch = async (context, req, res) => {
   resp.cardCount = payoutInformation.cardCount;
   resp.payoutMultiplier = config.payoutMultiplier;
 
+  const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
   let play = true;
   if (req.body.bet === undefined) {
     play = false;
   }
-  if (resp.accountInfo.error) {
+  if (banano < 1) {
     play = false;
-    resp.score = [`Account '${account}' has zero balance. Please send at least one banano to the account, or do the captcha until you have 1 ban in the account.`];
+    resp.score = ['Account has zero balance.', 'Please add at least one banano', 'or do the captcha until you have one.'];
     resp.scoreError = true;
   }
   if (resp.houseAccountInfo.error) {
     play = false;
-    resp.score = [`House Account '${houseAccount}' has zero balance. Please send at least one banano to the account.`];
+    resp.score = [`House Account has zero balance.','Please add at least one banano.`];
     resp.scoreError = true;
   }
 
   if (play) {
-    const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseInt(req.body.bet, 10);
     const winPayment = (resp.payoutAmount * bet * resp.payoutMultiplier).toFixed(2);
