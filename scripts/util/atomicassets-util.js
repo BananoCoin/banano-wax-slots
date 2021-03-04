@@ -134,7 +134,7 @@ const getOwnedCards = async (owner) => {
   let moreAssets = true;
   const allAssets = [];
   while (moreAssets) {
-    console.log('owner', owner, 'page', page, allAssets.length);
+    // console.log('owner', owner, 'page', page, allAssets.length);
     const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
     pageAssets.forEach((asset) => {
       allAssets.push(asset);

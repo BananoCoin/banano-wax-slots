@@ -220,7 +220,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = ['Max Bet 1000 Ban'];
       resp.scoreError = true;
     } else if (winPayment > houseBanano) {
-      resp.score = [`Low Central Balance. Bet '${bet}' times payout '${resp.payoutAmount}' times payout multiplier '${resp.payoutMultiplier}' = Win Payment ${winPayment} which is greater than house balance '${houseBanano}' of account '${houseAccount}'`];
+      resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];
       resp.scoreError = true;
     } else {
       won = true;
