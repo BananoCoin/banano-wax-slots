@@ -46,3 +46,7 @@ check out minting here:
   npm run screenrestart;
 
 ### todo
+
+1.  'low central balance' message does not fit into machine GUI.
+
+2.  waxApi.getAssets(assetOptions, 1, 1000); needs page number and limit.

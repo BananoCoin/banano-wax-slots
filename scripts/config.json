@@ -8,6 +8,8 @@
   "centralWalletSeed": "",
   "houseWalletSeed": "",
   "cookieSecret": "",
+  "maxAssetsPerPage": 100,
+  "maxTemplatesPerPage": 100,
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
   "thawTimeMs": 28800000,

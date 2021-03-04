@@ -63,7 +63,7 @@ const setWaxApiAndAddTemplates = async () => {
 const addAllTemplates = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
   let page = 1;
-  const max = 100;
+  const max = config.maxTemplatesPerPage;
 
   const addTemplates = async () => {
     loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates page', page);
@@ -129,8 +129,22 @@ const getTemplateCount = () => {
 
 const getOwnedCards = async (owner) => {
   const assetOptions = {'collection_name': 'crptomonkeys', 'owner': owner};
-  const assets = await waxApi.getAssets(assetOptions);
-  return assets;
+  let page = 1;
+  const assetsPerPage = config.maxAssetsPerPage;
+  let moreAssets = true;
+  const allAssets = [];
+  while (moreAssets) {
+    console.log('owner', owner, 'page', page, allAssets.length);
+    const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
+    pageAssets.forEach((asset) => {
+      allAssets.push(asset);
+    });
+    if (pageAssets.length < assetsPerPage) {
+      moreAssets = false;
+    }
+    page++;
+  }
+  return allAssets;
 };
 
 const getPayoutInformation = async (owner) => {
