@@ -80,6 +80,9 @@ const addAllTemplates = async () => {
         pageTemplateData.name = pageTemplate.immutable_data.name;
         pageTemplateData.img = pageTemplate.immutable_data.img;
         pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
+        pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply,10);
+        pageTemplateData.max_supply = parseInt(pageTemplate.max_supply,10);
+
         templates.push(pageTemplateData);
       }
 
