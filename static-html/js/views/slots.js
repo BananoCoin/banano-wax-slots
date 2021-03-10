@@ -61,12 +61,14 @@ const play = async (bet) => {
       setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
-      if (cardData.score[0] == 'Lost') {
-        startSound('loser');
-      }
-      if (cardData.score[0] == 'Won') {
-        startSound('winner');
-        startSound('money');
+      if(cardData.ready) {
+        if (cardData.score[0] == 'Lost') {
+          startSound('loser');
+        }
+        if (cardData.score[0] == 'Won') {
+          startSound('winner');
+          startSound('money');
+        }
       }
     }
   };
