@@ -186,6 +186,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.payoutAmount = payoutInformation.payoutAmount;
   resp.cardCount = payoutInformation.cardCount;
   resp.payoutMultiplier = config.payoutMultiplier;
+  resp.bets = config.bets;
 
   const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
   let play = true;
@@ -205,19 +206,21 @@ const postWithoutCatch = async (context, req, res) => {
 
   if (play) {
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
-    const bet = parseInt(req.body.bet, 10);
+    const bet = parseFloat(req.body.bet);
+    const minBet = parseFloat(config.minBet);
+    const maxBet = parseFloat(config.maxBet);
     const winPayment = (resp.payoutAmount * bet * resp.payoutMultiplier).toFixed(2);
     if (!Number.isFinite(bet)) {
-      resp.score = [`Bad Bet '${bet}'`];
+      resp.score = [`Bad Bet '${req.body.bet}'`];
       resp.scoreError = true;
     } else if (bet > banano) {
       resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano}'`];
       resp.scoreError = true;
-    } else if (bet < 1) {
-      resp.score = ['Min Bet 1 Ban'];
+    } else if (bet < minBet) {
+      resp.score = [`Min Bet ${minBet.toFixed(2)} Ban`];
       resp.scoreError = true;
-    } else if (bet > 1000) {
-      resp.score = ['Max Bet 1000 Ban'];
+    } else if (bet > maxBet) {
+      resp.score = [`Max Bet ${maxBet.toFixed(2)} Ban`];
       resp.scoreError = true;
     } else if (winPayment > houseBanano) {
       resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];

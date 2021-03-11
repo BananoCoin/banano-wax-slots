@@ -220,10 +220,10 @@
       <rect x="160" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" filter="url(#r)" id="10ban"/>
       <rect x="90" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" filter="url(#r)" id="5ban"/>
       <rect x="20" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" filter="url(#r)" id="1ban"/>
-      <text x="235" y="432" font-family="monospace" font-size="20" font-weight="bold" stroke="white" fill="black" pointer-events="none">50</text>
-      <text x="165" y="432" font-family="monospace" font-size="20" font-weight="bold" stroke="white" fill="black" pointer-events="none">10</text>
-      <text x="100" y="432" font-family="monospace" font-size="20" font-weight="bold" stroke="white" fill="black" pointer-events="none">5</text>
-      <text x="30" y="432" font-family="monospace" font-size="20" font-weight="bold" stroke="white" fill="black" pointer-events="none">1</text>
+      <text x="250" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="white" fill="black" pointer-events="none" id="50ban-text" text-anchor="middle">?</text>
+      <text x="180" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="white" fill="black" pointer-events="none" id="10ban-text" text-anchor="middle">?</text>
+      <text x="110" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="white" fill="black" pointer-events="none" id="5ban-text" text-anchor="middle">?</text>
+      <text x="40" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="white" fill="black" pointer-events="none" id="1ban-text" text-anchor="middle">?</text>
     </g>
     <g id="playArm" transform="translate(3.3595,17.917)">
       <title>Play!</title>

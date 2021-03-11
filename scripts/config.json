@@ -12,6 +12,14 @@
   "maxTemplatesPerPage": 100,
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
+  "minBet": 0.1,
+  "maxBet": 100.0,
+  "bets": {
+    "1ban": 0.1,
+    "5ban": 0.5,
+    "10ban": 1.0,
+    "50ban": 5.0
+  },
   "thawTimeMs": 28800000,
   "walletSeedIx": 0,
   "waxIdSeed": "",

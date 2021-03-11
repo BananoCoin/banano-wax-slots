@@ -8,6 +8,7 @@ const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 let owner;
 let cardData;
 let walletKind;
+let betFromSvgId = '1ban';
 let betFromSvg = 0;
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
@@ -61,7 +62,7 @@ const play = async (bet) => {
       setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
-      if(cardData.ready) {
+      if (cardData.ready) {
         if (cardData.score[0] == 'Lost') {
           startSound('loser');
         }
@@ -115,13 +116,20 @@ const getInt64StrFromUint8Array = (ba) => {
 };
 
 const synchBetButtons = (selectedId) => {
-  const idAmounts = {'1ban': 1, '5ban': 5, '10ban': 10, '50ban': 50};
-  const ids = Object.keys(idAmounts);
-  ids.forEach((id) => {
-    getSvgSlotMachineElementById(id).setAttribute('fill', '#7b7b7b');
-  });
-  betFromSvg = idAmounts[selectedId];
-  getSvgSlotMachineElementById(selectedId).setAttribute('fill', '#000000');
+  betFromSvgId = selectedId;
+  if (cardData !== undefined) {
+    const idAmounts = cardData.bets;
+    const ids = Object.keys(idAmounts);
+    ids.forEach((id) => {
+      getSvgSlotMachineElementById(id).setAttribute('fill', '#7b7b7b');
+      const textElt = getSvgSlotMachineElementById(id+'-text');
+      const text = parseFloat(idAmounts[id]).toFixed(2);
+      // console.log('synchBetButtons', textElt, text);
+      textElt.textContent = text;
+    });
+    betFromSvg = idAmounts[selectedId];
+    getSvgSlotMachineElementById(selectedId).setAttribute('fill', '#000000');
+  }
 };
 
 const addPlayArmListeners = (id) => {
@@ -159,7 +167,6 @@ window.onLoad = async () => {
   addBetListeners('5ban');
   addBetListeners('10ban');
   addBetListeners('50ban');
-  synchBetButtons('1ban');
   addPlayArmListeners('playArm');
 
   const burnAccount = document.querySelector('#burnAccount').innerText;
@@ -327,7 +334,7 @@ window.onLoad = async () => {
 };
 
 const setAllTopTo = (logInHtml, accountBalance, accountBalanceTooltip) => {
-  console.trace('setAllTopTo');
+  // console.trace('setAllTopTo');
   document.getElementById('account').innerHTML = logInHtml;
   setAccountCacheBalance(accountBalance, accountBalanceTooltip);
   document.getElementById('houseAccountBalance').innerHTML = logInHtml;
@@ -343,6 +350,7 @@ const truncate = (number) => {
 };
 
 const addCards = async () => {
+  synchBetButtons(betFromSvgId);
   const lastNonceHashElt = document.querySelector('#lastNonceHash');
   const nonceHashElt = document.querySelector('#nonceHash');
 
