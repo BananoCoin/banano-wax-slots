@@ -482,7 +482,7 @@ const resetScoreText = async () => {
   const idAmounts = cardData.bets;
   const potentialProfit = cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier;
 
-  scoreText.push(`Potential Profit${potentialProfit.toFixed(2)}`);
+  scoreText.push(`Potential Profit:${potentialProfit.toFixed(2)}`);
 
   if (cardData.score[0] == 'Won') {
     setScore(scoreText, 'lightgreen', 'green');
