@@ -9,22 +9,25 @@
         <button id="additionlDetailsButton" class="w40pct font_size_50pct" onclick="showAdditionalDetails();return false;">
           Withdraw, Captcha, Additional Details.
         </button>
+        <button id="faqButton" class="w40pct font_size_50pct" onclick="showFAQ();return false;">
+          FAQ
+        </button>
       </td>
       <td>&nbsp;</td>
     </tr>
     <tr>
       <td>&nbsp;</td>
-      <td class="w100vmin h90vmin">
+      <td class="w100vmin h90vmin vertical_align_top">
         <span class="w100pct h90vmin">
           <table id="slotMachineTable" class="w100pct">
             <tbody>
               <tr>
                 <td class="h15vmin" colspan="1">
                   <button class="w40pct font_size_50pct" onclick="waxjsWallet();return false;">
-                    Log In Again<br>(Cloud Wallet)
+                    Log In<br>(Cloud Wallet)
                   </button>
                   <button class="w40pct font_size_50pct" onclick="anchorWallet();return false;">
-                    Log In Again<br>(Anchor Wallet)
+                    Log In<br>(Anchor Wallet)
                   </button>
                   <button id="play" class="bg_light_green w80pct" onclick="play();return false;" disabled>Play!<br>(Or use the arm)</button>
                   <br>
@@ -49,7 +52,7 @@
               </tr>
               <tr>
                 <td colspan="1">
-                  <span class="bg_color_black">Banano Account: <span class="selectable" id="account"></span>
+                  <span class="bg_color_black">Deposit Account: <span class="selectable" id="account"></span>
                 </td>
               </tr>
             </tbody>
@@ -105,6 +108,25 @@
                       </p>
                     </span>
                   </form>
+                </td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+          <table id="faqTable" class="display_none w100pct">
+            <tbody>
+              <tr>
+                <td>&nbsp;</td>
+                <td class="w100vmin bg_color_black rounded vertical_align_top">
+                  <h1>FAQ</h1>
+                  <ol>
+                    <li>make a wax wallet. <a href="https://wallet.wax.io" target="_blank"></a></li>
+                    <li>have cryptomonKeys. <a href="https://wax.atomichub.io/market?collection_name=crptomonkeys" target="_blank"></a></li>
+                    <li>Login with Wax wallet (Anchor of Cloud)</li>
+                    <li>either deposit banano or work the captcha to get a banano</li>
+                    <li>bet or withdraw</li>
+                    <li>frozen cards? they unfreeze after eight hours. come back and play again!</li>
+                  </ol>
                 </td>
                 <td>&nbsp;</td>
               </tr>

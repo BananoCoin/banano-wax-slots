@@ -207,6 +207,7 @@
       <rect x="160.81" y="297.09" width="300.32" height="109.48" ry="4.9678e-6" fill="url(#c)" stroke="url(#i)" stroke-linecap="round" stroke-linejoin="round" stroke-width="12.465">
         <title id="accountCacheBalanceTooltip"></title>
       </rect>
+      <text x="310" y="305" font-family="impact" font-size="25" stroke="white" fill="black" pointer-events="none" text-anchor="middle">Balance</text>
       <text x="310" y="365" font-family="impact" font-size="35" stroke="white" fill="black" pointer-events="none" id="accountCacheBalance" text-anchor="middle"></text>
     </g>
     <g id="score_group">

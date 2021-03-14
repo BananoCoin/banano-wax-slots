@@ -130,6 +130,7 @@ const synchBetButtons = (selectedId) => {
     betFromSvg = idAmounts[selectedId];
     getSvgSlotMachineElementById(selectedId).setAttribute('fill', '#000000');
   }
+  resetScoreText();
 };
 
 const addPlayArmListeners = (id) => {
@@ -443,37 +444,52 @@ const addCards = async () => {
       setCard(card2Elt, cardData.cards[1]);
       setCard(card3Elt, cardData.cards[2]);
     }
-    const scoreText = [];
-    if (Array.isArray(cardData.score)) {
-      cardData.score.forEach((scoreElt, scoreEltIx) => {
-        if (scoreEltIx == 0) {
-          if (cardData.scoreError) {
-            scoreText.push('Error:' + scoreElt);
-          } else {
-            scoreText.push('Score:' + scoreElt);
-          }
-        } else {
-          scoreText.push(scoreElt);
-        }
-      });
-    } else {
-      if (cardData.scoreError) {
-        scoreText.push('Error:' + cardData.score);
-      } else {
-        scoreText.push('Score:' + cardData.score);
-      }
-    }
-    scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutAmount}:1`);
-    scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
+    resetScoreText();
     if (cardData.score[0] == 'Won') {
       winConfetti();
-      setScore(scoreText, 'lightgreen', 'green');
-    } else {
-      setScore(scoreText);
     }
   }
 };
 
+const resetScoreText = async () => {
+  const scoreText = [];
+  if (cardData === undefined) {
+    return;
+  }
+
+  if (Array.isArray(cardData.score)) {
+    cardData.score.forEach((scoreElt, scoreEltIx) => {
+      if (scoreEltIx == 0) {
+        if (cardData.scoreError) {
+          scoreText.push('Error:' + scoreElt);
+        } else {
+          scoreText.push('Score:' + scoreElt);
+        }
+      } else {
+        scoreText.push(scoreElt);
+      }
+    });
+  } else {
+    if (cardData.scoreError) {
+      scoreText.push('Error:' + cardData.score);
+    } else {
+      scoreText.push('Score:' + cardData.score);
+    }
+  }
+  scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutAmount}:1`);
+  scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
+
+  const idAmounts = cardData.bets;
+  const potentialProfit = cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier;
+
+  scoreText.push(`Potential Profit${potentialProfit.toFixed(2)}`);
+
+  if (cardData.score[0] == 'Won') {
+    setScore(scoreText, 'lightgreen', 'green');
+  } else {
+    setScore(scoreText);
+  }
+};
 
 const addAttributes = (child, attributes) => {
   if (attributes) {
@@ -613,16 +629,29 @@ window.submitHcaptcha = () => {
   xmlhttp.send(JSON.stringify(parms));
 };
 
+window.showFAQ = () => {
+  document.querySelector('#faqButton').disabled = true;
+  document.querySelector('#additionlDetailsButton').disabled = false;
+  document.querySelector('#slotMachineButton').disabled = false;
+  document.querySelector('#faqTable').className = 'w100pct';
+  document.querySelector('#additionlDetailsTable').className = 'display_none';
+  document.querySelector('#slotMachineTable').className = 'display_none';
+};
+
 window.showSlotMachine = () => {
+  document.querySelector('#faqButton').disabled = false;
   document.querySelector('#additionlDetailsButton').disabled = false;
   document.querySelector('#slotMachineButton').disabled = true;
+  document.querySelector('#faqTable').className = 'display_none';
   document.querySelector('#additionlDetailsTable').className = 'display_none';
   document.querySelector('#slotMachineTable').className = 'w100pct';
 };
 
 window.showAdditionalDetails = () => {
+  document.querySelector('#faqButton').disabled = false;
   document.querySelector('#additionlDetailsButton').disabled = true;
   document.querySelector('#slotMachineButton').disabled = false;
+  document.querySelector('#faqTable').className = 'display_none';
   document.querySelector('#additionlDetailsTable').className = 'w100pct';
   document.querySelector('#slotMachineTable').className = 'display_none';
 };
