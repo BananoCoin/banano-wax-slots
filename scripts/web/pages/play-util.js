@@ -188,7 +188,8 @@ const postWithoutCatch = async (context, req, res) => {
   resp.payoutMultiplier = config.payoutMultiplier;
   resp.bets = config.bets;
 
-  const banano = parseInt(resp.cacheBalanceParts[resp.cacheBalanceParts.majorName], 10);
+  const banano = resp.cacheBalanceDecimal;
+
   let play = true;
   if (req.body.bet === undefined) {
     play = false;
@@ -214,7 +215,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = [`Bad Bet '${req.body.bet}'`];
       resp.scoreError = true;
     } else if (bet > banano) {
-      resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano}'`];
+      resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano.toFixed(2)}'`];
       resp.scoreError = true;
     } else if (bet < minBet) {
       resp.score = [`Min Bet ${minBet.toFixed(2)} Ban`];
