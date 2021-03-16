@@ -54,6 +54,11 @@ const play = async (bet) => {
   setScore('pending...');
   setAllTopTo(`<span class="small">pending...</span>`, 'pending...', 'pending...');
 
+  if (window.localStorage.owner !== undefined) {
+    const ownerElt = document.querySelector('#owner');
+    ownerElt.innerHTML = `<span>${owner}</span>`;
+  }
+
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       cardData = JSON.parse(this.responseText);
@@ -271,7 +276,6 @@ window.onLoad = async () => {
       }
     };
 
-
     async function autoLogin() {
       const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
       if (isAutoLoginAvailable) {
@@ -319,17 +323,18 @@ window.onLoad = async () => {
           blocksBehind: 3,
           expireSeconds: 30,
         });
-        console.log(result);
+        console.log('nonceTx', 'result', result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
         const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (e) {
+        console.log('nonceTx', 'error1', e.message);
         document.getElementById('transaction_id').innerHTML = e.message;
       }
     };
   } catch (e) {
-    console.log(e.message);
+    console.log('nonceTx', 'error2', e.message);
     document.getElementById('owner').innerHTML = `<span>${e.message}</span>`;
   }
 };

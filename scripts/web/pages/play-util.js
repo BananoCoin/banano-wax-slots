@@ -193,9 +193,10 @@ const postWithoutCatch = async (context, req, res) => {
   if (req.body.bet === undefined) {
     play = false;
   }
-  if (banano < 1) {
+  const minBet = parseFloat(config.minBet);
+  if (resp.cacheBalanceDecimal < minBet) {
     play = false;
-    resp.score = ['Account has zero balance.', 'Please add at least one banano', 'or do the captcha until you have one.'];
+    resp.score = [`Account balance too low.`, `Min balance:${minBet.toFixed(2)}`];
     resp.scoreError = true;
   }
   if (resp.houseAccountInfo.error) {
@@ -207,7 +208,6 @@ const postWithoutCatch = async (context, req, res) => {
   if (play) {
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseFloat(req.body.bet);
-    const minBet = parseFloat(config.minBet);
     const maxBet = parseFloat(config.maxBet);
     const winPayment = (resp.payoutAmount * bet * resp.payoutMultiplier).toFixed(2);
     if (!Number.isFinite(bet)) {
