@@ -9,7 +9,7 @@
   "scripts": {
     "eslint": "eslint --fix 'scripts/**/*.js'",
     "new-config": "node scripts/new-config.js",
-    "start": "node -max-old-space-size=1700 scripts/index.js",
+    "start": "node -max-old-space-size=1700 --trace-warnings scripts/index.js",
     "screenstart": "screen -dmSL banano_wax_slots npm start;screen -x banano_wax_slots",
     "screenrestart": "npm stop;screen -x banano_wax_slots;screen -dmSL banano_wax_slots npm start;screen -x banano_wax_slots",
     "stop": "node scripts/stop.js"
