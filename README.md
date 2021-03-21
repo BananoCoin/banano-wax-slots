@@ -23,6 +23,8 @@ check out minting here:
 
     https://www.npmjs.com/package/atomicassets
 
+    https://gist.github.com/Vyryn/ea4ae93818c87a57ef63f4056a21de01#file-create_claimlink-py-L51
+
 ## add user so you aren't running as root
 
   adduser waxslots;
