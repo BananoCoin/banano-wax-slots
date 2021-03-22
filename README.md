@@ -25,6 +25,10 @@ check out minting here:
 
     https://gist.github.com/Vyryn/ea4ae93818c87a57ef63f4056a21de01#file-create_claimlink-py-L51
 
+    https://github.com/EOSIO/eosjs#signature-provider
+
+    https://wax.bloks.io/account/atomictoolsx?tab=ABI&account=atomictoolsx
+
 ## add user so you aren't running as root
 
   adduser waxslots;
