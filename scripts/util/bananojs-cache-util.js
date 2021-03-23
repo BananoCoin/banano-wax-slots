@@ -114,11 +114,11 @@ const receiveBananoDepositsForSeed = async (seed, seedIx, representative, hash) 
   if (account != centralAccount) {
     const accountInfo = await bananojs.getAccountInfo(account, true);
     const balanceParts = await bananojs.getBananoPartsFromRaw(accountInfo.balance);
-    const banano = balanceParts[balanceParts.majorName];
+    const bananoDecimal = await bananojs.getBananoPartsAsDecimal(balanceParts);
 
-    loggingUtil.log('sweeping', banano, 'banano from account', account, 'to central wallet', centralAccount);
+    loggingUtil.log('sweeping', bananoDecimal, 'banano from account', account, 'to central wallet', centralAccount);
 
-    await bananojs.sendBananoWithdrawalFromSeed(seed, seedIx, centralAccount, banano);
+    await bananojs.sendBananoWithdrawalFromSeed(seed, seedIx, centralAccount, bananoDecimal);
 
     const mutexRelease = await mutex.acquire();
     try {

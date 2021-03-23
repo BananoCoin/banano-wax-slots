@@ -141,7 +141,9 @@ const postWithoutCatch = async (context, req, res) => {
   const seed = seedUtil.getSeedFromOwner(owner);
   // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-  // loggingUtil.log(dateUtil.getDate(), 'account');// , account);
+  if (config.centralWalletReceivePendingLoggingOn) {
+    loggingUtil.log(dateUtil.getDate(), 'checkPendingSeeds.add', account);
+  }
   checkPendingSeeds.add(seed);
 
   const resp = {};
