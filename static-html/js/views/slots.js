@@ -52,7 +52,7 @@ const play = async (bet) => {
     parms.bet = betFromSvg;
   }
   setScore('pending...');
-  setAllTopTo(`<span class="small">pending...</span>`, 'pending...', 'pending...');
+  setAllTopToClass('small', 'pending...');
 
   if (window.localStorage.owner !== undefined) {
     const ownerElt = document.querySelector('#owner');
@@ -234,6 +234,7 @@ window.onLoad = async () => {
     getLastNonceAndAddTemplates();
 
     async function anchorLogin() {
+      setAllTopToClass('bg_green', '(1/4) login...');
       const transport = new AnchorLinkBrowserTransport();
       const waxChainId = '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4';
       const waxRpcUrl = 'https://chain.wax.io';
@@ -267,9 +268,9 @@ window.onLoad = async () => {
         });
         console.log('result', result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
-        const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
+        const scoreText = ['Please wait 25 seconds past', getDate(), 'For blockchain to update.'];
         setScore(scoreText);
-        setTimeout(getLastNonceAndAddTemplates, 5000);
+        setTimeout(getLastNonceAndAddTemplates, 25000);
       } catch (error) {
         console.log('error', error.message);
         ownerElt.innerHTML = `<span>${error.message}</span>`;
@@ -277,6 +278,7 @@ window.onLoad = async () => {
     };
 
     async function autoLogin() {
+      setAllTopToClass('bg_green', '(1/4) auto login...');
       const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
       if (isAutoLoginAvailable) {
         const userAccount = wax.userAccount;
@@ -291,6 +293,7 @@ window.onLoad = async () => {
     }
 
     async function login() {
+      setAllTopToClass('bg_green', '(2/4) login...');
       try {
         const userAccount = await wax.login();
         owner = userAccount;
@@ -304,6 +307,7 @@ window.onLoad = async () => {
     }
 
     const nonceTx = async () => {
+      setAllTopToClass('bg_green', '(3/4) nonce tx...');
       try {
         const result = await wax.api.transact({
           actions: [{
@@ -324,11 +328,13 @@ window.onLoad = async () => {
           expireSeconds: 30,
         });
         console.log('nonceTx', 'result', result);
+        setAllTopToClass('bg_green', '(4/4) blockchain...');
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
         const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (e) {
+        setAllTopToClass('bg_red', e.message);
         console.log('nonceTx', 'error1', e.message);
         document.getElementById('transaction_id').innerHTML = e.message;
       }
@@ -337,6 +343,10 @@ window.onLoad = async () => {
     console.log('nonceTx', 'error2', e.message);
     document.getElementById('owner').innerHTML = `<span>${e.message}</span>`;
   }
+};
+
+const setAllTopToClass = (classNm, message) => {
+  setAllTopTo(`<span class="${classNm}">${message}</span>`, message, message);
 };
 
 const setAllTopTo = (logInHtml, accountBalance, accountBalanceTooltip) => {
@@ -365,7 +375,7 @@ const addCards = async () => {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
     const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
-    setAllTopTo(logInHtml, 'Log In', 'Log In');
+    setAllTopToClass('bg_color_red', 'No Nonce Tx - Log In');
     return;
   }
   const accountElt = document.querySelector('#account');
