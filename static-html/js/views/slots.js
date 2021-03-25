@@ -375,7 +375,7 @@ const addCards = async () => {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
     const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
-    setAllTopToClass('bg_color_red', 'No Nonce Tx - Log In');
+    setAllTopToClass('bg_color_red', 'Try Again, Tx Failed');
     return;
   }
   const accountElt = document.querySelector('#account');
