@@ -367,8 +367,8 @@ const truncate = (number) => {
 
 const setEverythingNotGray = () => {
   getSvgSlotMachineElementById('slotmachine').removeAttribute('filter');
-  document.getElementsByTagName('body')[0].removeAttribute('style');
-  document.getElementsByTagName('html')[0].removeAttribute('style');
+  document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
+  document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
 
   // document.getElementById('play').removeAttribute('style');
   document.getElementById('play').disabled = '';

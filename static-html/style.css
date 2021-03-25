@@ -34,14 +34,14 @@ button[disabled] {
 }
 
 html {
-  background-color: green;
+  background-color: gray;
 }
 
 body {
   padding: 0;
   margin: 0;
   background-image:
-    /* linear-gradient(black, black), */
+    linear-gradient(black, black),
     url("forest-background.png");
   background-blend-mode: saturation;
   background-size: cover;
