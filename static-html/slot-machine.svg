@@ -171,7 +171,7 @@
       <stop stop-opacity="0" offset="1"/>
     </linearGradient>
   </defs>
-  <g>
+  <g id="slotmachine">
     <!-- <rect x="50" y="200" width="650" height="740" fill="#ffd42a"/> -->
     <path d="m62.311 699.27 65.499-78.927h367.91l-66.465 78.927z" fill="#ffd42a" filter="url(#s)"/>
     <path d="m427.5 929.13 1.755-229.86 66.465-78.927v-356.09l121.85-44.351v640.68z" fill="url(#p)" filter="url(#t)"/>

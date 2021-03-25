@@ -40,7 +40,10 @@ html {
 body {
   padding: 0;
   margin: 0;
-  background-image: url("forest-background.png");
+  background-image:
+    /* linear-gradient(black, black), */
+    url("forest-background.png");
+  background-blend-mode: saturation;
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -55,6 +58,11 @@ body {
 
 .bg_color_red {
   background-color: red;
+}
+
+.bg_color_green {
+  background-color: green;
+  filter: grayscale(0) !important;
 }
 
 .vertical_align_top {

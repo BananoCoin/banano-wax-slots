@@ -365,17 +365,41 @@ const truncate = (number) => {
   return number.substring(0, ix+3);
 };
 
+const setEverythingNotGray = () => {
+  getSvgSlotMachineElementById('slotmachine').removeAttribute('filter');
+  document.getElementsByTagName('body')[0].removeAttribute('style');
+  document.getElementsByTagName('html')[0].removeAttribute('style');
+
+  // document.getElementById('play').removeAttribute('style');
+  document.getElementById('play').disabled = '';
+
+  // document.getElementById('additionlDetailsButton').removeAttribute('style');
+  document.getElementById('additionlDetailsButton').disabled = '';
+};
+
+const setEverythingGray = () => {
+  getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
+  document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
+  document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
+  // document.getElementById('play').setAttribute('style', 'background-color:gray;');
+  document.getElementById('play').disabled = 'disabled';
+  // document.getElementById('additionlDetailsButton').setAttribute('style', 'background-color:gray;');
+  document.getElementById('additionlDetailsButton').disabled = 'disabled';
+};
+
 const addCards = async () => {
   synchBetButtons(betFromSvgId);
   const lastNonceHashElt = document.querySelector('#lastNonceHash');
   const nonceHashElt = document.querySelector('#nonceHash');
 
   const scoreElt = document.querySelector('#score');
+  setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
     const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
     setAllTopToClass('bg_color_red', 'Try Again, Tx Failed');
+    setEverythingGray();
     return;
   }
   const accountElt = document.querySelector('#account');
