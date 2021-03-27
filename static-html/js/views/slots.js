@@ -402,9 +402,9 @@ const addCards = async () => {
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
     if (tryNumber < maxTryNumber) {
-      setAllTopToClass('bg_color_red', 'Ready to Log In'+tryNumber);
+      setAllTopToClass('bg_color_red', 'Ready to Log In');
     } else {
-      setAllTopToClass('bg_color_red', 'Try Again, Tx Failed'+tryNumber);
+      setAllTopToClass('bg_color_red', 'Try Again, Tx Failed');
     }
     console.log('tryNumber++', tryNumber);
     tryNumber++;
