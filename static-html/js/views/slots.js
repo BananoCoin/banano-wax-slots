@@ -5,6 +5,8 @@ import {getDate} from '../../js-lib/date-util.js';
 
 const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 
+let tryNumber = 0;
+const maxTryNumber = 2;
 let owner;
 let cardData;
 let walletKind;
@@ -398,7 +400,14 @@ const addCards = async () => {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
     const logInHtml = '<span class="bg_color_red">Log In</span>';
     document.getElementById('owner').innerHTML = logInHtml;
-    setAllTopToClass('bg_color_red', 'Try Again, Tx Failed');
+    console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
+    if (tryNumber < maxTryNumber) {
+      setAllTopToClass('bg_color_red', 'Ready to Log In'+tryNumber);
+    } else {
+      setAllTopToClass('bg_color_red', 'Try Again, Tx Failed'+tryNumber);
+    }
+    console.log('tryNumber++', tryNumber);
+    tryNumber++;
     setEverythingGray();
     return;
   }
