@@ -138,6 +138,7 @@ const initWebServer = async () => {
       resp.message = 'hcaptcha failed';
       resp.success = false;
       res.send(resp);
+      return;
     }
     const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
     const seed = seedUtil.getSeedFromOwner(owner);
