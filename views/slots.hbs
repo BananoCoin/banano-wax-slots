@@ -34,11 +34,16 @@
                   <span class="bg_color_black">Logged in with <span class="selectable" id="owner"></span></span>
                   <br>
                   <span class="bg_color_black">
+                    Welcome to cryptomonKey slot machine!
+                    <br>
+                    The more cryptomonKey cards you own, the better your chances to win some Banano!
+                    <br>
                     Gameplay: draw 1 of {{templateCount}} cards, three times.
                     <br>
                     Only 1 of {{templateCount}} cards needed to win!.
                   </span>
                   {{#if hcaptchaEnabled}}
+                    <br>
                     <span class="bg_color_black">
                       Don't have any banano? Do a captcha! You will be credited a small amount of banano.
                     </span>
@@ -61,7 +66,7 @@
             <tbody>
               <tr>
                 <td>&nbsp;</td>
-                <td colspan="1" class="w100vmin bg_color_black rounded">
+                <td colspan="1" class="w100pct bg_color_black rounded">
                   <span>House Account: </span><span class="selectable overflow_wrap_anywhere" id="houseAccount"></span>
                   <br>
                   <span>House Pending Balance: </span><span class="selectable" id="houseAccountBalance"></span>
@@ -120,12 +125,20 @@
                 <td class="w100vmin bg_color_black rounded vertical_align_top">
                   <h1>FAQ</h1>
                   <ol>
-                    <li><a href="https://wallet.wax.io" target="_blank">make a wax wallet. </a></li>
-                    <li><a href="https://wax.atomichub.io/market?collection_name=crptomonkeys" target="_blank">have cryptomonKeys. </a></li>
+                    <li>Don't have wallet? Make one! <a href="https://wallet.wax.io" target="_blank">Make a wax wallet. </a></li>
+                    <li>Don't have cryptomonKeys? Get some! <a href="https://wax.atomichub.io/market?collection_name=crptomonkeys" target="_blank">Get cryptomonKeys.</a></li>
                     <li>Login with Wax wallet (Anchor or Cloud)</li>
-                    <li>either deposit banano or work the captcha to get a banano</li>
-                    <li>bet or withdraw</li>
-                    <li>frozen cards? they unfreeze after eight hours. come back and play again!</li>
+                    <li>Either deposit banano or work the captcha to get a banano</li>
+                    <li>Bet or withdraw</li>
+                    <li>Frozen cards? they unfreeze after eight hours. come back and play again!</li>
+                    <li>the login will ask you to approve both a "know account name" and a "getrand" transaction to prove you are the owner of the account, and open a game session for your account. (Otherwise anyone could impersonate your account if
+                      they know it's name)</li>
+                    <li> there are three stacks of cards, each stack contains all 45 cards.
+                      <br>
+                      each play it draws 1 card from each stack, three cards total.
+                      <br>
+                      if you own all three of the cards that were drawn, you win.
+                    </li>
                   </ol>
                 </td>
                 <td>&nbsp;</td>
@@ -138,6 +151,7 @@
     </tr>
   </tbody>
 </table>
+<span class="display_none" id="ownedAssets"></span>
 <span class="display_none" id="nonce"></span>
 <span class="display_none" id="nonceHash"></span>
 <span class="display_none" id="lastNonceHash"></span>

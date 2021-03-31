@@ -98,7 +98,7 @@ const centralAccountReceivePending = async () => {
       const seed = seeds[seedIx];
       const pendingList = await receivePending(centralAccount, seed);
       if (config.centralWalletReceivePendingLoggingOn) {
-        loggingUtil.log(dateUtil.getDate(), 'pendingList');// , pendingList);
+        loggingUtil.log(dateUtil.getDate(), 'pendingList', pendingList);
       }
       checkPendingSeeds.delete(seed);
     }
@@ -187,6 +187,7 @@ const postWithoutCatch = async (context, req, res) => {
   const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
   resp.payoutAmount = payoutInformation.payoutAmount;
   resp.cardCount = payoutInformation.cardCount;
+  resp.ownedAssets = payoutInformation.ownedAssets;
   resp.payoutMultiplier = config.payoutMultiplier;
   resp.bets = config.bets;
 

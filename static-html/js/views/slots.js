@@ -281,16 +281,21 @@ window.onLoad = async () => {
 
     async function autoLogin() {
       setAllTopToClass('bg_green', '(1/4) auto login...');
-      const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
-      if (isAutoLoginAvailable) {
-        const userAccount = wax.userAccount;
-        owner = userAccount;
-        window.localStorage.owner = owner;
-        ownerElt.innerHTML = `<span>${owner}</span>`;
-        setTimeout(nonceTx, 0);
-      } else {
-        ownerElt.innerHTML = `<span>Not auto-logged in</span>`;
-        login();
+      try {
+        const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
+        if (isAutoLoginAvailable) {
+          const userAccount = wax.userAccount;
+          owner = userAccount;
+          window.localStorage.owner = owner;
+          ownerElt.innerHTML = `<span>${owner}</span>`;
+          setTimeout(nonceTx, 0);
+        } else {
+          ownerElt.innerHTML = `<span>Not auto-logged in</span>`;
+          login();
+        }
+      } catch (error) {
+        console.log('autoLogin error', error.message);
+        ownerElt.innerHTML = `<span>${error.message}</span>`;
       }
     }
 
@@ -303,7 +308,7 @@ window.onLoad = async () => {
         ownerElt.innerHTML = `<span>${owner}</span>`;
         setTimeout(nonceTx, 0);
       } catch (e) {
-        console.log(e.message);
+        console.log('login error', e.message);
         ownerElt.innerHTML = `<span>${e.message}</span>`;
       }
     }
@@ -380,7 +385,7 @@ const setEverythingNotGray = () => {
 };
 
 const setEverythingGray = () => {
-  getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
+  // getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
   document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
   document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
   // document.getElementById('play').setAttribute('style', 'background-color:gray;');
@@ -493,6 +498,58 @@ const addCards = async () => {
       setCard(card3Elt, cardData.cards[2]);
     }
     resetScoreText();
+
+    let ownedAssetsHtml = '';
+    cardData.ownedAssets.sort((a, b) => {
+      if (a.templateId != b.templateId) {
+        return b.templateId - a.templateId;
+      }
+      if (a.frozen != b.frozen) {
+        let aFrozen;
+        if (a.frozen) {
+          aFrozen = 1;
+        } else {
+          aFrozen = 0;
+        }
+        let bFrozen;
+        if (b.frozen) {
+          bFrozen = 1;
+        } else {
+          bFrozen = 0;
+        }
+        return bFrozen - aFrozen;
+      }
+      if (a.assetId != b.assetId) {
+        return b.assetId - a.assetId;
+      }
+    });
+    for (let ix = 0; ix < cardData.ownedAssets.length; ix++) {
+      const ownedAsset = cardData.ownedAssets[ix];
+      let border = '';
+      if (ownedAsset.frozen) {
+        border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;color:black;';
+      } else {
+        border = 'border-width:0.2vh;border-color:black;background-color:white;color:black;';
+      }
+      const src = `/ipfs/${ownedAsset.img}.webp`;
+      ownedAssetsHtml += `<div style="${border}margin:1.0vh;" class="bordered float_left">`;
+      ownedAssetsHtml += `<image style="margin:1.0vh;" class="bordered" src="${src}">`;
+      ownedAssetsHtml += '<br>';
+      ownedAssetsHtml += ownedAsset.name;
+      ownedAssetsHtml += '<br>';
+      ownedAssetsHtml += `Frozen:${ownedAsset.frozen}`;
+
+      if (ownedAsset.thawTimeMs !== undefined) {
+        if (ownedAsset.thawTimeMs > 0) {
+          const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000)).toFixed(3);
+          ownedAssetsHtml += ` Thaw Time:${thawTimeHours} Hours`;
+        }
+      }
+      // ownedAssetsHtml += JSON.stringify(ownedAsset);
+      ownedAssetsHtml += '</div>';
+    }
+    document.getElementById('ownedAssets').innerHTML = ownedAssetsHtml;
+
     if (cardData.score[0] == 'Won') {
       winConfetti();
     }
@@ -684,6 +741,7 @@ window.showFAQ = () => {
   document.querySelector('#faqTable').className = 'w100pct';
   document.querySelector('#additionlDetailsTable').className = 'display_none';
   document.querySelector('#slotMachineTable').className = 'display_none';
+  document.querySelector('#ownedAssets').className = 'display_none';
 };
 
 window.showSlotMachine = () => {
@@ -693,6 +751,7 @@ window.showSlotMachine = () => {
   document.querySelector('#faqTable').className = 'display_none';
   document.querySelector('#additionlDetailsTable').className = 'display_none';
   document.querySelector('#slotMachineTable').className = 'w100pct';
+  document.querySelector('#ownedAssets').className = 'display_none';
 };
 
 window.showAdditionalDetails = () => {
@@ -702,6 +761,7 @@ window.showAdditionalDetails = () => {
   document.querySelector('#faqTable').className = 'display_none';
   document.querySelector('#additionlDetailsTable').className = 'w100pct';
   document.querySelector('#slotMachineTable').className = 'display_none';
+  document.querySelector('#ownedAssets').className = '';
 };
 
 const winConfetti = () => {

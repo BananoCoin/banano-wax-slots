@@ -62,6 +62,18 @@ const isAssetFrozen = (assetId) => {
   return fs.existsSync(assetFileNm);
 };
 
+const getThawTimeMs = (assetId) => {
+  const assetFileNm = getAssetFileNm(assetId);
+  if (fs.existsSync(assetFileNm)) {
+    const {birthtimeMs} = fs.statSync(assetFileNm);
+    const thawTimeMs = birthtimeMs + config.thawTimeMs;
+    const nowTimeMs = Date.now();
+    const diffMs = thawTimeMs - nowTimeMs;
+    // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
+    return diffMs;
+  }
+}
+
 const thawAssetIfItIsTime = (assetId) => {
   const assetFileNm = getAssetFileNm(assetId);
   if (fs.existsSync(assetFileNm)) {
@@ -80,4 +92,5 @@ module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.isAssetFrozen = isAssetFrozen;
 module.exports.freezeAsset = freezeAsset;
+module.exports.getThawTimeMs = getThawTimeMs;
 module.exports.thawAssetIfItIsTime = thawAssetIfItIsTime;

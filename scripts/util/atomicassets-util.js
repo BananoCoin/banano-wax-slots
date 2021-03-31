@@ -80,8 +80,8 @@ const addAllTemplates = async () => {
         pageTemplateData.name = pageTemplate.immutable_data.name;
         pageTemplateData.img = pageTemplate.immutable_data.img;
         pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
-        pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply,10);
-        pageTemplateData.max_supply = parseInt(pageTemplate.max_supply,10);
+        pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply, 10);
+        pageTemplateData.max_supply = parseInt(pageTemplate.max_supply, 10);
 
         templates.push(pageTemplateData);
       }
@@ -158,7 +158,9 @@ const getPayoutInformation = async (owner) => {
   const ownedCards = await getOwnedCards(owner);
   const frozenAssetByTemplateMap = {};
   const unfrozenAssetByTemplateMap = {};
+  const ownedAssets = [];
 
+  resp.ownedAssets = ownedAssets;
   resp.frozenAssetByTemplateMap = frozenAssetByTemplateMap;
   resp.unfrozenAssetByTemplateMap = unfrozenAssetByTemplateMap;
 
@@ -167,7 +169,8 @@ const getPayoutInformation = async (owner) => {
     const assetId = ownedCard.asset_id;
     assetUtil.thawAssetIfItIsTime(assetId);
     const template_id = ownedCard.template.template_id.toString();
-    if (assetUtil.isAssetFrozen(assetId)) {
+    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    if (isAssetFrozenFlag) {
       if (frozenAssetByTemplateMap[template_id] === undefined) {
         frozenAssetByTemplateMap[template_id] = [];
       }
@@ -178,6 +181,14 @@ const getPayoutInformation = async (owner) => {
       }
       unfrozenAssetByTemplateMap[template_id].push(assetId);
     }
+    const ownedAsset = {};
+    ownedAsset.name = ownedCard.template.immutable_data.name;
+    ownedAsset.img = ownedCard.template.immutable_data.img;
+    ownedAsset.assetId = assetId;
+    ownedAsset.templateId = template_id;
+    ownedAsset.frozen = isAssetFrozenFlag;
+    ownedAsset.thawTimeMs = assetUtil.getThawTimeMs(assetId);
+    ownedAssets.push(ownedAsset);
   }
   // loggingUtil.log(dateUtil.getDate(), 'ownedCards', ownedCards);
   // loggingUtil.log(dateUtil.getDate(), 'ownedCardTemplateSet', ownedCardTemplateSet);
