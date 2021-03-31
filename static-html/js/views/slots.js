@@ -12,6 +12,8 @@ let cardData;
 let walletKind;
 let betFromSvgId = '1ban';
 let betFromSvg = 0;
+let spinMonKeysFlag = false;
+let spinMonkeysIx = 0;
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -55,6 +57,9 @@ const play = async (bet) => {
   }
   setScore('pending...');
   setAllTopToClass('small', 'pending...');
+  if (bet) {
+    setArm('smclick');
+  }
 
   if (window.localStorage.owner !== undefined) {
     const ownerElt = document.querySelector('#owner');
@@ -66,6 +71,7 @@ const play = async (bet) => {
       cardData = JSON.parse(this.responseText);
       console.log('cardData', cardData);
       document.querySelector('#play').disabled = false;
+      setArm('smrest');
       setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
@@ -128,16 +134,87 @@ const synchBetButtons = (selectedId) => {
     const idAmounts = cardData.bets;
     const ids = Object.keys(idAmounts);
     ids.forEach((id) => {
-      getSvgSlotMachineElementById(id).setAttribute('fill', '#7b7b7b');
+      getSvgSlotMachineElementById(id).setAttribute('fill', 'yellow');
+      getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
       const textElt = getSvgSlotMachineElementById(id+'-text');
       const text = parseFloat(idAmounts[id]).toFixed(2);
       // console.log('synchBetButtons', textElt, text);
       textElt.textContent = text;
     });
     betFromSvg = idAmounts[selectedId];
-    getSvgSlotMachineElementById(selectedId).setAttribute('fill', '#000000');
+    getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
+    getSvgSlotMachineElementById(selectedId).setAttribute('stroke', 'black');
   }
   resetScoreText();
+};
+
+const spinMonkey = (cardElt, ownedAsset) => {
+  clear(cardElt);
+  cardElt.setAttribute('class', 'bordered');
+  if (ownedAsset.frozen) {
+    addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightblue', 'stroke': 'blue'});
+  } else {
+    addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'white', 'stroke': 'black'});
+  }
+  const cardTitle = `${ownedAsset.name}`;
+  const src = `/ipfs/${ownedAsset.img}.webp`;
+  const image = addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
+  addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
+};
+
+const spinMonKeys = () => {
+  if (cardData == undefined) {
+    return;
+  }
+  if (cardData.ownedAssets == undefined) {
+    return;
+  }
+  if (cardData.ownedAssets.length == 0) {
+    return;
+  }
+  const card1Elt = getSvgSlotMachineElementById('card1');
+  const card2Elt = getSvgSlotMachineElementById('card2');
+  const card3Elt = getSvgSlotMachineElementById('card3');
+
+  if (spinMonKeysFlag) {
+    const increment = () => {
+      spinMonkeysIx++;
+      if (spinMonkeysIx >= cardData.ownedAssets.length) {
+        spinMonkeysIx = 0;
+      }
+    };
+
+    increment();
+    spinMonkey(card1Elt, cardData.ownedAssets[spinMonkeysIx]);
+    increment();
+    spinMonkey(card2Elt, cardData.ownedAssets[spinMonkeysIx]);
+    increment();
+    spinMonkey(card3Elt, cardData.ownedAssets[spinMonkeysIx]);
+    setTimeout(spinMonKeys, 50);
+  }
+};
+
+const clearMonkeys = () => {
+  const card1Elt = getSvgSlotMachineElementById('card1');
+  const card2Elt = getSvgSlotMachineElementById('card2');
+  const card3Elt = getSvgSlotMachineElementById('card3');
+
+  clear(card1Elt);
+  clear(card2Elt);
+  clear(card3Elt);
+};
+
+const setArm = (id) => {
+  spinMonKeysFlag = id == 'smmouse';
+  setTimeout(spinMonKeys, 0);
+  const smrestElt = getSvgSlotMachineElementById('smrest');
+  const smmouseElt = getSvgSlotMachineElementById('smmouse');
+  const smclickElt = getSvgSlotMachineElementById('smclick');
+  const elt = getSvgSlotMachineElementById(id);
+  smrestElt.setAttribute('visibility', 'hidden');
+  smmouseElt.setAttribute('visibility', 'hidden');
+  smclickElt.setAttribute('visibility', 'hidden');
+  elt.setAttribute('visibility', 'visible');
 };
 
 const addPlayArmListeners = (id) => {
@@ -146,14 +223,16 @@ const addPlayArmListeners = (id) => {
     if (document.querySelector('#play').disabled) {
       return false;
     }
+    clearMonkeys();
     window.play();
     return false;
   });
   elt.addEventListener('mouseleave', () => {
-    elt.setAttribute('stroke', '#000000');
+    setArm('smrest');
+    clearMonkeys();
   });
   elt.addEventListener('mouseenter', () => {
-    elt.setAttribute('stroke', '#AAAAAA');
+    setArm('smmouse');
   });
 };
 
@@ -385,7 +464,7 @@ const setEverythingNotGray = () => {
 };
 
 const setEverythingGray = () => {
-  // getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
+  getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
   document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
   document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
   // document.getElementById('play').setAttribute('style', 'background-color:gray;');
@@ -449,6 +528,8 @@ const addCards = async () => {
       addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightblue', 'stroke': 'blue'});
     } else if (cardData.score[0] == 'Won') {
       addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'lightgreen', 'stroke': 'green'});
+    } else {
+      addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'white', 'stroke': 'black'});
     }
     const cardTitle = `${cardDataElt.name} (${cardDataElt.totalCardCount-cardDataElt.frozenCardCount}/${cardDataElt.totalCardCount})`;
     const anchorElt = addChildSvgElement(cardElt, 'a', {'href': href, 'target': '__blank'});
@@ -525,28 +606,7 @@ const addCards = async () => {
     });
     for (let ix = 0; ix < cardData.ownedAssets.length; ix++) {
       const ownedAsset = cardData.ownedAssets[ix];
-      let border = '';
-      if (ownedAsset.frozen) {
-        border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;color:black;';
-      } else {
-        border = 'border-width:0.2vh;border-color:black;background-color:white;color:black;';
-      }
-      const src = `/ipfs/${ownedAsset.img}.webp`;
-      ownedAssetsHtml += `<div style="${border}margin:1.0vh;" class="bordered float_left">`;
-      ownedAssetsHtml += `<image style="margin:1.0vh;" class="bordered" src="${src}">`;
-      ownedAssetsHtml += '<br>';
-      ownedAssetsHtml += ownedAsset.name;
-      ownedAssetsHtml += '<br>';
-      ownedAssetsHtml += `Frozen:${ownedAsset.frozen}`;
-
-      if (ownedAsset.thawTimeMs !== undefined) {
-        if (ownedAsset.thawTimeMs > 0) {
-          const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000)).toFixed(3);
-          ownedAssetsHtml += ` Thaw Time:${thawTimeHours} Hours`;
-        }
-      }
-      // ownedAssetsHtml += JSON.stringify(ownedAsset);
-      ownedAssetsHtml += '</div>';
+      ownedAssetsHtml += getOwnedAssetHtml(ownedAsset);
     }
     document.getElementById('ownedAssets').innerHTML = ownedAssetsHtml;
 
@@ -554,6 +614,33 @@ const addCards = async () => {
       winConfetti();
     }
   }
+};
+
+const getOwnedAssetHtml = (ownedAsset) => {
+  let ownedAssetsHtml = '';
+  let border = '';
+  if (ownedAsset.frozen) {
+    border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;color:black;';
+  } else {
+    border = 'border-width:0.2vh;border-color:black;background-color:white;color:black;';
+  }
+  const src = `/ipfs/${ownedAsset.img}.webp`;
+  ownedAssetsHtml += `<div style="${border}margin:1.0vh;" class="bordered float_left">`;
+  ownedAssetsHtml += `<image style="margin:1.0vh;" class="bordered" src="${src}">`;
+  ownedAssetsHtml += '<br>';
+  ownedAssetsHtml += ownedAsset.name;
+  ownedAssetsHtml += '<br>';
+  ownedAssetsHtml += `Frozen:${ownedAsset.frozen}`;
+
+  if (ownedAsset.thawTimeMs !== undefined) {
+    if (ownedAsset.thawTimeMs > 0) {
+      const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000)).toFixed(3);
+      ownedAssetsHtml += ` Thaw Time:${thawTimeHours} Hours`;
+    }
+  }
+  // ownedAssetsHtml += JSON.stringify(ownedAsset);
+  ownedAssetsHtml += '</div>';
+  return ownedAssetsHtml;
 };
 
 const resetScoreText = async () => {
@@ -641,7 +728,7 @@ const setScore = (scoreText, fill, stroke) => {
 
 
   if ((fill != undefined) && (stroke != undefined)) {
-    addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 285, 'height': 70, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
+    addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 285, 'height': 90, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
   }
 
   let y = 750;
