@@ -59,6 +59,8 @@ const play = async (bet) => {
   setAllTopToClass('small', 'pending...');
   if (bet) {
     setArm('smclick');
+    spinMonKeysFlag = true;
+    setTimeout(spinMonKeys, 0);
   }
 
   if (window.localStorage.owner !== undefined) {
@@ -72,6 +74,7 @@ const play = async (bet) => {
       console.log('cardData', cardData);
       document.querySelector('#play').disabled = false;
       setArm('smrest');
+      spinMonKeysFlag = false;
       setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
@@ -223,13 +226,19 @@ const addPlayArmListeners = (id) => {
     if (document.querySelector('#play').disabled) {
       return false;
     }
-    clearMonkeys();
+    if (spinMonKeysFlag) {
+      spinMonKeysFlag = false;
+      clearMonkeys();
+    }
     window.play();
     return false;
   });
   elt.addEventListener('mouseleave', () => {
     setArm('smrest');
-    clearMonkeys();
+    if (spinMonKeysFlag) {
+      spinMonKeysFlag = false;
+      clearMonkeys();
+    }
   });
   elt.addEventListener('mouseenter', () => {
     setArm('smmouse');
