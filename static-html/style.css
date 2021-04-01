@@ -60,9 +60,17 @@ body {
   background-color: red;
 }
 
+.bg_color_lightblue {
+  background-color: lightblue;
+}
+
 .bg_color_green {
   background-color: green;
   filter: grayscale(0) !important;
+}
+
+.color_black {
+  color: black;
 }
 
 .vertical_align_top {

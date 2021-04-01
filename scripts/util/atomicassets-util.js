@@ -68,7 +68,6 @@ const addAllTemplates = async () => {
   const addTemplates = async () => {
     loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates page', page);
     let lessThanMax = false;
-    const worked = false;
     try {
       const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys'}, page, max);
       lessThanMax = templates.length < max;
@@ -168,24 +167,24 @@ const getPayoutInformation = async (owner) => {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
     assetUtil.thawAssetIfItIsTime(assetId);
-    const template_id = ownedCard.template.template_id.toString();
+    const templateId = ownedCard.template.template_id.toString();
     const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
-      if (frozenAssetByTemplateMap[template_id] === undefined) {
-        frozenAssetByTemplateMap[template_id] = [];
+      if (frozenAssetByTemplateMap[templateId] === undefined) {
+        frozenAssetByTemplateMap[templateId] = [];
       }
-      frozenAssetByTemplateMap[template_id].push(assetId);
+      frozenAssetByTemplateMap[templateId].push(assetId);
     } else {
-      if (unfrozenAssetByTemplateMap[template_id] === undefined) {
-        unfrozenAssetByTemplateMap[template_id] = [];
+      if (unfrozenAssetByTemplateMap[templateId] === undefined) {
+        unfrozenAssetByTemplateMap[templateId] = [];
       }
-      unfrozenAssetByTemplateMap[template_id].push(assetId);
+      unfrozenAssetByTemplateMap[templateId].push(assetId);
     }
     const ownedAsset = {};
     ownedAsset.name = ownedCard.template.immutable_data.name;
     ownedAsset.img = ownedCard.template.immutable_data.img;
     ownedAsset.assetId = assetId;
-    ownedAsset.templateId = template_id;
+    ownedAsset.templateId = templateId;
     ownedAsset.frozen = isAssetFrozenFlag;
     ownedAsset.thawTimeMs = assetUtil.getThawTimeMs(assetId);
     ownedAssets.push(ownedAsset);

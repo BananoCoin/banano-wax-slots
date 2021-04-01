@@ -135,18 +135,20 @@ const synchBetButtons = (selectedId) => {
   betFromSvgId = selectedId;
   if (cardData !== undefined) {
     const idAmounts = cardData.bets;
-    const ids = Object.keys(idAmounts);
-    ids.forEach((id) => {
-      getSvgSlotMachineElementById(id).setAttribute('fill', 'yellow');
-      getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
-      const textElt = getSvgSlotMachineElementById(id+'-text');
-      const text = parseFloat(idAmounts[id]).toFixed(2);
-      // console.log('synchBetButtons', textElt, text);
-      textElt.textContent = text;
-    });
-    betFromSvg = idAmounts[selectedId];
-    getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
-    getSvgSlotMachineElementById(selectedId).setAttribute('stroke', 'black');
+    if (idAmounts !== undefined) {
+      const ids = Object.keys(idAmounts);
+      ids.forEach((id) => {
+        getSvgSlotMachineElementById(id).setAttribute('fill', 'yellow');
+        getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
+        const textElt = getSvgSlotMachineElementById(id+'-text');
+        const text = parseFloat(idAmounts[id]).toFixed(2);
+        // console.log('synchBetButtons', textElt, text);
+        textElt.textContent = text;
+      });
+      betFromSvg = idAmounts[selectedId];
+      getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
+      getSvgSlotMachineElementById(selectedId).setAttribute('stroke', 'black');
+    }
   }
   resetScoreText();
 };
@@ -681,11 +683,11 @@ const resetScoreText = async () => {
   scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
 
   const idAmounts = cardData.bets;
-  const potentialProfit = cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier;
-
-  scoreText.push(`Potential Profit:${potentialProfit.toFixed(2)}`);
-
-  if (cardData.score[0] == 'Won') {
+  if (idAmounts !== undefined) {
+    const potentialProfit = cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier;
+    scoreText.push(`Potential Profit:${potentialProfit.toFixed(2)}`);
+  }
+  if ((Array.isArray(cardData.score)) && (cardData.score.length > 0) && (cardData.score[0] == 'Won')) {
     setScore(scoreText, 'lightgreen', 'green');
   } else {
     setScore(scoreText);
@@ -804,6 +806,73 @@ const withdraw = () => {
   withdrawButton.disabled = true;
 };
 window.withdraw = withdraw;
+
+window.blackMonkeyAnswer = (answer) => {
+  const xmlhttp = new XMLHttpRequest();
+  const parms = {};
+  parms.owner = window.localStorage.owner;
+  parms.nonce = window.localStorage.nonce;
+  parms.answer = answer;
+  const blackMonkeyElt = document.getElementById('blackMonkey');
+  clear(blackMonkeyElt);
+
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      const response = JSON.parse(this.responseText);
+      // console.log(response);
+      let classNm;
+      let message;
+      if (response.success) {
+        classNm = 'bg_color_green';
+        message = 'you win!';
+        winConfetti();
+        play();
+      } else {
+        classNm = 'bg_color_red';
+        message = response.message;
+      }
+      const html = `<span class="${classNm}">${message}</span>`;
+      blackMonkeyElt.innerHTML = html;
+    }
+  };
+  xmlhttp.open('POST', '/black_monkey', true);
+  xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xmlhttp.send(JSON.stringify(parms));
+};
+
+window.blackMonkeyImage = () => {
+  const xmlhttp = new XMLHttpRequest();
+  const parms = {};
+  parms.owner = window.localStorage.owner;
+  parms.nonce = window.localStorage.nonce;
+  const blackMonkeyElt = document.getElementById('blackMonkey');
+  clear(blackMonkeyElt);
+
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      const response = JSON.parse(this.responseText);
+      console.log(response);
+      if(response.success) {
+        const keys = [...Object.keys(response.images)];
+        let html = '';
+        for (let ix = 0; ix < keys.length; ix++) {
+          const key = keys[ix];
+          const image = response.images[key];
+          html += `<button onclick="blackMonkeyAnswer('${key}');return false;">`;
+          html += `<img style="width:25vmin;" src="${image}"></img>`;
+          html += `</button>`;
+        }
+        blackMonkeyElt.innerHTML = html;
+      } else {
+        const html = `<span class="bg_color_lightblue color_black">${response.message}</span>`;
+        blackMonkeyElt.innerHTML = html;
+      }
+    }
+  };
+  xmlhttp.open('POST', '/black_monkey_images', true);
+  xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xmlhttp.send(JSON.stringify(parms));
+};
 
 window.submitHcaptcha = () => {
   const hcaptchaElts = [...document.getElementsByName('h-captcha-response')];

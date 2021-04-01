@@ -103,7 +103,7 @@ const centralAccountReceivePending = async () => {
       checkPendingSeeds.delete(seed);
     }
     if (config.centralWalletReceivePendingLoggingOn) {
-      loggingUtil.log(dateUtil.getDate(), 'SUCCESS centralAccountReceivePending');// , centralPendingList);
+      loggingUtil.log(dateUtil.getDate(), 'SUCCESS centralAccountReceivePending', centralPendingList);
     }
   } catch (error) {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE centralAccountReceivePending', error.message);

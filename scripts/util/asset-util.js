@@ -7,6 +7,7 @@ const path = require('path');
 const dateUtil = require('./date-util.js');
 
 // constants
+const DEBUG = false;
 
 // variables
 /* eslint-disable no-unused-vars */
@@ -51,7 +52,9 @@ const getAssetFileNm = (assetId) => {
 const freezeAsset = (assetId) => {
   const assetFileNm = getAssetFileNm(assetId);
   if (!fs.existsSync(assetFileNm)) {
-    // loggingUtil.log(dateUtil.getDate(), 'freezing asset', assetId);
+    if (DEBUG) {
+      loggingUtil.log(dateUtil.getDate(), 'freezing asset', assetId);
+    }
     const assetFile = fs.openSync(assetFileNm, 'w');
     fs.closeSync(assetFile);
   }
@@ -72,7 +75,7 @@ const getThawTimeMs = (assetId) => {
     // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
     return diffMs;
   }
-}
+};
 
 const thawAssetIfItIsTime = (assetId) => {
   const assetFileNm = getAssetFileNm(assetId);
@@ -82,7 +85,9 @@ const thawAssetIfItIsTime = (assetId) => {
     const nowTimeMs = Date.now();
     // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
     if (thawTimeMs < nowTimeMs) {
-      // loggingUtil.log(dateUtil.getDate(), 'thawing asset', assetId);
+      if (DEBUG) {
+        loggingUtil.log(dateUtil.getDate(), 'thawing asset', assetId);
+      }
       fs.unlinkSync(assetFileNm);
     }
   }

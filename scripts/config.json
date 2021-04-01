@@ -27,6 +27,14 @@
     "port": "8686"
   },
   "disableWithdraw": false,
+  "blackMonkeyCaptcha": {
+    "thawTimeMs": 5000,
+    "enabled": false,
+    "url": "",
+    "level": "",
+    "key": "",
+    "bananos": 0.05
+  },
   "hcaptcha": {
     "enabled": true,
     "sitekey": "",

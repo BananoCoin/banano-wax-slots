@@ -16,10 +16,13 @@ const atomicassetsUtil = require('../util/atomicassets-util.js');
 const bananojsCacheUtil = require('../util/bananojs-cache-util.js');
 const nonceUtil = require('../util/nonce-util.js');
 const seedUtil = require('../util/seed-util.js');
+const blackMonkeyUtil = require('../util/black-monkey-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
 const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 
 // constants
+const blackMonkeyImagesByOwner = {};
+const blackMonkeyFrozenByOwner = {};
 
 // variables
 let config;
@@ -83,6 +86,8 @@ const initWebServer = async () => {
     data.templateCount = atomicassetsUtil.getTemplateCount();
     data.burnAccount = config.burnAccount;
     data.hcaptchaEnabled = config.hcaptcha.enabled;
+    data.blackMonkeyEnabled = config.blackMonkeyCaptcha.enabled;
+    data.anyCaptchaEnabled = data.hcaptchaEnabled || data.blackMonkeyEnabled;
     data.hcaptchaSiteKey = config.hcaptcha.sitekey;
 
     res.render('slots', data);
@@ -98,34 +103,84 @@ const initWebServer = async () => {
     await webPageWithdrawUtil.post(context, req, res);
   });
 
+  app.post('/black_monkey_images', async (req, res) => {
+    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
+    if (verifyOwnerAndNonceResponse !== undefined) {
+      res.send(verifyOwnerAndNonceResponse);
+      return;
+    }
+    if (blackMonkeyFrozenByOwner[req.body.owner] !== undefined) {
+      const birthtimeMs = blackMonkeyFrozenByOwner[req.body.owner];
+      const thawTimeMs = birthtimeMs + config.blackMonkeyCaptcha.thawTimeMs;
+      const nowTimeMs = Date.now();
+      const diffMs = thawTimeMs - nowTimeMs;
+      if (diffMs > 0) {
+        const resp = {};
+        resp.images = [];
+        resp.message = `cooldown ${diffMs/1000} seconds`;
+        resp.success = false;
+        res.send(resp);
+        return;
+      } else {
+        delete blackMonkeyFrozenByOwner[req.body.owner];
+      }
+    }
+    if (blackMonkeyImagesByOwner[req.body.owner] === undefined) {
+      const images = await blackMonkeyUtil.getImages();
+      // console.log('black_monkey_images', images);
+      blackMonkeyImagesByOwner[req.body.owner] = images;
+    }
+    if (blackMonkeyFrozenByOwner[req.body.owner] === undefined) {
+      blackMonkeyFrozenByOwner[req.body.owner] = Date.now();
+    }
+    const images = blackMonkeyImagesByOwner[req.body.owner];
+    const resp = {};
+    resp.images = images.data;
+    resp.success = true;
+    res.send(resp);
+  });
+
+  app.post('/black_monkey', async (req, res) => {
+    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
+    if (verifyOwnerAndNonceResponse !== undefined) {
+      res.send(verifyOwnerAndNonceResponse);
+      return;
+    }
+    const owner = req.body.owner;
+    const answer = blackMonkeyImagesByOwner[owner];
+    delete blackMonkeyImagesByOwner[owner];
+    
+    if ((answer == undefined) || (req.body.answer == undefined) || (parseInt(answer.answer, 10) !== parseInt(req.body.answer, 10))) {
+      const resp = {};
+      resp.message = `black monkey failed expected:'${answer.answer}' actual:'${req.body.answer}'`;
+      resp.success = false;
+      res.send(resp);
+      return;
+    }
+
+    const seed = seedUtil.getSeedFromOwner(owner);
+    const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
+    const captchaAmount = config.blackMonkeyCaptcha.bananos;
+    loggingUtil.log(dateUtil.getDate(), 'black monkey', account, captchaAmount);
+    await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
+    const resp = {};
+    resp.message = '';
+    resp.success = true;
+    res.send(resp);
+  });
+
   app.post('/hcaptcha', async (req, res) => {
-    const context = {};
     if (req.body['h-captcha-response'] === undefined) {
       const resp = {};
       resp.message = 'no h-captcha-response';
       resp.success = false;
       res.send(resp);
+      return;
     }
-    if (req.body.nonce === undefined) {
-      const resp = {};
-      resp.message = 'no nonce';
-      resp.success = false;
-      res.send(resp);
-    }
-    if (req.body.owner === undefined) {
-      const resp = {};
-      resp.message = 'no owner';
-      resp.success = false;
-      res.send(resp);
-    }
-    const nonce = req.body.nonce;
-    const owner = req.body.owner;
-    const badNonce = await nonceUtil.isBadNonce(owner, nonce);
-    if (badNonce) {
-      const resp = {};
-      resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
-      resp.ready = false;
-      res.send(resp);
+
+    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
+    if (verifyOwnerAndNonceResponse !== undefined) {
+      res.send(verifyOwnerAndNonceResponse);
       return;
     }
 
@@ -140,7 +195,6 @@ const initWebServer = async () => {
       res.send(resp);
       return;
     }
-    const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
     const seed = seedUtil.getSeedFromOwner(owner);
     const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
     const captchaAmount = config.hcaptcha.bananos;
@@ -247,6 +301,30 @@ const getCaptchaResponse = async (config, req, ip) => {
       resolve(response);
     });
   });
+};
+
+const verifyOwnerAndNonce = async (req) => {
+  if (req.body.nonce === undefined) {
+    const resp = {};
+    resp.message = 'no nonce';
+    resp.success = false;
+    return resp;
+  }
+  if (req.body.owner === undefined) {
+    const resp = {};
+    resp.message = 'no owner';
+    resp.success = false;
+    return resp;
+  }
+  const nonce = req.body.nonce;
+  const owner = req.body.owner;
+  const badNonce = await nonceUtil.isBadNonce(owner, nonce);
+  if (badNonce) {
+    const resp = {};
+    resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
+    resp.ready = false;
+    return resp;
+  }
 };
 
 // exports

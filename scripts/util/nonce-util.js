@@ -92,6 +92,7 @@ const isBadNonce = async (owner, nonce) => {
       badNonce = true;
     }
   }
+  return badNonce;
 };
 
 module.exports.init = init;

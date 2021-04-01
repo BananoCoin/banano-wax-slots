@@ -46,15 +46,6 @@ const deactivate = () => {
   trackedAccountSet.clear();
 };
 
-const getAssetFileNm = (assetId) => {
-  /* istanbul ignore if */
-  if (assetId === undefined) {
-    throw new Error('assetId is required.');
-  };
-  const assetFileNm = path.join(config.bananojsCacheDataDir, assetId);
-  return assetFileNm;
-};
-
 const getBananoAccountFromSeed = async (seed, seedIx) => {
   if (seed === undefined) {
     throw new Error('seed is required.');

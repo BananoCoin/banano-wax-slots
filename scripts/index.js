@@ -9,6 +9,7 @@ const seedUtil = require('./util/seed-util.js');
 const nonceUtil = require('./util/nonce-util.js');
 const randomUtil = require('./util/random-util.js');
 const atomicassetsUtil = require('./util/atomicassets-util.js');
+const blackMonkeyUtil = require('./util/black-monkey-util.js');
 const webPagePlayUtil = require('./web/pages/play-util.js');
 const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
@@ -51,7 +52,7 @@ const init = async () => {
   if (config.hcaptcha === undefined) {
     throw Error('hcaptcha is required in ./config.json');
   }
-  if(config.hcaptcha.enabled) {
+  if (config.hcaptcha.enabled) {
     if (config.hcaptcha.sitekey == '') {
       throw Error('hcaptcha sitekey is required in ./config.json');
     }
@@ -67,6 +68,7 @@ const init = async () => {
   modules.push(nonceUtil);
   modules.push(randomUtil);
   modules.push(atomicassetsUtil);
+  modules.push(blackMonkeyUtil);
   modules.push(webPagePlayUtil);
   modules.push(webPageWithdrawUtil);
   modules.push(webServerUtil);

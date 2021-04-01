@@ -42,7 +42,7 @@
                     <br>
                     Only 1 of {{templateCount}} cards needed to win!.
                   </span>
-                  {{#if hcaptchaEnabled}}
+                  {{#if anyCaptchaEnabled }}
                     <br>
                     <span class="bg_color_black">
                       Don't have any banano? Do a captcha! You will be credited a small amount of banano.
@@ -74,10 +74,19 @@
                   <span>House Balance: </span><span class="selectable" id="houseAccountCacheBalance"></span>
                   <hr>
                   <span>Your Account Balance: </span><span class="selectable" id="accountCacheBalance"></span>
-                  {{#if hcaptchaEnabled}}
+                  {{#if anyCaptchaEnabled}}
                     <p>
                       Don't have any banano? Do a captcha! You will be credited a small amount of banano.
                     </p>
+                  {{/if}}
+                  {{#if blackMonkeyEnabled}}
+                    <button class="w40pct font_size_50pct bg_color_green" onclick="blackMonkeyImage();return false;">
+                      Black Monkey!
+                    </button>
+                    <div id="blackMonkey">
+                    </div>
+                  {{/if}}
+                  {{#if hcaptchaEnabled}}
                     <form action=" /hcaptcha" method="POST">
                       <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-size="compact" data-theme="dark" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
                       <br />
