@@ -149,7 +149,7 @@ const initWebServer = async () => {
     const owner = req.body.owner;
     const answer = blackMonkeyImagesByOwner[owner];
     delete blackMonkeyImagesByOwner[owner];
-    
+
     if ((answer == undefined) || (req.body.answer == undefined) || (parseInt(answer.answer, 10) !== parseInt(req.body.answer, 10))) {
       const resp = {};
       resp.message = `black monkey failed expected:'${answer.answer}' actual:'${req.body.answer}'`;

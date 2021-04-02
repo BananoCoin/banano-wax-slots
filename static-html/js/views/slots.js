@@ -788,14 +788,28 @@ const withdraw = () => {
 
   setScore('pending...');
   xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      withdrawButton.disabled = false;
-      const response = JSON.parse(this.responseText);
-      console.log('withdraw', response);
-      setScore(response.message);
-      withdrawResponseElt.innerText = response.message;
-      if (response.success) {
-        play();
+    console.log('withdraw', this);
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        withdrawButton.disabled = false;
+        const response = JSON.parse(this.responseText);
+        console.log('withdraw response', response);
+        if (response.success) {
+          setScore(response.message, 'green', 'white');
+        } else {
+          withdrawResponseElt.innerHTML = `<span class="bg_color_red">${response.message}</span>`;
+          setScore(response.message, 'red', 'white');
+        }
+        withdrawResponseElt.innerText = response.message;
+        if (response.success) {
+          play();
+        }
+      } else {
+        withdrawButton.disabled = false;
+        const response = JSON.parse(this.responseText);
+        console.log('withdraw error', response);
+        withdrawResponseElt.innerHTML = `<span class="bg_color_red">${this.status}(${this.statusText}):${response.message}</span>`;
+        setScore(response.message, 'red', 'white');
       }
     }
   };
@@ -852,7 +866,7 @@ window.blackMonkeyImage = () => {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
       console.log(response);
-      if(response.success) {
+      if (response.success) {
         const keys = [...Object.keys(response.images)];
         let html = '';
         for (let ix = 0; ix < keys.length; ix++) {

@@ -73,6 +73,7 @@ const postWithoutCatch = async (context, req, res) => {
     const resp = {};
     resp.message = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
     resp.success = false;
+    res.status(401);
     res.send(resp);
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad nonce');
     return;
@@ -84,12 +85,14 @@ const postWithoutCatch = async (context, req, res) => {
     resp.message = `bad account '${account}'`;
     resp.success = false;
     res.send(resp);
+    res.status(409);
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad account', account);
     return;
   }
   const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
   if (amountRaw <= BigInt(0)) {
     const resp = {};
+    res.status(409);
     resp.message = `bad amount '${amount}'`;
     resp.success = false;
     res.send(resp);

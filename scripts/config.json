@@ -13,7 +13,7 @@
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
   "minBet": 0.1,
-  "maxBet": 100.0,
+  "maxBet": 5.0,
   "bets": {
     "1ban": 0.1,
     "5ban": 0.5,
