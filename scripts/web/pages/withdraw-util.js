@@ -58,7 +58,7 @@ const postWithoutCatch = async (context, req, res) => {
 
   if (config.disableWithdraw) {
     const resp = {};
-    resp.status(401);
+    res.status(401);
     resp.message = 'demo mode only, withdrawal is disabled';
     resp.success = false;
     res.send(resp);
