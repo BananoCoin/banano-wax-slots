@@ -248,24 +248,22 @@ const postWithoutCatch = async (context, req, res) => {
         cardData.ipfs = card.img;
         cardData.frozenCardCount = 0;
         cardData.totalCardCount = 0;
+        cardData.frozen = true;
 
         if (unfrozenAssets === undefined) {
-          cardData.grayscale = true;
         } else if (unfrozenAssets.length == 0) {
-          cardData.grayscale = true;
         } else {
           cardData.totalCardCount += unfrozenAssets.length;
-          cardData.grayscale = false;
+          cardData.frozen = false;
         }
+
         if (frozenAssets === undefined) {
-          cardData.frozen = false;
         } else if (frozenAssets.length == 0) {
-          cardData.frozen = false;
         } else {
           cardData.totalCardCount += frozenAssets.length;
           cardData.frozenCardCount += frozenAssets.length;
-          cardData.frozen = true;
         }
+        cardData.grayscale = cardData.totalCardCount == 0;
 
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
         if (cardData.grayscale || cardData.frozen) {
