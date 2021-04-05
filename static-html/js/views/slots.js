@@ -161,7 +161,7 @@ const spinMonkey = (cardElt, ownedAsset) => {
   } else {
     addChildSvgElement(cardElt, 'rect', {'x': 0, 'y': 0, 'width': 86, 'height': 125, 'fill': 'white', 'stroke': 'black'});
   }
-  const cardTitle = `${ownedAsset.name}`;
+  const cardTitle = `${ownedAsset.name} (${ownedAsset.assetId})`;
   const src = `/ipfs/${ownedAsset.img}.webp`;
   const image = addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
   addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);

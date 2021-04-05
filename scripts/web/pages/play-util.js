@@ -272,7 +272,7 @@ const postWithoutCatch = async (context, req, res) => {
         }
         resp.cards.push(cardData);
       }
-      if (won || config.freezeOnLoss) {
+      if (won) {
         for (let cardIx = 0; cardIx < cards.length; cardIx++) {
           const card = cards[cardIx];
           const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
