@@ -20,6 +20,7 @@
     "10ban": 1.0,
     "50ban": 5.0
   },
+  "freezeOnLoss":false,
   "thawTimeMs": 28800000,
   "walletSeedIx": 0,
   "waxIdSeed": "",
