@@ -264,6 +264,9 @@ const postWithoutCatch = async (context, req, res) => {
           cardData.frozenCardCount += frozenAssets.length;
         }
         cardData.grayscale = cardData.totalCardCount == 0;
+        if (cardData.grayscale) {
+          cardData.frozen = false;
+        }
 
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
         if (cardData.grayscale || cardData.frozen) {
