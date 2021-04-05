@@ -251,9 +251,7 @@ const postWithoutCatch = async (context, req, res) => {
         cardData.frozen = true;
 
         if (unfrozenAssets === undefined) {
-          cardData.frozen = false;
         } else if (unfrozenAssets.length == 0) {
-          cardData.frozen = false;
         } else {
           cardData.totalCardCount += unfrozenAssets.length;
           cardData.frozen = false;
