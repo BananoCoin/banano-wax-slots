@@ -321,7 +321,7 @@ const verifyOwnerAndNonce = async (req) => {
   const badNonce = await nonceUtil.isBadNonce(owner, nonce);
   if (badNonce) {
     const resp = {};
-    resp.errorMessage = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;
+    resp.errorMessage = `Nonce mismatch, log in again.`;
     resp.ready = false;
     return resp;
   }
