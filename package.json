@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "v1.0.51",
+  "version": "v1.0.58",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.4",
-    "eslint": "^7.23.0",
+    "eslint": "^7.24.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^8.3.2",
     "nyc": "^15.1.0",
