@@ -560,7 +560,7 @@ const addCards = async () => {
       const scoreText = ['Wax Account Ready', 'An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
     } else {
-      const scoreText = ['Wax Account Ready', ' An error error occurred server side',
+      const scoreText = ['Wax Account Ready', ' An error occurred server side',
         cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
     }
