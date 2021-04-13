@@ -5,6 +5,8 @@ import {getDate} from '../../js-lib/date-util.js';
 
 const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 
+const blurSize = '0.5vmin';
+
 let tryNumber = 0;
 const maxTryNumber = 2;
 let owner;
@@ -431,8 +433,8 @@ window.onLoad = async () => {
         setScore(scoreText);
         setTimeout(getLastNonceAndAddTemplates, 5000);
       } catch (e) {
-        setAllTopToClass('bg_red', e.message);
         console.log('nonceTx', 'error1', e.message);
+        setAllTopToClass('bg_red', e.message);
         document.getElementById('transaction_id').innerHTML = e.message;
       }
     };
@@ -527,7 +529,10 @@ const addCards = async () => {
     // innerHTML += `<span class="bordered" style="${border}">`;
     let filter = '';
     if (cardDataElt.grayscale) {
-      filter = `url(#grayscale)`;
+      filter += ` url(#grayscale)`;
+    }
+    if (cardDataElt.frozen) {
+      filter += ` blur(${blurSize});`;
     }
     const href = `https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX`;
 
@@ -630,14 +635,18 @@ const addCards = async () => {
 const getOwnedAssetHtml = (ownedAsset) => {
   let ownedAssetsHtml = '';
   let border = '';
+  let filter = '';
   if (ownedAsset.frozen) {
     border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;color:black;';
   } else {
     border = 'border-width:0.2vh;border-color:black;background-color:white;color:black;';
   }
+  if (ownedAsset.frozen) {
+    filter += ` filter:blur(${blurSize});`;
+  }
   const src = `/ipfs/${ownedAsset.img}.webp`;
   ownedAssetsHtml += `<div style="${border}margin:1.0vh;" class="bordered float_left">`;
-  ownedAssetsHtml += `<image style="margin:1.0vh;" class="bordered" src="${src}">`;
+  ownedAssetsHtml += `<image style="margin:1.0vh;${filter}" class="bordered" src="${src}">`;
   ownedAssetsHtml += '<br>';
   ownedAssetsHtml += `<span style="${border}" class="selectable">`;
   ownedAssetsHtml += ownedAsset.name;
