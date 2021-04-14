@@ -165,7 +165,7 @@ const spinMonkey = (cardElt, ownedAsset) => {
   }
   const cardTitle = `${ownedAsset.name}`;
   const src = `/ipfs/${ownedAsset.img}.webp`;
-  const image = addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
+  const image = addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale) url(#blur)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
   addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
 };
 
@@ -532,7 +532,7 @@ const addCards = async () => {
       filter += ` url(#grayscale)`;
     }
     if (cardDataElt.frozen) {
-      filter += ` blur(${blurSize});`;
+      filter += ` url(#blur)`;
     }
     const href = `https://wax.atomichub.io/market?collection_name=crptomonkeys&match=${encodeURIComponent(cardDataElt.name)}&order=asc&sort=price&symbol=WAX`;
 
