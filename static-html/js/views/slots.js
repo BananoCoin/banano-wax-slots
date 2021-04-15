@@ -959,6 +959,8 @@ const winConfetti = () => {
   const count = 200;
   const defaults = {
     origin: {y: 0.7},
+    shapes: ['square', 'circle', 'emoji:🍌'],
+    colors: ['#FFFF00', '#00FF00'],
   };
 
   function fire(particleRatio, opts) {
