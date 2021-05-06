@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "v1.0.63",
+  "version": "v1.0.67",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -26,16 +26,16 @@
     "cors": "^2.8.5",
     "eosjs": "^21.0.4",
     "express": "^4.16.4",
-    "express-handlebars": "^5.3.0",
+    "express-handlebars": "^5.3.2",
     "node-fetch": "^2.6.1",
     "request": "^2.88.2",
-    "socket.io": "^4.0.1",
-    "socket.io-client": "^4.0.1"
+    "socket.io": "^4.0.2",
+    "socket.io-client": "^4.0.2"
   },
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.4",
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^8.3.2",
     "nyc": "^15.1.0",
