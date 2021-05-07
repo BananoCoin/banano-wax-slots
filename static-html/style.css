@@ -5,14 +5,23 @@ tr,
 td,
 span,
 form,
-ul,
-li {
+ul {
   font-family: 'Open Sans', sans-serif;
   font-size: 1.5vmin;
   border: 0;
   padding: 0;
   margin: 0;
   text-align: center;
+  vertical-align: middle;
+}
+
+li {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.5vmin;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: left;
   vertical-align: middle;
 }
 
@@ -186,4 +195,21 @@ body {
 
 .bet label:hover {
   background: #DDD;
+}
+
+.exit_link {
+  text-decoration: none;
+  color: yellow;
+}
+
+.exit_link:visited {
+  color: yellow;
+}
+
+.exit_link:active {
+  color: #AAA;
+}
+
+.exit_link:hover {
+  color: #AAA;
 }
