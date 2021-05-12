@@ -39,6 +39,7 @@ const init = (_config, _loggingUtil) => {
       })
           .catch((err) => reject(err))
           .then((res) => res.json())
+          .catch((err) => reject(err))
           .then((json) => {
             // console.log('history_get_actions', 'json', json);
             resolve(json);
