@@ -105,6 +105,7 @@ body {
 
 .color_red {
   color: red;
+  font-weight: bold;
 }
 
 .bold {

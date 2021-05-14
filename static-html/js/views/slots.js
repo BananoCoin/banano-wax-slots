@@ -571,12 +571,12 @@ const addCards = async () => {
     }
   } else {
     accountElt.innerText = cardData.account;
-    houseAccountElt.innerText = cardData.houseAccount;
-    houseAccountCacheBalanceElt.innerText = cardData.cacheHouseBalanceDescription;
+    houseAccountElt.innerHTML = `<a class="exit_link" href="https://creeper.banano.cc/explorer/account/${cardData.houseAccount}/history" target="_blank">Link to House Account</a>`;
+    houseAccountCacheBalanceElt.innerText = truncate(cardData.cacheHouseBalanceDecimal) + ' BAN';
     if (cardData.houseAccountInfo.error) {
       houseAccountBalanceElt.innerText = cardData.houseAccountInfo.error;
     } else {
-      houseAccountBalanceElt.innerText = cardData.houseBalanceDescription;
+      houseAccountBalanceElt.innerText = truncate(cardData.houseBalanceDecimal) + ' BAN';
     }
 
     let balanceTooltip = `Your Balance: ${cardData.cacheBalanceDescription}`;
@@ -587,7 +587,7 @@ const addCards = async () => {
     } else {
       balanceTooltip += cardData.balanceDescription;
     }
-    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal) + ' ban', balanceTooltip);
+    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal) + ' BAN', balanceTooltip);
 
     if ((cardData.cards !== undefined) && (cardData.cards.length == 3)) {
       setCard(card1Elt, cardData.cards[0]);
