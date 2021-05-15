@@ -466,8 +466,8 @@ const truncate = (number) => {
 
 const setEverythingNotGray = () => {
   getSvgSlotMachineElementById('slotmachine').removeAttribute('filter');
-  document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
-  document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
+  //document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
+  //document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
 
   // document.getElementById('play').removeAttribute('style');
   document.getElementById('play').disabled = '';
@@ -478,8 +478,8 @@ const setEverythingNotGray = () => {
 
 const setEverythingGray = () => {
   getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
-  document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
-  document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
+  //document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
+  //document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
   // document.getElementById('play').setAttribute('style', 'background-color:gray;');
   document.getElementById('play').disabled = 'disabled';
   // document.getElementById('additionlDetailsButton').setAttribute('style', 'background-color:gray;');
@@ -495,13 +495,13 @@ const addCards = async () => {
   setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
-    const logInHtml = '<span class="bg_color_red">Log In</span>';
+    const logInHtml = '<button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button><button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>';
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
     if (tryNumber < maxTryNumber) {
-      setAllTopToClass('bg_color_red', 'Ready to Log In');
+      setAllTopToClass('bold', 'Please Log in');
     } else {
-      setAllTopToClass('bg_color_red', 'Try Again, Tx Failed');
+      setAllTopToClass('color_red', 'Try Again, Tx Failed');
     }
     console.log('tryNumber++', tryNumber);
     tryNumber++;
@@ -571,12 +571,12 @@ const addCards = async () => {
     }
   } else {
     accountElt.innerText = cardData.account;
-    houseAccountElt.innerText = cardData.houseAccount;
-    houseAccountCacheBalanceElt.innerText = cardData.cacheHouseBalanceDescription;
+    houseAccountElt.innerHTML = `<a class="exit_link" href="https://creeper.banano.cc/explorer/account/${cardData.houseAccount}/history" target="_blank">Link to House Account</a>`;
+    houseAccountCacheBalanceElt.innerText = truncate(cardData.cacheHouseBalanceDecimal) + ' BAN';
     if (cardData.houseAccountInfo.error) {
       houseAccountBalanceElt.innerText = cardData.houseAccountInfo.error;
     } else {
-      houseAccountBalanceElt.innerText = cardData.houseBalanceDescription;
+      houseAccountBalanceElt.innerText = truncate(cardData.houseBalanceDecimal) + ' BAN';
     }
 
     let balanceTooltip = `Your Balance: ${cardData.cacheBalanceDescription}`;
@@ -587,7 +587,7 @@ const addCards = async () => {
     } else {
       balanceTooltip += cardData.balanceDescription;
     }
-    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal) + ' ban', balanceTooltip);
+    setAccountCacheBalance(truncate(cardData.cacheBalanceDecimal) + ' BAN', balanceTooltip);
 
     if ((cardData.cards !== undefined) && (cardData.cards.length == 3)) {
       setCard(card1Elt, cardData.cards[0]);

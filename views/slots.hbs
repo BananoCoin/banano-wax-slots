@@ -1,53 +1,41 @@
-<table class="w100pct">
-  <tbody>
-    <tr>
-      <td>&nbsp;</td>
-      <td class="w100vmin h10vmin">
-        <button id="slotMachineButton" class="w40pct font_size_50pct bg_color_green" disabled onclick="showSlotMachine();return false;">
-          Slot Machine
-        </button>
-        <button id="additionlDetailsButton" class="w40pct font_size_50pct bg_color_green" onclick="showAdditionalDetails();return false;" disabled>
-          Withdraw, Captcha, Additional Details.
-        </button>
-        <button id="faqButton" class="w40pct font_size_50pct bg_color_green" onclick="showFAQ();return false;">
-          FAQ
-        </button>
-      </td>
-      <td>&nbsp;</td>
-    </tr>
+<tbody>
+  <table class="w100pct">
+    <div class=" bg_color_darkgreen d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3" style="margin:1%">
+      <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+        <img src="/logo.png" class="bi me-2" width="132" style="margin-left:5%" height="32" role="img" aria-label="Bootstrap"></img>
+      </a>
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <button id="slotMachineButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showSlotMachine();return false;">Slots</button>
+        <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Captcha / Details</button>
+        <button id="faqButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" onclick="showFAQ();return false;">FAQ</button>
+      </ul>
+      <b class="col-md-3 color_black text-end" style="margin-right:3%">
+        Account: <span class="selectable" id="owner"></span>
+      </b>
+    </div>
     <tr>
       <td>&nbsp;</td>
       <td class="w100vmin h90vmin vertical_align_top">
         <span class="w100pct h90vmin">
-          <table id="slotMachineTable" class="w100pct">
+          <table id="slotMachineTable" class="w100pct ">
             <tbody>
               <tr>
                 <td class="h15vmin" colspan="1">
-                  <button class="w40pct font_size_50pct bg_color_green" onclick="waxjsWallet();return false;">
-                    Log In<br>(Cloud Wallet)
-                  </button>
-                  <button class="w40pct font_size_50pct bg_color_green" onclick="anchorWallet();return false;">
-                    Log In<br>(Anchor Wallet)
-                  </button>
-                  <button id="play" class="bg_light_green w80pct bg_color_green" onclick="play();return false;" disabled>Play!<br>(Or use the arm)</button>
                   <br>
-                  <span class="bg_color_black">Logged in with <span class="selectable" id="owner"></span></span>
+                  <div class="col-md text-center" style="margin-left: 15%;margin-right: 15%;">
+                    <div class="card bg_color_yellow color_black">
+                        <div class="card-header">
+                          <h3 class="card-text">Welcome to monKeyslots</h3>
+                        </div>
+                        <div class="card-body">
+                          <h6 class="card-title">The only slot machine that gives you a chance to win some Banano with your cryptomonKeys!<br>
+                          How do I play? Wen BAN? Take a look at the FAQ.</h6>
+                          Deposit Account: <span class="selectable" id="account"></span>
+                        </div>
+                    </div>
+                  </div>            
                   <br>
-                  <span class="bg_color_black">
-                    Welcome to monKeyslots slot machine!
-                    <br>
-                    The more cryptomonKeys NFTs you own, the better your chances to win some Banano!
-                    <br>
-                    Gameplay: draw 1 of {{templateCount}} cards, three times.
-                    <br>
-                    Only 1 of {{templateCount}} cards needed to win!.
-                  </span>
-                  {{#if anyCaptchaEnabled }}
-                    <br>
-                    <span class="bg_color_black">
-                      Don't have any Banano? Do a captcha! You will be credited a small amount of Banano.
-                    </span>
-                  {{/if}}
+                  <button id="play" class="btn btn-outline-black me-2 color_black bg_color_green" onclick="play();return false;" disabled>Play!<br>(Or use the arm)</button>
                 </td>
               </tr>
               <tr>
@@ -55,104 +43,241 @@
                   <object id="slotMachine" class="w100pct h72vmin" type="image/svg+xml" data="slot-machine.svg"></object>
                 </td>
               </tr>
-              <tr>
-                <td colspan="1">
-                  <span class="bg_color_black">Deposit Account: <span class="selectable" id="account"></span>
-                </td>
-              </tr>
             </tbody>
           </table>
-          <table id="additionlDetailsTable" class="display_none w100pct">
+          <table id="additionlDetailsTable" class="display_none w100pct color_black">
             <tbody>
               <tr>
                 <td>&nbsp;</td>
-                <td colspan="1" class="w100pct bg_color_black rounded">
-                  <span>House Account: </span><span class="selectable overflow_wrap_anywhere" id="houseAccount"></span>
-                  <br>
-                  <span>House Pending Balance: </span><span class="selectable" id="houseAccountBalance"></span>
-                  <br>
-                  <span>House Balance: </span><span class="selectable" id="houseAccountCacheBalance"></span>
-                  <hr>
-                  <span>Your Account Balance: </span><span class="selectable" id="accountCacheBalance"></span>
+                <br>
+                <td colspan="1" class="w100pct ">
+                  <div class="row" >
+                    <div class="col-md text-center " >
+                      <div class="card bg_color_yellow">
+                          <div class="card-header">
+                            <h4 class="card-text">House Balance: <span class="selectable" id="houseAccountBalance"></span>
+                              </h4>
+                          </div>
+                          <div class="card-body">
+                            <h5 class="card-text">
+                            House Pending Balance: <span class="selectable" id="houseAccountCacheBalance"></span>
+                            <br>
+                            <span class="selectable overflow_wrap_anywhere" id="houseAccount"></span>
+                            </h5>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-md text-center " >
+                      <div class="card bg_color_yellow">
+                          <div class="card-header">
+                            <h4 class="card-text">Your Account Balance: 
+                              </h4>
+                          </div>
+                          <div class="card-body">
+                            <h5 class="card-title">
+                            <span class="selectable" id="accountCacheBalance"></span>
+                            </h5>
+                          </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  
                   {{#if anyCaptchaEnabled}}
-                    <p>
-                      Don't have any Banano? Do a captcha! You will be credited a small amount of Banano.
-                    </p>
+                  <br>
+                  <div class="card bg_color_yellow">
+                    <div class="card-header">
+                      <h5 class="card-text">Don't have any Banano? Do a captcha! You will be credited a small amount of Banano.
+                        </h5>
+                    </div>
+                  </div>
                   {{/if}}
                   {{#if blackMonkeyEnabled}}
-                    <button class="w40pct font_size_50pct bg_color_green" onclick="blackMonkeyImage();return false;">
-                      Black Monkey!
-                    </button>
-                    <div id="blackMonkey">
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <button class="btn btn-black me-2 bg_color_green color_black" onclick="blackMonkeyImage();return false;">
+                        Black Monkey!
+                      </button>
+                      <div id="blackMonkey">
+                      </div>
+                    </h5>
+                  </div>
+
+                  </div>
                   {{/if}}
                   {{#if hcaptchaEnabled}}
-                    <form action=" /hcaptcha" method="POST">
+                  <div class="card-body">
+                    <div class="card-title">
+                      <form action=" /hcaptcha" method="POST">
                       <div class="h-captcha" data-sitekey="{{hcaptchaSiteKey}}" data-size="compact" data-theme="dark" data-callback="dataCallback" data-expired-callback="dataExpiredCallback" data-error-callback="dataErrorCallback"></div>
                       <br />
-                    </form>
-                    <script>
-                      function dataCallback() {
-                        submitHcaptcha();
-                      }
+                      </form>
+                      <script>
+                        function dataCallback() {
+                          submitHcaptcha();
+                        }
 
-                      function dataExpiredCallback() {
-                        submitHcaptcha();
-                      }
+                        function dataExpiredCallback() {
+                          submitHcaptcha();
+                        }
 
-                      function dataErrorCallback() {
-                        submitHcaptcha();
-                      }
-                    </script>
+                        function dataErrorCallback() {
+                          submitHcaptcha();
+                        }
+                      </script>
+                    </div>
+                  </div>
+                    
+                  </div>
                   {{/if}}
-                  <form method="POST">
-                    <span>
-                      <p>
-                        Withdraw To Account<br>
-                        <input id="withdrawAccount" type="text" size="66" max_length="64" value="" defaultValue="To Account">
-                      </p>
-                      <p>
-                        Withdraw Amount (Banano)<br>
-                        <input id="withdrawAmount" type="number" size="66" max_length="64" min="0" step="any" value="0.0">
-                      </p>
-                      <p>
-                        <button id="withdrawButton" class="w40vmin" title="Withdraw" onclick="withdraw(); return false;">Withdraw</button>
-                        <hr>
-                        <span id="withdrawResponse" class="selectable">No Withdrawal Yet, TX id will show here</span>
-                      </p>
-                    </span>
-                  </form>
+          
+                  <br>
+                  <div class="col-md text-center md-3" >
+                    <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h3 class="card-text">Withdraw To Account 
+                            </h3>
+                        </div>
+                        <div class="card-body color_black">
+                          <form method="POST">
+                            <span>
+                              <p>
+                                Target address:
+                                <input id="withdrawAccount" type="text" size="66" max_length="64" value="" defaultValue="To Account">
+                              </p>
+                              <p>
+                                Withdraw Amount (Banano):
+                                <input id="withdrawAmount" type="number" size="66" max_length="64" min="0" step="any" value="0.0">
+                              </p>
+                              <p>
+                                <button id="withdrawButton" class="btn btn-black me-2 bg_color_green color_black" title="Withdraw" onclick="withdraw(); return false;">Withdraw</button>
+                                <hr>
+                                <span id="withdrawResponse" class="selectable">No Withdrawal Yet, TX id will show here</span>
+                              </p>
+                            </span>
+                          </form>
+                        </div>
+                    </div>
+                  </div>  
                 </td>
                 <td>&nbsp;</td>
               </tr>
             </tbody>
           </table>
-          <table id="faqTable" class="display_none w100pct">
+          <table id="faqTable" class="display_none w100pct color_black">
             <tbody>
               <tr>
                 <td>&nbsp;</td>
-                <td class="w100vmin bg_color_black rounded vertical_align_top">
-                  <h1>FAQ</h1>
-                  <ol>
-                    <li>What is Banano? <a class="exit_link" href="https://banano.cc/" target="_blank">https://banano.cc/</a> Banano is a feeless, instant, rich in potassium cryptocurrency powered by DAG technology disrupting the meme economy.</li>
-                    <li>What is cryptomonKeys? <a class="exit_link" href="http://cryptomonkeys.cc/" target="_blank">http://cryptomonkeys.cc/</a>
-                      cryptomonKeys is a freely distributed, community-driven, meme-rich digital trading card series based on NFT technology, here to disrupt the meme economy.</li>
-                    <li>Don't have wallet? Make one! <a class="exit_link" href="https://wallet.wax.io" target="_blank"> Make a wax wallet. </a></li>
-                    <li>Don't have cryptomonKeys? Get some! <a class="exit_link" href="https://wax.atomichub.io/market?collection_name=crptomonkeys" target="_blank">Get cryptomonKeys.</a></li>
-                    <li>Login with Wax wallet (Anchor or Cloud)</li>
-                    <li>Either deposit Banano or work the captcha to get a Banano</li>
-                    <li>Bet or withdraw</li>
-                    <li>Frozen cards? they unfreeze after eight hours. come back and play again!</li>
-                    <li>the login will ask you to approve both a "know account name" and a "getrand" transaction to prove you are the owner of the account, and open a game session for your account. (Otherwise anyone could impersonate your account if
-                      they know it's name)</li>
-                    <li> there are three stacks of cards, each stack contains all 45 cards.
-                      <br>
-                      each play it draws 1 card from each stack, three cards total.
-                      <br>
-                      if you own all three of the cards that were drawn, you win.
-                    </li>
-                  </ol>
-                </td>
+                <br>
+                <td colspan="1" class="w100pct ">
+                    <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">What is Banano?</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            <a class="exit_link" href="https://banano.cc/" target="_blank">Banano</a> is a feeless, instant, rich in potassium cryptocurrency powered by DAG technology disrupting the meme economy.
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">What is cryptomonKeys?</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            <a class="exit_link" href="http://cryptomonkeys.cc/" target="_blank">cryptomonKeys</a> is a freely distributed, community-driven, meme-rich digital trading card series based on NFT technology, here to disrupt the meme economy.</div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">You don't have a WAX wallet or cryptomonKeys?</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            Create your WAX wallet<a class="exit_link" href="https://wallet.wax.io" target="_blank"> here</a> or get some cryptomonKeys on <a class="exit_link" href="https://wax.atomichub.io/market?collection_name=crptomonkeys" target="_blank">Atomichub</a>.
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">How to play</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            1. Login with Wax wallet (Anchor or Cloud) in the top right corner.<br>
+                            2. Either deposit Banano or work the captcha to get a Banano.<br>
+                            3. Pull the slots arm and hope for some luck!<br>
+                            (4. Withdraw or continue to play.)
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">How to login</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            Click on either WAX (Wax cloud wallet) or Anchor in the top right corner.<br>
+                            You'll be asked to approve both a "know account name" and a "getrand" transaction to prove you are the owner of the account.<br>
+                            After that a game session opens for your account. <br>(Otherwise anyone could impersonate your account if they know it's name)
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">Frozen cards?</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            Cards freeze when they win a spin. A frozen card is "on cooldown" and therefor can't win if drawn by one wheel.<br>
+                            They unfreeze after eight hours. You can come back after that time and play again!
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">How does it work?</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="card-title">
+                            There are three stacks of cards, one behind each wheel. Each stack contains all {{templateCount}} cards.<br>
+                            Each play it draws 1 card from each stack = three cards total.<br> You win if you own all three of the cards (unfrozen) that were drawn.  
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                    <div class="card bg_color_yellow">
+                      <div class="card-header">
+                        <h4 class="card-text">Why?! Who does profit?</h4>
+                      </div>
+                      <div class="card-body">
+                        <div class="card-title">
+                          First of all: The monKeyslots are designed to work as a faucet.<br>
+                          <span class="bold">You can lose Banano while playing the slots!</span><br> But every Banano goes back to the house account and therefor back into the pot.<br>
+                          The more different monKey NFTs you own, the higher are your odds to win. The payout rate is adjusted to your current odds.<br>
+                          Keep in mind you need only 1 of {{templateCount}} cards to win even if its very unlikely!<br>
+                          tl;dr real monKey Hodlor's are the ones that profit from monKeyslots 
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>               
                 <td>&nbsp;</td>
               </tr>
             </tbody>
@@ -160,9 +285,9 @@
         </span>
       </td>
       <td>&nbsp;</td>
-    </tr>
-  </tbody>
-</table>
+    </tr> 
+  </table>
+</tbody>
 <span class="display_none" id="ownedAssets"></span>
 <span class="display_none" id="nonce"></span>
 <span class="display_none" id="nonceHash"></span>
@@ -179,6 +304,7 @@
 <script src="js-lib/confetti-1.4.0.js"></script>
 <script src="https://unpkg.com/anchor-link@2"></script>
 <script src="https://unpkg.com/anchor-link-browser-transport@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
 {{#if hcaptchaEnabled}}
   <script src="https://hcaptcha.com/1/api.js" async defer></script>
 {{/if}}

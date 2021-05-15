@@ -26,7 +26,7 @@ li {
 }
 
 span, form, ul, li, p {
-  color: white;
+  color: black;
 }
 
 button {
@@ -42,19 +42,24 @@ button[disabled] {
   border-color: gray;
 }
 
-html {
-  background-color: gray;
+tbody { 
+  padding: 0;
 }
 
 body {
   padding: 0;
   margin: 0;
-  background-image:
-    linear-gradient(black, black),
-    url("forest-background.png");
-  background-blend-mode: saturation;
+  background: url(forest-background.png) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
   background-size: cover;
-  background-repeat: no-repeat;
+  
+}
+
+.bg_primary {
+  
+  background-color: gray;
 }
 
 .bg_color_white {
@@ -72,14 +77,39 @@ body {
 .bg_color_lightblue {
   background-color: lightblue;
 }
-
+.bg_color_gray {
+  background-color: rgb(73, 72, 72);
+}
 .bg_color_green {
-  background-color: green;
-  filter: grayscale(0) !important;
+  background-color: rgb(76, 191, 75);
+}
+.bg_color_darkgreen {
+  background-color: rgb(0, 128, 0);
+}
+
+.bg_color_yellow {
+  background-color: rgb(251, 221, 17);
+}
+
+.bg_color_brightyellow {
+  background-color: rgb(252, 248, 4);
 }
 
 .color_black {
   color: black;
+}
+
+.color_white {
+  color:  white;
+}
+
+.color_red {
+  color: red;
+  font-weight: bold;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .vertical_align_top {
@@ -199,11 +229,12 @@ body {
 
 .exit_link {
   text-decoration: none;
-  color: yellow;
+  font-weight: bold;
+  color: rgb(6, 156, 42);
 }
 
 .exit_link:visited {
-  color: yellow;
+  color: rgb(6, 156, 42);
 }
 
 .exit_link:active {
@@ -213,3 +244,34 @@ body {
 .exit_link:hover {
   color: #AAA;
 }
+
+.mb-3{
+  margin-left: 10%; 
+  margin-right: 10%;
+}
+
+.form-control-dark {
+  color: #fff;
+  background-color: var(--bs-dark);
+  border-color: var(--bs-gray);
+}
+.form-control-dark:focus {
+  color: #fff;
+  background-color: var(--bs-dark);
+  border-color: #fff;
+  box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .25);
+}
+
+.bi {
+  vertical-align: -.125em;
+  fill: currentColor;
+}
+
+.text-small {
+  font-size: 85%;
+}
+
+.dropdown-toggle {
+  outline: 0;
+}
+
