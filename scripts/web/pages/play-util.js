@@ -173,6 +173,7 @@ const postWithoutCatch = async (context, req, res) => {
     }
     resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
     resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
+    resp.cacheHouseBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.cacheHouseBalanceParts);
     if (!resp.accountInfo.error) {
       resp.balanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(accountInfo.balance);
       resp.balanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.balanceParts);
