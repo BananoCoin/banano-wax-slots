@@ -572,11 +572,11 @@ const addCards = async () => {
   } else {
     accountElt.innerText = cardData.account;
     houseAccountElt.innerHTML = `<a class="exit_link" href="https://creeper.banano.cc/explorer/account/${cardData.houseAccount}/history" target="_blank">Link to House Account</a>`;
-    houseAccountCacheBalanceElt.innerText = truncate(cardData.cacheHouseBalanceDecimal) + ' BAN';
+    houseAccountCacheBalanceElt.innerText = truncate(cardData.houseBalanceDecimal) + ' BAN';
     if (cardData.houseAccountInfo.error) {
       houseAccountBalanceElt.innerText = cardData.houseAccountInfo.error;
     } else {
-      houseAccountBalanceElt.innerText = truncate(cardData.houseBalanceDecimal) + ' BAN';
+      houseAccountBalanceElt.innerText = truncate(cardData.cacheHouseBalanceDecimal) + ' BAN';
     }
 
     let balanceTooltip = `Your Balance: ${cardData.cacheBalanceDescription}`;
