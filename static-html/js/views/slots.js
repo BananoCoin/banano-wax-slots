@@ -495,7 +495,7 @@ const addCards = async () => {
   setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
-    const logInHtml = '<button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button><button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>';
+    const logInHtml = 'Log In';
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
     if (tryNumber < maxTryNumber) {
