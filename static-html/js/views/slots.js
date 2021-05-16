@@ -466,8 +466,8 @@ const truncate = (number) => {
 
 const setEverythingNotGray = () => {
   getSvgSlotMachineElementById('slotmachine').removeAttribute('filter');
-  //document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
-  //document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
+  // document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
+  // document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
 
   // document.getElementById('play').removeAttribute('style');
   document.getElementById('play').disabled = '';
@@ -478,8 +478,8 @@ const setEverythingNotGray = () => {
 
 const setEverythingGray = () => {
   getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
-  //document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
-  //document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
+  // document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
+  // document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
   // document.getElementById('play').setAttribute('style', 'background-color:gray;');
   document.getElementById('play').disabled = 'disabled';
   // document.getElementById('additionlDetailsButton').setAttribute('style', 'background-color:gray;');
@@ -691,7 +691,9 @@ const resetScoreText = async () => {
       scoreText.push('Score:' + cardData.score);
     }
   }
-  scoreText.push(`Odds:${cardData.cardCount} of ${cardData.templateCount} Payout:${cardData.payoutAmount}:1`);
+
+  const oddsPct = (Math.pow(cardData.cardCount, 3) / Math.pow(cardData.templateCount, 3)) * 100;
+  scoreText.push(`Odds:${oddsPct.toFixed(2)}% Payout:${cardData.payoutAmount}:1`);
   scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
 
   const idAmounts = cardData.bets;
