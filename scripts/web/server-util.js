@@ -160,6 +160,19 @@ const initWebServer = async () => {
 
     const seed = seedUtil.getSeedFromOwner(owner);
     const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
+    const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
+    const bananosMax = config.blackMonkeyCaptcha.bananosMax;
+    const bananosMaxRaw = BigInt(bananojs.getRawStrFromBananoStr(bananosMax.toString()));
+    const amount = accountInfo.balance;
+    const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
+    if(amountRaw >= bananosMaxRaw) {
+      const resp = {};
+      resp.message = `black monkey failed. account balance '${amount}' meets or exceeds max balance '${bananosMax}'`;
+      resp.success = false;
+      res.send(resp);
+      return;
+    }
+
     const captchaAmount = config.blackMonkeyCaptcha.bananos;
     loggingUtil.log(dateUtil.getDate(), 'black monkey', account, captchaAmount);
     await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);

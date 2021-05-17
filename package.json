@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "v1.0.76",
+  "version": "v1.0.77",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -29,8 +29,8 @@
     "express-handlebars": "^5.3.2",
     "node-fetch": "^2.6.1",
     "request": "^2.88.2",
-    "socket.io": "^4.1.1",
-    "socket.io-client": "^4.1.1"
+    "socket.io": "^4.1.2",
+    "socket.io-client": "^4.1.2"
   },
   "preferGlobal": true,
   "devDependencies": {

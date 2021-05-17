@@ -190,6 +190,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.cardCount = payoutInformation.cardCount;
   resp.ownedAssets = payoutInformation.ownedAssets;
   resp.payoutMultiplier = config.payoutMultiplier;
+  resp.betBonus = config.betBonus;
   resp.bets = config.bets;
 
   const banano = resp.cacheBalanceDecimal;
@@ -214,7 +215,7 @@ const postWithoutCatch = async (context, req, res) => {
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseFloat(req.body.bet);
     const maxBet = parseFloat(config.maxBet);
-    const winPayment = (resp.payoutAmount * bet * resp.payoutMultiplier).toFixed(2);
+    const winPayment = ((resp.payoutAmount * bet * resp.payoutMultiplier) + resp.betBonus).toFixed(2);
     if (!Number.isFinite(bet)) {
       resp.score = [`Bad Bet '${req.body.bet}'`];
       resp.scoreError = true;

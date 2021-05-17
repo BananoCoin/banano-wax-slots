@@ -31,21 +31,48 @@ const init = (_config, _loggingUtil) => {
   waxRpc = {};
   waxRpc.history_get_actions = async (t, e, r) => {
     return new Promise((resolve, reject) => {
-      const urlBase = randomUtil.getRandomArrayElt(config.waxEndpoints);
-      const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
-      // console.log('history_get_actions', 'req', req);
-      fetch(`'${urlBase}/v1/history/get_actions'`, {
-        method: 'post',
-        body: req,
-        headers: {'Content-Type': 'application/json'},
-      })
-          .catch((err) => reject(err))
-          .then((res) => res.json())
-          .catch((err) => reject(err))
-          .then((json) => {
-            // console.log('history_get_actions', 'json', json);
-            resolve(json);
-          });
+      if (config.waxEndpoints == 'v1') {
+        const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
+        const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
+        // console.log('history_get_actions', 'req', req);
+        fetch(`'${urlBase}/v1/history/get_actions'`, {
+          method: 'post',
+          body: req,
+          headers: {'Content-Type': 'application/json'},
+        })
+            .catch((err) => reject(err))
+            .then((res) => res.json())
+            .catch((err) => reject(err))
+            .then((json) => {
+              // console.log('history_get_actions', 'json', json);
+              resolve(json);
+            });
+        return;
+      }
+      if (config.waxEndpoints == 'v2') {
+        const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+        // console.log('history_get_actions', 'req', req);
+        const urlStr = `${urlBase}/v2/history/get_actions`;
+        const url = new URL(urlStr);
+        url.searchParams.append('account', t);
+        url.searchParams.append('skip', e);
+        url.searchParams.append('limit', r);
+        url.searchParams.append('simple', false);
+        // console.log('history_get_actions', 'url', url);
+        fetch(url, {
+          method: 'get',
+          headers: {'Content-Type': 'application/json'},
+        })
+            .catch((err) => reject(err))
+            .then((res) => res.json())
+            .catch((err) => reject(err))
+            .then((json) => {
+              // console.log('history_get_actions', 'json', json);
+              resolve(json);
+            });
+        return;
+      }
+      reject(Error(`unsupported value of config.waxEndpoints: '${config.waxEndpoints}'`));
     });
   };
 };
@@ -78,19 +105,23 @@ const getInt64StrFromUint8Array = (ba) => {
 
 const isBadNonce = async (owner, nonce) => {
   const nonceHash = getNonceHash(nonce);
-  const ownerActions = await waxRpc.history_get_actions(owner, -1, -2);
+  const ownerActions = await waxRpc.history_get_actions(owner, 1, 1);
   const ownerAction = ownerActions.actions[0];
   let badNonce = false;
+  // console.log('isBadNonce', 'ownerAction', ownerAction);
   if (ownerAction == undefined) {
     badNonce = true;
-  } else if (ownerAction.action_trace == undefined) {
+  } else if (ownerAction == undefined) {
     badNonce = true;
-  } else if (ownerAction.action_trace.act == undefined) {
+  } else if (ownerAction.act == undefined) {
     badNonce = true;
-  } else if (ownerAction.action_trace.act.data == undefined) {
+  } else if (ownerAction.act.data == undefined) {
     badNonce = true;
   } else {
-    const lastNonceHash = ownerAction.action_trace.act.data.assoc_id;
+    const lastNonceHash = ownerAction.act.data.assoc_id;
+    // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
+    // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
+    // console.log('isBadNonce', 'nonceHash', nonceHash);
     if (lastNonceHash != nonceHash) {
       badNonce = true;
     }

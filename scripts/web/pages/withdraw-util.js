@@ -90,7 +90,19 @@ const postWithoutCatch = async (context, req, res) => {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad account', account);
     return;
   }
+  const minWithdrawalBananosRaw = BigInt(bananojs.getRawStrFromBananoStr(config.minWithdrawalBananos.toString()));
   const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
+
+  if (amountRaw <= minWithdrawalBananosRaw) {
+    const resp = {};
+    res.status(409);
+    resp.message = `amount '${amount}' is below minimum '${config.minWithdrawalBananos}'`;
+    resp.success = false;
+    res.send(resp);
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad amount', amount);
+    return;
+  }
+
   if (amountRaw <= BigInt(0)) {
     const resp = {};
     res.status(409);

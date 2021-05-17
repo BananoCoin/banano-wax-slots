@@ -95,17 +95,27 @@
                       </div>
                     </div>
                   {{/if}}
+                  <br>
                   {{#if blackMonkeyEnabled}}
-                    <div class="card-body">
-                      <h5 class="card-title">
-                        <button class="btn btn-black me-2 bg_color_green color_black" onclick="blackMonkeyImage();return false;">
-                          Black Monkey!
-                        </button>
-                        <div id="blackMonkey">
+                    <div class="col-md text-center mb-3">
+                      <div class="card bg_color_yellow">
+                        <div class="card-header">
+                          <h4 class="card-text">Black Monkey Manual</h4>
                         </div>
-                      </h5>
+                        <div class="card-body">
+                          <div class="card-title">
+                            <a class="exit_link" href="https://blackmonkey.banano.cc/manual-en.html" target="_blank">Open Black Monkey Manual</a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
+                    <div class="card-body">
+                      <button class="btn btn-black me-2 bg_color_green color_black" onclick="blackMonkeyImage();return false;">
+                        Black Monkey!
+                      </button>
+                      <div id="blackMonkey">
+                      </div>
+                      </h5>
                     </div>
                   {{/if}}
                   {{#if hcaptchaEnabled}}
@@ -133,7 +143,6 @@
 
                     </div>
                   {{/if}}
-
                   <br>
                   <div class="col-md text-center md-3">
                     <div class="card bg_color_yellow">
@@ -285,6 +294,36 @@
                           <span class="bold">frozen cards</span><br>
                           When a card is shown in a win, it is frozen for 8 hours.<br>Multiple cards will have some benefit. each card is frozen individually.<br>If you have multiple cards you can play longer before all get frozen.<br>You can see all
                           your cards on the 'additional details' page if you scroll down.<br>There is a timer shown on the additional details page for each frozen card.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md text-center mb-3">
+                    <div class="card bg_color_yellow">
+                      <div class="card-header">
+                        <h4 class="card-text">I HAVE PROBLEMS</h4>
+                      </div>
+                      <div class="card-body">
+                        <div class="card-title">
+                          <ul>
+                            <li>
+                              <span class="bold">billed CPU time (999 us) is greater than the maximum billable CPU time for the transaction (999 us)</span>
+                              This is a WAX error, where you need to stake wax to run the secure-rand smart contract.
+                              <a class="exit_link" href="https://wax.bloks.io/wallet/resources/stake" target="_blank">Stake some WAX for CPU</a>
+                            </li>
+                            <li>
+                              <span class="bold">Unexpected token < in JSON at position 0</span>
+                                  This is a WAX error, where the wax content delivery network is overloaded. Can't do anything, just wait for them to fix it.
+                            </li>
+                            <li>
+                              <span class="bold">an error occurred server side: connection refused</span>
+                              This is a WAX error, where the wax network api is overloaded. Can't do anything, just wait for them to fix it.
+                            </li>
+                            <li>
+                              <span class="bold">if you see "(3/4) nonce tx.." for more than 60 seconds</span>
+                              Try again. The login to wax failed, and there should be an error in the console.
+                            </li>
+                          </ul>
                         </div>
                       </div>
                     </div>
