@@ -4,6 +4,7 @@ const blake = require('blakejs');
 const fetch = require('node-fetch');
 
 // modules
+const randomUtil = require('./random-util.js');
 
 // constants
 
@@ -30,9 +31,10 @@ const init = (_config, _loggingUtil) => {
   waxRpc = {};
   waxRpc.history_get_actions = async (t, e, r) => {
     return new Promise((resolve, reject) => {
+      const urlBase = randomUtil.getRandomArrayElt(config.waxEndpoints);
       const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
       // console.log('history_get_actions', 'req', req);
-      fetch('https://wax.greymass.com/v1/history/get_actions', {
+      fetch(`'${urlBase}/v1/history/get_actions'`, {
         method: 'post',
         body: req,
         headers: {'Content-Type': 'application/json'},
