@@ -41,7 +41,7 @@
     "url": "",
     "level": "",
     "key": "",
-    "bananos": 1.0,
+    "bananos": 0.05,
     "bananosMax": 10.0
   },
   "hcaptcha": {

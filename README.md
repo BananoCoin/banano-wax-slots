@@ -52,6 +52,8 @@ check out minting here:
   npm run screenrestart;
 
 ### todo
+
+- disable all bets over 0.0 if odds are under 50%.
 - make faq linkable.
 - add ability to disable sounds
 - add ability to check for nonce in the blockchain, to not spend so much on securerand.

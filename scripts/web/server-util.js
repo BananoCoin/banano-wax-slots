@@ -104,6 +104,13 @@ const initWebServer = async () => {
   });
 
   app.post('/black_monkey_images', async (req, res) => {
+    if (!config.blackMonkeyCaptcha.enabled) {
+      const resp = {};
+      resp.message = `black monkey disabled`;
+      resp.success = false;
+      res.send(resp);
+      return;
+    }
     const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
     if (verifyOwnerAndNonceResponse !== undefined) {
       res.send(verifyOwnerAndNonceResponse);
@@ -141,6 +148,14 @@ const initWebServer = async () => {
   });
 
   app.post('/black_monkey', async (req, res) => {
+    if (!config.blackMonkeyCaptcha.enabled) {
+      const resp = {};
+      resp.message = `black monkey disabled`;
+      resp.success = false;
+      res.send(resp);
+      return;
+    }
+
     const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
     if (verifyOwnerAndNonceResponse !== undefined) {
       res.send(verifyOwnerAndNonceResponse);
@@ -163,11 +178,19 @@ const initWebServer = async () => {
     const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
     const bananosMax = config.blackMonkeyCaptcha.bananosMax;
     const bananosMaxRaw = BigInt(bananojsCacheUtil.getRawStrFromBananoStr(bananosMax.toString()));
-    const amount = accountInfo.balance;
-    const amountRaw = BigInt(bananojsCacheUtil.getRawStrFromBananoStr(amount.toString()));
-    if(amountRaw >= bananosMaxRaw) {
+    const balance = accountInfo.cacheBalance;
+    const balanceParts = bananojsCacheUtil.getBananoPartsFromRaw(balance);
+    delete balanceParts.raw;
+    const balanceDecimal = bananojsCacheUtil.getBananoPartsAsDecimal(balanceParts);
+    const balanceRaw = balance;
+
+    loggingUtil.log(dateUtil.getDate(), 'black monkey balanceRaw   ', balanceRaw);
+    loggingUtil.log(dateUtil.getDate(), 'black monkey bananosMaxRaw', bananosMaxRaw);
+
+    if (balanceRaw >= bananosMaxRaw) {
       const resp = {};
-      resp.message = `black monkey failed. account balance '${amount}' meets or exceeds max balance '${bananosMax}'`;
+      resp.message = `black monkey failed. account balance '${balanceDecimal}' meets or exceeds max balance '${bananosMax}'`;
+      loggingUtil.log(dateUtil.getDate(), 'black monkey', resp.message);
       resp.success = false;
       res.send(resp);
       return;

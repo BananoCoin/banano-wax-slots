@@ -90,26 +90,15 @@ const postWithoutCatch = async (context, req, res) => {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad account', account);
     return;
   }
-  const minWithdrawalBananosRaw = BigInt(bananojs.getRawStrFromBananoStr(config.minWithdrawalBananos.toString()));
+  
   const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
-
-  if (amountRaw <= minWithdrawalBananosRaw) {
-    const resp = {};
-    res.status(409);
-    resp.message = `amount '${amount}' is below minimum '${config.minWithdrawalBananos}'`;
-    resp.success = false;
-    res.send(resp);
-    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad amount', amount);
-    return;
-  }
-
   if (amountRaw <= BigInt(0)) {
     const resp = {};
     res.status(409);
     resp.message = `bad amount '${amount}'`;
     resp.success = false;
     res.send(resp);
-    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad amount', amount);
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', resp.message);
     return;
   }
 
@@ -117,6 +106,27 @@ const postWithoutCatch = async (context, req, res) => {
 
   // side effect of caching the seed, in case the user withdraws immediately upon startup.
   await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
+
+  const ownerAccount = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
+
+  const minWithdrawalBananosRaw = BigInt(bananojs.getRawStrFromBananoStr(config.minWithdrawalBananos.toString()));
+
+  const accountInfo = await bananojsCacheUtil.getAccountInfo(ownerAccount, true);
+  const balance = accountInfo.cacheBalance;
+  const balanceParts = bananojsCacheUtil.getBananoPartsFromRaw(balance);
+  delete balanceParts.raw;
+  const balanceDecimal = bananojsCacheUtil.getBananoPartsAsDecimal(balanceParts);
+  const balanceRaw = balance;
+
+  if (balanceRaw <= minWithdrawalBananosRaw) {
+    const resp = {};
+    res.status(409);
+    resp.message = `balance '${balanceDecimal}' is below minimum '${config.minWithdrawalBananos}'`;
+    resp.success = false;
+    res.send(resp);
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', resp.message);
+    return;
+  }
 
   // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
   try {

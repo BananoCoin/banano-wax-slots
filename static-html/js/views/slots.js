@@ -112,6 +112,7 @@ window.getLastNonce = async () => {
   const lastNonceElt = document.querySelector('#lastNonceHash');
   const ownerActions = await wax.rpc.history_get_actions(owner, -1, -2);
   const ownerAction = ownerActions.actions[0];
+  console.log(ownerAction);
   try {
     const lastNonce = ownerAction.action_trace.act.data.assoc_id;
     lastNonceElt.innerText = lastNonce;
