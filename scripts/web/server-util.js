@@ -162,9 +162,9 @@ const initWebServer = async () => {
     const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
     const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
     const bananosMax = config.blackMonkeyCaptcha.bananosMax;
-    const bananosMaxRaw = BigInt(bananojs.getRawStrFromBananoStr(bananosMax.toString()));
+    const bananosMaxRaw = BigInt(bananojsCacheUtil.getRawStrFromBananoStr(bananosMax.toString()));
     const amount = accountInfo.balance;
-    const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
+    const amountRaw = BigInt(bananojsCacheUtil.getRawStrFromBananoStr(amount.toString()));
     if(amountRaw >= bananosMaxRaw) {
       const resp = {};
       resp.message = `black monkey failed. account balance '${amount}' meets or exceeds max balance '${bananosMax}'`;

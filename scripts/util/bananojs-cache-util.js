@@ -182,6 +182,7 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
 
 module.exports.init = init;
 module.exports.deactivate = deactivate;
+module.exports.getRawStrFromBananoStr = bananojs.getRawStrFromBananoStr;
 module.exports.setBananodeApiUrl = bananojs.setBananodeApiUrl;
 module.exports.getBananoPartsFromRaw = bananojs.getBananoPartsFromRaw;
 module.exports.getBananoPartsDescription = bananojs.getBananoPartsDescription;
