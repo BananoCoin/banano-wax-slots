@@ -42,7 +42,7 @@
     "level": "",
     "key": "",
     "bananos": 1.0,
-    "bananosMax": 15.0
+    "bananosMax": 10.0
   },
   "hcaptcha": {
     "enabled": true,
