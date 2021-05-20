@@ -1,6 +1,7 @@
 {
   "bananodeApiUrl": "https://kaliumapi.appditto.com/api",
   "underMaintenance": false,
+  "overrideNonce":false,
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",
   "burnAccount": "",
@@ -14,13 +15,13 @@
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
   "betBonus": 0.1,
-  "minBet": 0.0,
-  "maxBet": 1.0,
+  "minBet": 0.1,
+  "maxBet": 5.0,
   "bets": {
-    "1ban": 0.0,
-    "5ban": 0.1,
-    "10ban": 0.5,
-    "50ban": 1.0
+    "1ban": 0.1,
+    "5ban": 0.5,
+    "10ban": 1.0,
+    "50ban": 5.0
   },
   "thawTimeMs": 28800000,
   "walletSeedIx": 0,

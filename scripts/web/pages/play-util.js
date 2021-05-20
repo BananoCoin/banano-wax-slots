@@ -193,7 +193,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.betBonus = config.betBonus;
   resp.bets = config.bets;
 
-  const banano = resp.cacheBalanceDecimal;
+  const banano = parseFloat(resp.cacheBalanceDecimal);
 
   let play = true;
   if (req.body.bet === undefined) {
@@ -232,8 +232,8 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];
       resp.scoreError = true;
     } else {
-      won = true;
-      resp.score = ['Won'];
+      won = false;
+      resp.score = ['Lost'];
       resp.scoreError = false;
       const card1 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
       const card2 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
@@ -271,9 +271,9 @@ const postWithoutCatch = async (context, req, res) => {
         }
 
         // loggingUtil.log('INTERIM play', cardIx, 'card', card);
-        if (cardData.grayscale || cardData.frozen) {
-          resp.score = ['Lost'];
-          won = false;
+        if ((!cardData.grayscale) && (!cardData.frozen)) {
+          resp.score = ['Won'];
+          won = true;
         }
         resp.cards.push(cardData);
       }
@@ -301,7 +301,7 @@ const postWithoutCatch = async (context, req, res) => {
         }
       };
 
-      loggingUtil.log(dateUtil.getDate(), 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won);
+      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won);
       await payout();
     }
   }

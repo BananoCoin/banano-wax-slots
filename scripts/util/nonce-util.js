@@ -104,6 +104,9 @@ const getInt64StrFromUint8Array = (ba) => {
 };
 
 const isBadNonce = async (owner, nonce) => {
+  if (config.overrideNonce) {
+    return false;
+  }
   const nonceHash = getNonceHash(nonce);
   const ownerActions = await waxRpc.history_get_actions(owner, 1, 1);
   let badNonce = false;

@@ -129,8 +129,18 @@ const getTemplateCount = () => {
   return templates.length;
 };
 
+const getAssetOptions = (owner) => {
+  return {'collection_name': 'crptomonkeys', 'owner': owner};
+};
+
+const hasOwnedCards = async (owner) => {
+  const assetOptions = getAssetOptions(owner);
+  const pageAssets = await waxApi.getAssets(assetOptions, 1, 1);
+  return pageAssets.length > 0;
+};
+
 const getOwnedCards = async (owner) => {
-  const assetOptions = {'collection_name': 'crptomonkeys', 'owner': owner};
+  const assetOptions = getAssetOptions(owner);
   let page = 1;
   const assetsPerPage = config.maxAssetsPerPage;
   let moreAssets = true;
@@ -232,6 +242,7 @@ const getTemplates = () => {
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getTemplateCount = getTemplateCount;
+module.exports.hasOwnedCards = hasOwnedCards;
 module.exports.getOwnedCards = getOwnedCards;
 module.exports.getPayoutInformation = getPayoutInformation;
 module.exports.isReady = isReady;

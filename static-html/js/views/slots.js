@@ -706,7 +706,7 @@ const resetScoreText = async () => {
   }
 
   const oddsPctSingle = cardData.cardCount / cardData.templateCount;
-  const oddsPct = Math.pow(oddsPctSingle, 3) * 100;
+  const oddsPct = oddsPctSingle * 100;
   scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}`);
   scoreText.push(`Chance To Win: ${oddsPct.toFixed(2)}% Payout:${cardData.payoutAmount}:1`);
   scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
@@ -863,7 +863,7 @@ window.blackMonkeyAnswer = (answer) => {
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
-      // console.log(response);
+      console.log('bm',response);
       let classNm;
       let message;
       if (response.success) {
@@ -871,6 +871,9 @@ window.blackMonkeyAnswer = (answer) => {
         message = 'you win!';
         winConfetti();
         play();
+      } else if (response.ready == false) {
+        classNm = 'bg_color_red';
+        message = response.errorMessage;
       } else {
         classNm = 'bg_color_red';
         message = response.message;
@@ -906,6 +909,9 @@ window.blackMonkeyImage = () => {
           html += `<img style="width:25vmin;" src="${image}"></img>`;
           html += `</button>`;
         }
+        blackMonkeyElt.innerHTML = html;
+      } else if (response.ready == false) {
+        const html = `<span class="bg_color_lightblue color_black">${response.errorMessage}</span>`;
         blackMonkeyElt.innerHTML = html;
       } else {
         const html = `<span class="bg_color_lightblue color_black">${response.message}</span>`;

@@ -73,7 +73,7 @@ const initWebServer = async () => {
   }));
   app.use((err, req, res, next) => {
     if (err) {
-      loggingUtil.log(dateUtil.getDate(), 'error', err.message, err.body);
+      loggingUtil.log(dateUtil.getDate(), 'error', req.url, err.message, err.body);
       res.send('');
     } else {
       next();
@@ -164,6 +164,17 @@ const initWebServer = async () => {
       return;
     }
     const owner = req.body.owner;
+
+    const hasCards = await atomicassetsUtil.hasOwnedCards(owner);
+    if (!hasCards) {
+      const resp = {};
+      resp.message = `black monkey failed. owner '${owner}' has no cards`;
+      loggingUtil.log(dateUtil.getDate(), 'black monkey', resp.message);
+      resp.success = false;
+      res.send(resp);
+      return;
+    }
+
     const answer = blackMonkeyImagesByOwner[owner];
     delete blackMonkeyImagesByOwner[owner];
 
