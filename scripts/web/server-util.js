@@ -23,6 +23,7 @@ const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 // constants
 const blackMonkeyImagesByOwner = {};
 const blackMonkeyFrozenByOwner = {};
+const version = require('../../package.json').version;
 
 // variables
 let config;
@@ -89,6 +90,7 @@ const initWebServer = async () => {
     data.blackMonkeyEnabled = config.blackMonkeyCaptcha.enabled;
     data.anyCaptchaEnabled = data.hcaptchaEnabled || data.blackMonkeyEnabled;
     data.hcaptchaSiteKey = config.hcaptcha.sitekey;
+    data.version = version;
 
     res.render('slots', data);
   });

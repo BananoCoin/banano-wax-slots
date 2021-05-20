@@ -106,24 +106,28 @@ const getInt64StrFromUint8Array = (ba) => {
 const isBadNonce = async (owner, nonce) => {
   const nonceHash = getNonceHash(nonce);
   const ownerActions = await waxRpc.history_get_actions(owner, 1, 1);
-  const ownerAction = ownerActions.actions[0];
   let badNonce = false;
-  // console.log('isBadNonce', 'ownerAction', ownerAction);
-  if (ownerAction == undefined) {
-    badNonce = true;
-  } else if (ownerAction == undefined) {
-    badNonce = true;
-  } else if (ownerAction.act == undefined) {
-    badNonce = true;
-  } else if (ownerAction.act.data == undefined) {
+  if(ownerActions.actions == undefined) {
     badNonce = true;
   } else {
-    const lastNonceHash = ownerAction.act.data.assoc_id;
-    // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
-    // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
-    // console.log('isBadNonce', 'nonceHash', nonceHash);
-    if (lastNonceHash != nonceHash) {
+    const ownerAction = ownerActions.actions[0];
+    // console.log('isBadNonce', 'ownerAction', ownerAction);
+    if (ownerAction == undefined) {
       badNonce = true;
+    } else if (ownerAction == undefined) {
+      badNonce = true;
+    } else if (ownerAction.act == undefined) {
+      badNonce = true;
+    } else if (ownerAction.act.data == undefined) {
+      badNonce = true;
+    } else {
+      const lastNonceHash = ownerAction.act.data.assoc_id;
+      // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
+      // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
+      // console.log('isBadNonce', 'nonceHash', nonceHash);
+      if (lastNonceHash != nonceHash) {
+        badNonce = true;
+      }
     }
   }
   return badNonce;

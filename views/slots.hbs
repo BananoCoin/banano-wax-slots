@@ -3,10 +3,11 @@
     <div class=" bg_color_darkgreen d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3" style="margin:1%">
       <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
         <img src="/logo.png" class="bi me-2" width="132" style="margin-left:5%" height="32" role="img" aria-label="Bootstrap"></img>
+        {{version}}
       </a>
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
         <button id="slotMachineButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showSlotMachine();return false;">Slots</button>
-        <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Captcha / Details</button>
+        <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Captcha / Details / Cards</button>
         <button id="faqButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" onclick="showFAQ();return false;">FAQ</button>
       </ul>
       <b class="col-md-3 color_black text-end" style="margin-right:3%">
@@ -32,7 +33,7 @@
                       <div class="card-body">
                         <h6 class="card-title">The only slot machine that gives you a chance to win some Banano with your cryptomonKeys!<br>
                           How do I play? Wen BAN? Take a look at the FAQ.</h6>
-                        Deposit Account: <span class="selectable" id="account"></span>
+                          <span class="display_none">Deposit Account: <span class="selectable" id="account"></span></span>
                       </div>
                     </div>
                   </div>
@@ -177,7 +178,7 @@
             </tbody>
           </table>
           <table id="faqTable" class="display_none w100pct color_black">
-            <tbody>
+            <tbody class="selectable">
               <tr>
                 <td>&nbsp;</td>
                 <br>

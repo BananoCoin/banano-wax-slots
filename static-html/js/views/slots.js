@@ -7,6 +7,8 @@ const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 
 const blurSize = '0.5vmin';
 
+const OVERRIDE_NONCE = true;
+
 let tryNumber = 0;
 const maxTryNumber = 2;
 let owner;
@@ -110,6 +112,11 @@ window.play = () => {
 
 window.getLastNonce = async () => {
   const lastNonceElt = document.querySelector('#lastNonceHash');
+  if (OVERRIDE_NONCE) {
+    const nonceHashElt = document.querySelector('#nonceHash');
+    lastNonceElt.innerText = nonceHashElt.innerText;
+    return;
+  }
   const ownerActions = await wax.rpc.history_get_actions(owner, -1, -2);
   const ownerAction = ownerActions.actions[0];
   console.log(ownerAction);
@@ -693,13 +700,21 @@ const resetScoreText = async () => {
     }
   }
 
-  const oddsPct = (Math.pow(cardData.cardCount, 3) / Math.pow(cardData.templateCount, 3)) * 100;
-  scoreText.push(`Odds:${oddsPct.toFixed(2)}% Payout:${cardData.payoutAmount}:1`);
+  if (cardData.cardCount == 0) {
+    scoreText.push('No Cards, Play Disabled');
+    document.querySelector('#play').disabled = true;
+  }
+
+  const oddsPctSingle = cardData.cardCount / cardData.templateCount;
+  const oddsPct = Math.pow(oddsPctSingle, 3) * 100;
+  scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}`);
+  scoreText.push(`Chance To Win: ${oddsPct.toFixed(2)}% Payout:${cardData.payoutAmount}:1`);
   scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
+  scoreText.push(`Faucet Bonus:${cardData.betBonus}`);
 
   const idAmounts = cardData.bets;
   if (idAmounts !== undefined) {
-    const potentialProfit = cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier;
+    const potentialProfit = (cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier) + cardData.betBonus;
     scoreText.push(`Potential Profit:${potentialProfit.toFixed(2)}`);
   }
   if ((Array.isArray(cardData.score)) && (cardData.score.length > 0) && (cardData.score[0] == 'Won')) {
