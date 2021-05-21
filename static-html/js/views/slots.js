@@ -7,7 +7,7 @@ const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
 
 const blurSize = '0.5vmin';
 
-const OVERRIDE_NONCE = true;
+const OVERRIDE_NONCE = false;
 
 let tryNumber = 0;
 const maxTryNumber = 2;

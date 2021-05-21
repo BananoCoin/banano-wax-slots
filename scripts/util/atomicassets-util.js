@@ -215,15 +215,16 @@ const getPayoutInformation = async (owner) => {
   // loggingUtil.log(dateUtil.getDate(), 'SUCCESS countCards');
 
   const winningOneCardOdds = resp.cardCount/resp.templateCount;
-  const winningOdds = winningOneCardOdds * winningOneCardOdds * winningOneCardOdds;
-  const payoutAmountDenominator = winningOneCardOdds * winningOneCardOdds;
+  const winningOdds = winningOneCardOdds;// * winningOneCardOdds * winningOneCardOdds;
+  // const payoutAmountDenominator = winningOneCardOdds * winningOneCardOdds;
 
   if (winningOdds == 0) {
     resp.winningOdds = 0;
     resp.payoutAmount = 0;
   } else {
     resp.winningOdds = winningOdds;
-    resp.payoutAmount = parseInt((1./payoutAmountDenominator).toFixed(0), 10);
+    // resp.payoutAmount = parseInt((1./payoutAmountDenominator).toFixed(0), 10);
+    resp.payoutAmount = 1;
   }
 
   // loggingUtil.log(dateUtil.getDate(), 'SUCCESS getPayoutInformation', resp);
