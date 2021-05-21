@@ -53,7 +53,8 @@ check out minting here:
 
 ### todo
 
-- disable all bets over 0.0 if odds are under 50%.
 - make faq linkable.
-- add ability to disable sounds
+
 - add ability to check for nonce in the blockchain, to not spend so much on securerand.
+
+  http://wax.eosrio.io/v2/history/get_actions?act.name=receiverand&account=greencollect

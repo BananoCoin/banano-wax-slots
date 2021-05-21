@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const {ExplorerApi} = require('atomicassets');
 const fs = require('fs');
 const request = require('request');
+const sharp = require('sharp');
 
 // modules
 const assetUtil = require('./asset-util.js');
@@ -106,11 +107,25 @@ const cacheAllCardImages = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED cacheAllCardImages');
 
   const getFile = async (ipfs) => {
-    const url = `https://wax.atomichub.io/preview?ipfs=${ipfs}&size=185&output=webp&animated=true`;
+    const url = `https://ipfs.globalupload.io/${ipfs}`;
+    const tempFileName = `static-html/ipfs/${ipfs}-temp.webp`;
     const fileName = `static-html/ipfs/${ipfs}.webp`;
     if (!fs.existsSync(fileName)) {
       return new Promise((resolve, reject) => {
-        request(url).pipe(fs.createWriteStream(fileName)).on('close', resolve);
+        const shrink = () => {
+          loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', fileName);
+          sharp(tempFileName)
+              .resize(265,370)
+              .toFile(fileName, (err, info) => {
+                if(err != null) {
+                  loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'err', err);
+                }
+                loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'info', info);
+                fs.unlinkSync(tempFileName);
+                resolve();
+              });
+        };
+        request(url).pipe(fs.createWriteStream(tempFileName)).on('close', shrink);
       });
     }
   };
@@ -119,7 +134,8 @@ const cacheAllCardImages = async () => {
     loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', (templateIx+1), templates.length);
     const card = templates[templateIx];
     await getFile(card.img);
-    await getFile(card.backimg);
+
+    // await getFile(card.backimg);
   }
   ready = true;
   loggingUtil.log(dateUtil.getDate(), 'SUCCESS cacheAllCardImages');
