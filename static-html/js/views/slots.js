@@ -15,6 +15,7 @@ let betFromSvg = 0;
 let spinMonKeysFlag = false;
 let spinMonkeysIx = 0;
 let waxEndpoint;
+let stopWinConfetti = true;
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -80,6 +81,7 @@ const play = async (bet) => {
       setScore('Ready to begin. Press Play!', 'lightgreen', 'green');
       addCards();
       stopSounds();
+      stopWinConfetti = true;
       if (cardData.ready) {
         if (cardData.score[0] == 'Lost') {
           startSound('loser');
@@ -93,6 +95,7 @@ const play = async (bet) => {
   };
   if (bet) {
     stopSounds();
+    stopWinConfetti = true;
     if (window.localStorage.owner !== undefined) {
       startSound('start');
       startSound('wheel');
@@ -147,7 +150,7 @@ window.getLastNonce = async () => {
     url.searchParams.append('skip', 0);
     url.searchParams.append('limit', 10);
     url.searchParams.append('simple', false);
-    console.log('history_get_actions', 'url', url);
+    // console.log('history_get_actions', 'url', url);
     fetch(url, {
       method: 'get',
       headers: {'Content-Type': 'application/json'},
@@ -328,6 +331,13 @@ const addBetListeners = (selectedId) => {
 };
 
 window.onLoad = async () => {
+  if (window.location.hash) {
+    console.log('window.location.hash', window.location.hash);
+    if (window.location.hash.startsWith('#faq-')) {
+      window.showFAQ();
+    }
+  }
+
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   const waxEndpointUrl = waxEndpointElt.innerText;
   waxEndpoint = new waxjs.WaxJS(waxEndpointUrl, null, null, false);
@@ -375,7 +385,7 @@ window.onLoad = async () => {
   blake2bUpdate(context, nonce);
   const nonceHash = getInt64StrFromUint8Array(blake2bFinal(context));
   nonceHashElt.innerText = nonceHash;
-  console.log('nonceHash', nonceHash);
+  // console.log('nonceHash', nonceHash);
 
   try {
     if (owner === undefined) {
@@ -632,7 +642,7 @@ const addCards = async () => {
     clear(card2Elt);
     clear(card3Elt);
     if (cardData === undefined) {
-      const scoreText = ['Wax Account Ready', 'An unknown error occurred server side', 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
+      const scoreText = ['Wax Account Ready', 'Waiting for server.', 'Please wait 30 seconds past', getDate(), 'For server to update.'];
       setScore(scoreText);
     } else {
       const scoreText = ['Wax Account Ready', ' An error occurred server side',
@@ -767,22 +777,46 @@ const resetScoreText = async () => {
     document.querySelector('#play').disabled = true;
   }
 
-  const oddsPctSingle = cardData.cardCount / cardData.templateCount;
-  const oddsPct = oddsPctSingle * 100;
   scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}`);
-  scoreText.push(`Chance To Win: ${oddsPct.toFixed(2)}% Payout:${cardData.payoutAmount}:1`);
-  scoreText.push(`Payout Win Multiplier:${cardData.payoutMultiplier}`);
-  scoreText.push(`Faucet Bonus:${cardData.betBonus}`);
 
+  // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;
+  let goodOdds = false;
   if (idAmounts !== undefined) {
-    const potentialProfit = (cardData.payoutAmount * idAmounts[betFromSvgId] * cardData.payoutMultiplier) + cardData.betBonus;
-    scoreText.push(`Potential Profit:${potentialProfit.toFixed(2)}`);
+    const bet = idAmounts[betFromSvgId];
+
+    const betLoss = bet;
+    const betWin = (bet * cardData.payoutMultiplier) + cardData.betBonus;
+    const chanceWin = cardData.cardCount / cardData.templateCount;
+    const expectedPctLoss = Math.pow(1 - chanceWin, 3);
+    const expectedPctWin = 1 - expectedPctLoss;
+    const expectedChanceToProfitPct = (betWin*expectedPctWin)/((betWin*expectedPctWin) + (betLoss*expectedPctLoss));
+    const expectedValue = (((betWin + betLoss)*expectedPctWin) - (betLoss*expectedPctLoss));
+    // console.log('betLoss', betLoss, 'expectedPctLoss', expectedPctLoss.toFixed(2));
+    // console.log('betWin', betWin, 'expectedPctWin', expectedPctWin.toFixed(2));
+    // console.log('expectedChanceToProfitPct', expectedChanceToProfitPct);
+    // console.log('expectedValue', expectedValue);
+    const expectedPctWinStr = expectedPctWin * 100;
+    const expectedChanceToProfitPctStr = expectedChanceToProfitPct * 100;
+    scoreText.push(`Multiplier:${cardData.payoutMultiplier} Bonus:${cardData.betBonus}  Payout:${betWin.toFixed(2)} `);
+    scoreText.push(`Chance To Win: ${expectedPctWinStr.toFixed(0)}% Exp Val:${expectedValue.toFixed(2)}`);
+    scoreText.push(`Expected Profit Chance:${expectedChanceToProfitPctStr.toFixed(2)}`);
+    if (expectedChanceToProfitPct > 0.5) {
+      scoreText.push(`Good Odds:Yes`);
+      goodOdds = true;
+    } else {
+      scoreText.push(`Good Odds:No`);
+    }
   }
-  if ((Array.isArray(cardData.score)) && (cardData.score.length > 0) && (cardData.score[0] == 'Won')) {
+  const won = (Array.isArray(cardData.score)) && (cardData.score.length > 0) && (cardData.score[0] == 'Won');
+  if (won) {
     setScore(scoreText, 'lightgreen', 'green');
   } else {
-    setScore(scoreText);
+    if (goodOdds) {
+      setScore(scoreText);
+    } else {
+      setScore(scoreText, 'pink', 'red');
+    }
   }
 };
 
@@ -1042,6 +1076,7 @@ window.showAdditionalDetails = () => {
 };
 
 const winConfetti = () => {
+  stopWinConfetti = false;
   const count = 200;
   const defaults = {
     origin: {y: 0.7},
@@ -1055,26 +1090,36 @@ const winConfetti = () => {
     }));
   }
 
-  fire(0.25, {
-    spread: 26,
-    startVelocity: 55,
-  });
-  fire(0.2, {
-    spread: 60,
-  });
-  fire(0.35, {
-    spread: 100,
-    decay: 0.91,
-    scalar: 0.8,
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.2,
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 45,
-  });
+  if (!stopWinConfetti) {
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+  }
+  if (!stopWinConfetti) {
+    fire(0.2, {
+      spread: 60,
+    });
+  }
+  if (!stopWinConfetti) {
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8,
+    });
+  }
+  if (!stopWinConfetti) {
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2,
+    });
+  }
+  if (!stopWinConfetti) {
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
+  }
 };

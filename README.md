@@ -52,9 +52,3 @@ check out minting here:
   npm run screenrestart;
 
 ### todo
-
-- make faq linkable.
-
-- add ability to check for nonce in the blockchain, to not spend so much on securerand.
-
-  http://wax.eosrio.io/v2/history/get_actions?act.name=receiverand&account=greencollect
