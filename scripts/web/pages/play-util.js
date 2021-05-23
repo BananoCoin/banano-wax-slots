@@ -122,11 +122,27 @@ const postWithoutCatch = async (context, req, res) => {
   }
   // loggingUtil.log(dateUtil.getDate(), 'STARTED play');
   const nonce = req.body.nonce;
+  if (nonce == undefined) {
+    loggingUtil.log(dateUtil.getDate(), 'no nonce');
+    const resp = {};
+    resp.errorMessage = 'no nonce';
+    resp.ready = false;
+    res.send(resp);
+    return;
+  }
   // loggingUtil.log(dateUtil.getDate(), 'nonce');// , owner);
 
   const houseAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.houseWalletSeed, config.walletSeedIx);
 
   const owner = req.body.owner;
+  if (owner == undefined) {
+    loggingUtil.log(dateUtil.getDate(), 'no owner');
+    const resp = {};
+    resp.errorMessage = 'no owner';
+    resp.ready = false;
+    res.send(resp);
+    return;
+  }
   // loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
 
   const badNonce = await nonceUtil.isBadNonce(owner, nonce);

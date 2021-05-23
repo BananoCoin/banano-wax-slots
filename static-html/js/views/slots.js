@@ -3,11 +3,7 @@ import {blake2bInit, blake2bUpdate, blake2bFinal} from '../../js-lib/blake2b.js'
 import {bananojs} from '../../js-lib/bananocoin-bananojs-2.2.2.js';
 import {getDate} from '../../js-lib/date-util.js';
 
-const wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
-
 const blurSize = '0.5vmin';
-
-const OVERRIDE_NONCE = false;
 
 let tryNumber = 0;
 const maxTryNumber = 2;
@@ -18,6 +14,7 @@ let betFromSvgId = '1ban';
 let betFromSvg = 0;
 let spinMonKeysFlag = false;
 let spinMonkeysIx = 0;
+let waxEndpoint;
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -55,6 +52,7 @@ const play = async (bet) => {
   const parms = {};
   parms.owner = window.localStorage.owner;
   parms.nonce = window.localStorage.nonce;
+  // console.log('play', parms);
 
   if (bet) {
     parms.bet = betFromSvg;
@@ -111,22 +109,81 @@ window.play = () => {
 };
 
 window.getLastNonce = async () => {
+  const overrideNonceElt = document.querySelector('#overrideNonce');
   const lastNonceElt = document.querySelector('#lastNonceHash');
-  if (OVERRIDE_NONCE) {
-    const nonceHashElt = document.querySelector('#nonceHash');
+  const nonceHashElt = document.querySelector('#nonceHash');
+  if (overrideNonceElt.innerText == 'true') {
     lastNonceElt.innerText = nonceHashElt.innerText;
     return;
   }
-  const ownerActions = await wax.rpc.history_get_actions(owner, -1, -2);
-  const ownerAction = ownerActions.actions[0];
-  console.log(ownerAction);
-  try {
+
+  const setLastNonceAndStart = (lastNonce) => {
+    try {
+      lastNonceElt.innerText = lastNonce;
+      setScore('');
+      addCards();
+    } catch (error) {
+      setScore('Nonce Error:' + error.message);
+    }
+  };
+
+  const waxEndpointVersionElt = document.querySelector('#waxEndpointVersion');
+  const waxEndpointVersion = waxEndpointVersionElt.innerText;
+  if (waxEndpointVersion == 'v1') {
+    const ownerActions = await waxEndpoint.rpc.history_get_actions(owner, -1, -2);
+    const ownerAction = ownerActions.actions[0];
     const lastNonce = ownerAction.action_trace.act.data.assoc_id;
-    lastNonceElt.innerText = lastNonce;
-    setScore('');
-    addCards();
-  } catch (error) {
-    setScore('Nonce Error:' + error.message);
+    // console.log(ownerAction);
+    setLastNonceAndStart(lastNonce);
+  }
+  if (waxEndpointVersion == 'v2') {
+    const waxEndpointElt = document.querySelector('#waxEndpoint');
+    const urlBase = waxEndpointElt.innerText;
+    const urlStr = `${urlBase}/v2/history/get_actions`;
+    const url = new URL(urlStr);
+    url.searchParams.append('act.name', 'requestrand');
+    // url.searchParams.append('act.data.assoc_id', nonceHashElt.innerText);
+    url.searchParams.append('account', owner);
+    url.searchParams.append('skip', 0);
+    url.searchParams.append('limit', 10);
+    url.searchParams.append('simple', false);
+    console.log('history_get_actions', 'url', url);
+    fetch(url, {
+      method: 'get',
+      headers: {'Content-Type': 'application/json'},
+    })
+        .catch((err) => {
+          console.log('history_get_actions', 'err', err);
+          setScore([err.message]);
+        })
+        .then((res) => res.json())
+        .catch((err) => {
+          console.log('history_get_actions', 'err', err);
+          setScore([err.message]);
+        })
+        .then((json) => {
+          if (json.error) {
+            const score = [];
+            score.push(json.error);
+            if (json.message) {
+              score.push(json.message);
+            }
+            setScore(score);
+            return;
+          }
+          // console.log('history_get_actions', 'json', json);
+          if (json.actions !== undefined) {
+            let lastNonce = json.actions[0].act.data.assoc_id;
+            json.actions.forEach((action) => {
+              if (action.act.data.assoc_id == nonceHashElt.innerText) {
+                lastNonce = action.act.data.assoc_id;
+              }
+            });
+            // console.log('history_get_actions', 'lastNonce', lastNonce);
+            // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
+            setLastNonceAndStart(lastNonce);
+          }
+        });
   }
 };
 
@@ -271,6 +328,10 @@ const addBetListeners = (selectedId) => {
 };
 
 window.onLoad = async () => {
+  const waxEndpointElt = document.querySelector('#waxEndpoint');
+  const waxEndpointUrl = waxEndpointElt.innerText;
+  waxEndpoint = new waxjs.WaxJS(waxEndpointUrl, null, null, false);
+
   addBetListeners('1ban');
   addBetListeners('5ban');
   addBetListeners('10ban');
@@ -314,6 +375,7 @@ window.onLoad = async () => {
   blake2bUpdate(context, nonce);
   const nonceHash = getInt64StrFromUint8Array(blake2bFinal(context));
   nonceHashElt.innerText = nonceHash;
+  console.log('nonceHash', nonceHash);
 
   try {
     if (owner === undefined) {
@@ -382,9 +444,9 @@ window.onLoad = async () => {
     async function autoLogin() {
       setAllTopToClass('bg_green', '(1/4) auto login...');
       try {
-        const isAutoLoginAvailable = await wax.isAutoLoginAvailable();
+        const isAutoLoginAvailable = await waxEndpoint.isAutoLoginAvailable();
         if (isAutoLoginAvailable) {
-          const userAccount = wax.userAccount;
+          const userAccount = waxEndpoint.userAccount;
           owner = userAccount;
           window.localStorage.owner = owner;
           ownerElt.innerHTML = `<span>${owner}</span>`;
@@ -402,7 +464,7 @@ window.onLoad = async () => {
     async function login() {
       setAllTopToClass('bg_green', '(2/4) login...');
       try {
-        const userAccount = await wax.login();
+        const userAccount = await waxEndpoint.login();
         owner = userAccount;
         window.localStorage.owner = owner;
         ownerElt.innerHTML = `<span>${owner}</span>`;
@@ -416,16 +478,16 @@ window.onLoad = async () => {
     const nonceTx = async () => {
       setAllTopToClass('bg_green', '(3/4) nonce tx...');
       try {
-        const result = await wax.api.transact({
+        const result = await waxEndpoint.api.transact({
           actions: [{
             account: 'orng.wax',
             name: 'requestrand',
             authorization: [{
-              actor: wax.userAccount,
+              actor: waxEndpoint.userAccount,
               permission: 'active',
             }],
             data: {
-              caller: wax.userAccount,
+              caller: waxEndpoint.userAccount,
               signing_value: nonceHash,
               assoc_id: nonceHash,
             },
@@ -863,7 +925,7 @@ window.blackMonkeyAnswer = (answer) => {
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
-      console.log('bm',response);
+      console.log('bm', response);
       let classNm;
       let message;
       if (response.success) {

@@ -29,9 +29,9 @@ const init = (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   waxRpc = {};
-  waxRpc.history_get_actions = async (t, e, r) => {
+  waxRpc.history_get_actions = async (t, skip, limit, nonce) => {
     return new Promise((resolve, reject) => {
-      if (config.waxEndpoints == 'v1') {
+      if (config.waxEndpointVersion == 'v1') {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
         const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
         // console.log('history_get_actions', 'req', req);
@@ -49,14 +49,16 @@ const init = (_config, _loggingUtil) => {
             });
         return;
       }
-      if (config.waxEndpoints == 'v2') {
+      if (config.waxEndpointVersion == 'v2') {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
         // console.log('history_get_actions', 'req', req);
         const urlStr = `${urlBase}/v2/history/get_actions`;
         const url = new URL(urlStr);
+        url.searchParams.append('act.name', 'requestrand');
+        // url.searchParams.append('act.data.assoc_id', nonce);
         url.searchParams.append('account', t);
-        url.searchParams.append('skip', e);
-        url.searchParams.append('limit', r);
+        url.searchParams.append('skip', skip);
+        url.searchParams.append('limit', limit);
         url.searchParams.append('simple', false);
         // console.log('history_get_actions', 'url', url);
         fetch(url, {
@@ -72,7 +74,7 @@ const init = (_config, _loggingUtil) => {
             });
         return;
       }
-      reject(Error(`unsupported value of config.waxEndpoints: '${config.waxEndpoints}'`));
+      reject(Error(`unsupported value of config.waxEndpointVersion: '${config.waxEndpointVersion}'`));
     });
   };
 };
@@ -107,30 +109,44 @@ const isBadNonce = async (owner, nonce) => {
   if (config.overrideNonce) {
     return false;
   }
+  if (owner == undefined) {
+    throw Error('owner is a required field');
+  }
+  if (nonce == undefined) {
+    throw Error('nonce is a required field');
+  }
+  // console.log('isBadNonce', 'owner', owner);
+  // console.log('isBadNonce', 'nonce', nonce);
   const nonceHash = getNonceHash(nonce);
-  const ownerActions = await waxRpc.history_get_actions(owner, 1, 1);
+  const ownerActions = await waxRpc.history_get_actions(owner, 0, 10, nonce);
   let badNonce = false;
-  if(ownerActions.actions == undefined) {
+  if (ownerActions.actions == undefined) {
     badNonce = true;
   } else {
-    const ownerAction = ownerActions.actions[0];
-    // console.log('isBadNonce', 'ownerAction', ownerAction);
-    if (ownerAction == undefined) {
-      badNonce = true;
-    } else if (ownerAction == undefined) {
-      badNonce = true;
-    } else if (ownerAction.act == undefined) {
-      badNonce = true;
-    } else if (ownerAction.act.data == undefined) {
-      badNonce = true;
-    } else {
-      const lastNonceHash = ownerAction.act.data.assoc_id;
-      // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
-      // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
-      // console.log('isBadNonce', 'nonceHash', nonceHash);
-      if (lastNonceHash != nonceHash) {
+    let allNoncesBad = true;
+    ownerActions.actions.forEach((ownerAction) => {
+      // console.log('isBadNonce', 'ownerAction', ownerAction);
+      if (ownerAction == undefined) {
         badNonce = true;
+      } else if (ownerAction == undefined) {
+        badNonce = true;
+      } else if (ownerAction.act == undefined) {
+        badNonce = true;
+      } else if (ownerAction.act.data == undefined) {
+        badNonce = true;
+      } else {
+        const lastNonceHash = ownerAction.act.data.assoc_id;
+        // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
+        // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
+        // console.log('isBadNonce', 'nonceHash', nonceHash);
+        if (lastNonceHash != nonceHash) {
+          allNoncesBad = false;
+        }
       }
+    });
+    badNonce = false;
+    if (allNoncesBad) {
+      badNonce = true;
     }
   }
   return badNonce;

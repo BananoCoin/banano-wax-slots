@@ -19,6 +19,7 @@ const seedUtil = require('../util/seed-util.js');
 const blackMonkeyUtil = require('../util/black-monkey-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
 const webPageWithdrawUtil = require('./pages/withdraw-util.js');
+const randomUtil = require('../util/random-util.js');
 
 // constants
 const blackMonkeyImagesByOwner = {};
@@ -91,6 +92,16 @@ const initWebServer = async () => {
     data.anyCaptchaEnabled = data.hcaptchaEnabled || data.blackMonkeyEnabled;
     data.hcaptchaSiteKey = config.hcaptcha.sitekey;
     data.version = version;
+    data.overrideNonce = config.overrideNonce;
+    data.waxEndpointVersion = config.waxEndpointVersion;
+
+    if (config.waxEndpointVersion == 'v2') {
+      data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    }
+    if (config.waxEndpointVersion == 'v1') {
+      data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
+    }
+    // console.log('/', data);
 
     res.render('slots', data);
   });

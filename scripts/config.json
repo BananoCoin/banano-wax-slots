@@ -1,7 +1,7 @@
 {
   "bananodeApiUrl": "https://kaliumapi.appditto.com/api",
   "underMaintenance": false,
-  "overrideNonce":false,
+  "overrideNonce": false,
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",
   "burnAccount": "",
@@ -26,11 +26,10 @@
   "thawTimeMs": 28800000,
   "walletSeedIx": 0,
   "waxIdSeed": "",
-  "waxEndpoints": "v2",
+  "waxEndpointVersion": "v2",
   "waxEndpointsV1": ["https://wax.greymass.com"],
-  "waxEndpointsV2": [
-    "https://wax.blokcrafters.io"
-  ],
+  "waxEndpointsV2": ["https://wax.eosrio.io"],
+  "!waxEndpointsV2": ["https://wax.blokcrafters.io"],
   "web": {
     "port": "8686"
   },
