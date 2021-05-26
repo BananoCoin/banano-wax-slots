@@ -439,6 +439,7 @@ window.onLoad = async () => {
         }, {
           blocksBehind: 3,
           expireSeconds: 30,
+          // broadcast: false,
         });
         console.log('result', result);
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
@@ -505,8 +506,20 @@ window.onLoad = async () => {
         }, {
           blocksBehind: 3,
           expireSeconds: 30,
+          // broadcast: false,
         });
-        console.log('nonceTx', 'result', result);
+        // console.log('nonceTx', 'waxEndpoint', waxEndpoint);
+        // console.log('nonceTx', 'result', result);
+        // result.signatures.forEach((signature, signatureIx) => {
+        //   waxEndpoint.pubKeys.forEach((pubKey, pubKeyIx) => {
+        //     console.log('nonceTx', signatureIx, pubKeyIx, 'signature', signature);
+        //     console.log('nonceTx', signatureIx, pubKeyIx, 'pubKey', pubKey);
+        //     const data = result.serializedTransaction.map((x) => x.toString(16).padStart(2, '0')).join('');
+        //     console.log('nonceTx', signatureIx, pubKeyIx, 'data', data.length, data);
+        //     const valid = eosjs_ecc.verify(signature, data, pubKey, 'hex');
+        //     console.log('nonceTx', signatureIx, pubKeyIx, 'valid', valid);
+        //   });
+        // });
         setAllTopToClass('bg_green', '(4/4) blockchain...');
         document.getElementById('transaction_id').innerHTML = result.transaction_id;
         const scoreText = ['Please wait 30 seconds past', getDate(), 'For blockchain to update.'];

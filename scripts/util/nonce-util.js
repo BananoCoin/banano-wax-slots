@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 const randomUtil = require('./random-util.js');
 
 // constants
+const lastNonceByOwnerMap = new Map();
 
 // variables
 /* eslint-disable no-unused-vars */
@@ -61,14 +62,29 @@ const init = (_config, _loggingUtil) => {
         url.searchParams.append('limit', limit);
         url.searchParams.append('simple', false);
         // console.log('history_get_actions', 'url', url);
+        let endEarly = false;
         fetch(url, {
           method: 'get',
           headers: {'Content-Type': 'application/json'},
         })
-            .catch((err) => reject(err))
-            .then((res) => res.json())
-            .catch((err) => reject(err))
+            .catch((err) => {
+              endEarly = true;
+              reject(err);
+            })
+            .then((res) => {
+              if (endEarly) {
+                return;
+              }
+              return res.json();
+            })
+            .catch((err) => {
+              endEarly = true;
+              reject(err);
+            })
             .then((json) => {
+              if (endEarly) {
+                return;
+              }
               // console.log('history_get_actions', 'json', json);
               resolve(json);
             });
@@ -115,10 +131,19 @@ const isBadNonce = async (owner, nonce) => {
   if (nonce == undefined) {
     throw Error('nonce is a required field');
   }
+  const nonceHash = getNonceHash(nonce);
+  if (lastNonceByOwnerMap.has(owner)) {
+    const lastNonceHash = lastNonceByOwnerMap.get(owner);
+    // console.log('isBadNonce', 'cache', 'lastNonceHash', lastNonceHash, nonceHash);
+    if (lastNonceHash == nonceHash) {
+      return false;
+    }
+    lastNonceByOwnerMap.delete(owner);
+  }
   // console.log('isBadNonce', 'owner', owner);
   // console.log('isBadNonce', 'nonce', nonce);
-  const nonceHash = getNonceHash(nonce);
   const ownerActions = await waxRpc.history_get_actions(owner, 0, 10, nonce);
+  // console.log('isBadNonce', 'ownerActions', ownerActions);
   let badNonce = false;
   if (ownerActions.actions == undefined) {
     badNonce = true;
@@ -139,8 +164,9 @@ const isBadNonce = async (owner, nonce) => {
         // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
         // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
         // console.log('isBadNonce', 'nonceHash', nonceHash);
-        if (lastNonceHash != nonceHash) {
+        if (lastNonceHash == nonceHash) {
           allNoncesBad = false;
+          lastNonceByOwnerMap.set(owner, lastNonceHash);
         }
       }
     });
