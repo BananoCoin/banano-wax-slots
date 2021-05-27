@@ -317,7 +317,7 @@ const postWithoutCatch = async (context, req, res) => {
         }
       };
 
-      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won);
+      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'cardCount', resp.cardCount);
       await payout();
     }
   }
