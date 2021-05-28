@@ -7,7 +7,7 @@
       </a>
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
         <button id="slotMachineButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showSlotMachine();return false;">Slots</button>
-        <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Captcha / Details / Cards</button>
+        <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Details / Cards</button>
         <button id="faqButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" onclick="showFAQ();return false;">FAQ</button>
       </ul>
       <b class="col-md-3 color_black text-end" style="margin-right:3%">
@@ -56,7 +56,7 @@
                 <td colspan="1" class="w100pct ">
                   <div class="row">
                     <div class="col-md text-center ">
-                      <div class="card bg_color_yellow">
+                      <div class="card bg_color_yellow" style="height:13vmin">
                         <div class="card-header">
                           <h4 class="card-text">House Balance: <span class="selectable" id="houseAccountBalance"></span>
                           </h4>
@@ -71,13 +71,13 @@
                       </div>
                     </div>
                     <div class="col-md text-center ">
-                      <div class="card bg_color_yellow">
+                      <div class="card bg_color_yellow" style="height:13vmin">
                         <div class="card-header">
                           <h4 class="card-text">Your Account Balance:
                           </h4>
                         </div>
                         <div class="card-body">
-                          <h5 class="card-title">
+                          <h5 class="card-text">
                             <span class="selectable" id="accountCacheBalance"></span>
                           </h5>
                         </div>
@@ -196,6 +196,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-what-is-cryptomonkeys"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -209,6 +210,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-no-wallet"></a>
                   <a name="faq-no-cryptomonkeys"></a>
                   <div class="col-md text-center mb-3">
@@ -224,6 +226,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-how-to-play"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -233,13 +236,14 @@
                       <div class="card-body">
                         <div class="card-title">
                           1. Login with Wax wallet (Anchor or Cloud) in the top right corner.<br>
-                          2. Either deposit Banano or work the captcha to get a Banano.<br>
+                          2. Bet banano using the buttons. Even if you bet 0 banano you might win some.<br>
                           3. Pull the slots arm and hope for some luck!<br>
                           (4. Withdraw or continue to play.)
                         </div>
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-how-to-login"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -255,6 +259,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-frozen-cards"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -270,6 +275,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-how-does-it-work"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -286,6 +292,7 @@
                       </div>
                     </div>
                   </div>
+                  <br>
                   <a name="faq-how-to-profit"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
@@ -302,6 +309,8 @@
                       </div>
                     </div>
                   </div>
+                  <br>
+                  <a name="faq-i-have-problems"></a>
                   <div class="col-md text-center mb-3">
                     <div class="card bg_color_yellow">
                       <div class="card-header">
@@ -315,25 +324,36 @@
                               This is a WAX error, where you need to stake wax to run the secure-rand smart contract.
                               <a class="exit_link" href="https://wax.bloks.io/wallet/resources/stake" target="_blank">Stake some WAX for CPU</a>
                             </li>
+                            <br>
                             <li>
                               <span class="bold">Unexpected token < in JSON at position 0</span>
                                   This is a WAX error, where the wax content delivery network is overloaded. Can't do anything, just wait for them to fix it.
                             </li>
+                            <br>
                             <li>
                               <span class="bold">an error occurred server side: connection refused</span>
                               This is a WAX error, where the wax network api is overloaded. Can't do anything, just wait for them to fix it.
                             </li>
+                            <br>
                             <li>
                               <span class="bold">if you see "(3/4) nonce tx.." for more than 60 seconds</span>
                               Try again. The login to wax failed, and there should be an error in the console.
                             </li>
+                            <br>
                             <li>
                               <span class="bold">if you see "user started a new transaction"</span>
                               Try again. The login to wax failed, and there should be an error in the console.
                             </li>
+                            <br>
                             <li>
                               <span class="bold">The roll over the arm is just animation.</span>
                               The roll over the arm is just animation. The win condition is calculated server side, and does not take into account what cards are shown when the arm is hovered over.
+                            </li>
+                            <br>
+                            <li>
+                              <span class="bold">if you see "no cards, play disabled"</span>
+                              Stop playing, all your cardds are frozen.
+                              <a class="exit_link" href="https://chat.cryotomonkeys.cc" target="_blank">Get a Free CryptomonKey</a>
                             </li>
                           </ul>
                         </div>
@@ -371,9 +391,7 @@
 <script src="https://unpkg.com/anchor-link@2"></script>
 <script src="https://unpkg.com/anchor-link-browser-transport@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/eosjs-ecc@4.0.4/lib/eosjs-ecc.min.js"
-  integrity="sha512-dYFDmK/d9r3/NCp6toLtfkwOjSMRBaEzaGAx1tfRItC0nsI0hVLERk05iNBQR7uDNI7ludYhcBI4vUiFHdjsTQ=="
-  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/eosjs-ecc@4.0.4/lib/eosjs-ecc.min.js" integrity="sha512-dYFDmK/d9r3/NCp6toLtfkwOjSMRBaEzaGAx1tfRItC0nsI0hVLERk05iNBQR7uDNI7ludYhcBI4vUiFHdjsTQ==" crossorigin="anonymous"></script>
 {{#if hcaptchaEnabled}}
   <script src="https://hcaptcha.com/1/api.js" async defer></script>
 {{/if}}

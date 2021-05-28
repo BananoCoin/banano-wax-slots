@@ -804,7 +804,7 @@ const resetScoreText = async () => {
     const expectedPctLoss = Math.pow(1 - chanceWin, 3);
     const expectedPctWin = 1 - expectedPctLoss;
     const expectedChanceToProfitPct = (betWin*expectedPctWin)/((betWin*expectedPctWin) + (betLoss*expectedPctLoss));
-    const expectedValue = (((betWin + betLoss)*expectedPctWin) - (betLoss*expectedPctLoss));
+    const expectedValue = (betWin*expectedPctWin) - (betLoss*expectedPctLoss);
     // console.log('betLoss', betLoss, 'expectedPctLoss', expectedPctLoss.toFixed(2));
     // console.log('betWin', betWin, 'expectedPctWin', expectedPctWin.toFixed(2));
     // console.log('expectedChanceToProfitPct', expectedChanceToProfitPct);
