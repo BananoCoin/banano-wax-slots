@@ -717,7 +717,7 @@ const addCards = async () => {
       const ownedAsset = cardData.ownedAssets[ix];
       ownedAssetsHtml += getOwnedAssetHtml(ownedAsset);
     }
-    document.getElementById('ownedAssets').innerHTML = ownedAssetsHtml;
+    document.getElementById('ownedAssetsInner').innerHTML = ownedAssetsHtml;
 
     if (cardData.score[0] == 'Won') {
       winConfetti();
