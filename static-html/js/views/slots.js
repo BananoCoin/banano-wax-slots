@@ -72,9 +72,16 @@ const play = async (bet) => {
   }
 
   xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      cardData = JSON.parse(this.responseText);
-      console.log('cardData', cardData);
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        cardData = JSON.parse(this.responseText);
+        console.log('cardData', cardData);
+      } else {
+        cardData = {
+          ready: false,
+          errorMessage: `${this.status}:${this.statusText}`,
+        };
+      }
       document.querySelector('#play').disabled = false;
       setArm('smrest');
       spinMonKeysFlag = false;

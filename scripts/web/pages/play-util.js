@@ -209,6 +209,14 @@ const postWithoutCatch = async (context, req, res) => {
   resp.betBonus = config.betBonus;
   resp.bets = config.bets;
 
+
+  resp.unfrozenCardCount = 0;
+  resp.ownedAssets.forEach((ownedAsset) => {
+    if (!ownedAsset.frozen) {
+      resp.unfrozenCardCount++;
+    }
+  });
+
   const banano = parseFloat(resp.cacheBalanceDecimal);
 
   let play = true;
@@ -317,7 +325,7 @@ const postWithoutCatch = async (context, req, res) => {
         }
       };
 
-      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'cardCount', resp.cardCount);
+      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'uniqueCardCount', resp.cardCount, 'totalCardCount', resp.ownedAssets.length, 'unfrozenCardCount', resp.unfrozenCardCount);
       await payout();
     }
   }
