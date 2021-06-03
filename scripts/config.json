@@ -24,6 +24,7 @@
     "50ban": 1.0
   },
   "thawTimeMs": 28800000,
+  "activeTimeMs": 28800000,
   "walletSeedIx": 0,
   "waxIdSeed": "",
   "waxEndpointVersion": "v2",

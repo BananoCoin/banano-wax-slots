@@ -329,6 +329,8 @@ const postWithoutCatch = async (context, req, res) => {
       await payout();
     }
   }
+  resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
+  resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

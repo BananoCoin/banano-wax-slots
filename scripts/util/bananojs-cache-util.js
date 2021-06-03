@@ -180,6 +180,31 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
   }
 };
 
+const getTotalAccountCount = () => {
+  if (fs.existsSync(config.bananojsCacheDataDir)) {
+    return fs.readdirSync(config.bananojsCacheDataDir).length;
+  } else {
+    return 0;
+  }
+};
+
+const getActiveAccountCount = () => {
+  let count = 0;
+  if (fs.existsSync(config.bananojsCacheDataDir)) {
+    fs.readdirSync(config.bananojsCacheDataDir).forEach((file) => {
+      const fileNm = path.join(config.bananojsCacheDataDir, file);
+      const {mtimeMs} = fs.statSync(fileNm);
+      const activeTimeMs = mtimeMs;
+      const activeTimeCutoffMs = Date.now() - config.activeTimeMs;
+      // loggingUtil.log(dateUtil.getDate(), 'file', file, 'activeTimeMs', activeTimeMs, 'activeTimeCutoffMs', activeTimeCutoffMs, 'diff', (activeTimeCutoffMs - activeTimeMs));
+      if (activeTimeMs > activeTimeCutoffMs) {
+        count++;
+      }
+    });
+  }
+  return count;
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getRawStrFromBananoStr = bananojs.getRawStrFromBananoStr;
@@ -192,3 +217,5 @@ module.exports.getAccountsPending = getAccountsPending;
 module.exports.getAccountInfo = getAccountInfo;
 module.exports.sendBananoWithdrawalFromSeed = sendBananoWithdrawalFromSeed;
 module.exports.receiveBananoDepositsForSeed = receiveBananoDepositsForSeed;
+module.exports.getTotalAccountCount = getTotalAccountCount;
+module.exports.getActiveAccountCount = getActiveAccountCount;
