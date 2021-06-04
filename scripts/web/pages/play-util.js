@@ -67,18 +67,20 @@ const receivePending = async (representative, seed) => {
     if (config.centralWalletReceivePendingLoggingOn) {
       loggingUtil.log(dateUtil.getDate(), 'account', account, 'pending', pending.blocks[account]);
     }
+    if (pending!== undefined) {
     // loggingUtil.log(dateUtil.getDate(), 'pending', pending);
-    if (pending.error) {
-      noPending = true;
-    } else {
-      const pendingBlocks = pending.blocks[account];
-      const hashes = [...Object.keys(pendingBlocks)];
-      if (hashes.length !== 0) {
-        const hash = hashes[0];
-        const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
-        pendingList.push(response);
-      } else {
+      if (pending.error) {
         noPending = true;
+      } else {
+        const pendingBlocks = pending.blocks[account];
+        const hashes = [...Object.keys(pendingBlocks)];
+        if (hashes.length !== 0) {
+          const hash = hashes[0];
+          const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
+          pendingList.push(response);
+        } else {
+          noPending = true;
+        }
       }
     }
   }
@@ -113,17 +115,17 @@ const centralAccountReceivePending = async () => {
 
 const postWithoutCatch = async (context, req, res) => {
   if (!atomicassetsUtil.isReady()) {
-    loggingUtil.log(dateUtil.getDate(), 'not ready');
+    loggingUtil.log(dateUtil.getDate(), 'play', 'not ready');
     const resp = {};
     resp.errorMessage = 'not ready';
     resp.ready = false;
     res.send(resp);
     return;
   }
-  // loggingUtil.log(dateUtil.getDate(), 'STARTED play');
+  // loggingUtil.log(dateUtil.getDate(), 'STARTED play', req.body);
   const nonce = req.body.nonce;
   if (nonce == undefined) {
-    loggingUtil.log(dateUtil.getDate(), 'no nonce');
+    loggingUtil.log(dateUtil.getDate(), 'play', 'no nonce');
     const resp = {};
     resp.errorMessage = 'no nonce';
     resp.ready = false;
@@ -136,7 +138,7 @@ const postWithoutCatch = async (context, req, res) => {
 
   const owner = req.body.owner;
   if (owner == undefined) {
-    loggingUtil.log(dateUtil.getDate(), 'no owner');
+    loggingUtil.log(dateUtil.getDate(), 'play', 'no owner');
     const resp = {};
     resp.errorMessage = 'no owner';
     resp.ready = false;

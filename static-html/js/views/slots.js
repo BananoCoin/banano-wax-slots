@@ -16,6 +16,7 @@ let spinMonKeysFlag = false;
 let spinMonkeysIx = 0;
 let waxEndpoint;
 let stopWinConfetti = true;
+let chainTimestamp = '';
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -183,12 +184,22 @@ window.getLastNonce = async () => {
           }
           // console.log('history_get_actions', 'json', json);
           if (json.actions !== undefined) {
-            let lastNonce = json.actions[0].act.data.assoc_id;
+            let lastNonce;
+            chainTimestamp = '';
+            if (json.actions[0].act !== undefined) {
+              chainTimestamp = json.actions[0].timestamp;
+              lastNonce = json.actions[0].act.data.assoc_id;
+            }
             json.actions.forEach((action) => {
               if (action.act.data.assoc_id == nonceHashElt.innerText) {
+                chainTimestamp = action.timestamp;
                 lastNonce = action.act.data.assoc_id;
               }
             });
+            const tIx = chainTimestamp.indexOf('T');
+            if (tIx != -1) {
+              chainTimestamp = chainTimestamp.substring(0,tIx);
+            }
             // console.log('history_get_actions', 'lastNonce', lastNonce);
             // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
             setLastNonceAndStart(lastNonce);
@@ -599,9 +610,9 @@ const addCards = async () => {
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
     if (tryNumber < maxTryNumber) {
-      setAllTopToClass('bold', 'Please Log in');
+      setAllTopToClass('bold', 'Please Log in, Chain Dt:' + chainTimestamp);
     } else {
-      setAllTopToClass('color_red', 'Try Again, Tx Failed');
+      setAllTopToClass('color_red', 'Try Again, Tx Failed, Chain Dt:' + chainTimestamp);
     }
     console.log('tryNumber++', tryNumber);
     tryNumber++;

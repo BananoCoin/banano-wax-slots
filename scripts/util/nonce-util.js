@@ -161,9 +161,12 @@ const isBadNonce = async (owner, nonce) => {
         badNonce = true;
       } else {
         const lastNonceHash = ownerAction.act.data.assoc_id;
+        const timestamp = ownerAction.timestamp;
         // console.log('isBadNonce', 'ownerAction.act', ownerAction.act);
         // console.log('isBadNonce', 'lastNonceHash', lastNonceHash);
         // console.log('isBadNonce', 'nonceHash', nonceHash);
+        // console.log('isBadNonce', 'timestamp', timestamp);
+
         if (lastNonceHash == nonceHash) {
           allNoncesBad = false;
           lastNonceByOwnerMap.set(owner, lastNonceHash);
