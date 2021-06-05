@@ -198,7 +198,7 @@ window.getLastNonce = async () => {
             });
             const tIx = chainTimestamp.indexOf('T');
             if (tIx != -1) {
-              chainTimestamp = chainTimestamp.substring(0,tIx);
+              chainTimestamp = chainTimestamp.substring(0, tIx);
             }
             // console.log('history_get_actions', 'lastNonce', lastNonce);
             // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
@@ -609,10 +609,16 @@ const addCards = async () => {
     const logInHtml = 'Log In';
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
-    if (tryNumber < maxTryNumber) {
-      setAllTopToClass('bold', 'Please Log in, Chain Dt:' + chainTimestamp);
+    if (chainTimestamp == '') {
+      const waxEndpointElt = document.querySelector('#waxEndpoint');
+      const urlBase = waxEndpointElt.innerText;
+      setAllTopToClass('color_red', 'No API:' + urlBase);
     } else {
-      setAllTopToClass('color_red', 'Try Again, Tx Failed, Chain Dt:' + chainTimestamp);
+      if (tryNumber < maxTryNumber) {
+        setAllTopToClass('bold', 'Please Log in, Chain Dt:' + chainTimestamp);
+      } else {
+        setAllTopToClass('color_red', 'Try Again, Tx Failed, Chain Dt:' + chainTimestamp);
+      }
     }
     console.log('tryNumber++', tryNumber);
     tryNumber++;
