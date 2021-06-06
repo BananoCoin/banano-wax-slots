@@ -42,23 +42,23 @@ button[disabled] {
   border-color: gray;
 }
 
-tbody { 
+tbody {
   padding: 0;
 }
 
 body {
   padding: 0;
   margin: 0;
-  background: url(forest-background.png) no-repeat center center fixed; 
+  background: url(forest-background.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
-  
+
 }
 
 .bg_primary {
-  
+
   background-color: gray;
 }
 
@@ -170,6 +170,10 @@ body {
   height: 90vmin;
 }
 
+.h58vmin {
+  height: 58vmin;
+}
+
 .h72vmin {
   height: 72vmin;
 }
@@ -246,7 +250,7 @@ body {
 }
 
 .mb-3{
-  margin-left: 10%; 
+  margin-left: 10%;
   margin-right: 10%;
 }
 
@@ -275,3 +279,8 @@ body {
   outline: 0;
 }
 
+.bpm0 {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

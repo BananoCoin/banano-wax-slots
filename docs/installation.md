@@ -51,7 +51,8 @@ then edit the file (vi config.json or nano config.json) and paste the new config
       "cookieSecret": "<hex>",
       "waxIdSeed": "<hex>",
       "centralWalletSeed": "<hex>",
-      "burnAccount": "crptomonkeys"
+      "burnAccount": "crptomonkeys",
+      "underMaintenance": false
     }
     ```
 

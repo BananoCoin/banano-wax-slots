@@ -33,11 +33,23 @@ const stopSounds = () => {
 };
 
 window.waxjsWallet = async () => {
+  if (cardData !== undefined) {
+    if (cardData.underMaintenance) {
+      alert('under maintenance');
+      return;
+    }
+  }
   walletKind = 'waxjs';
   resetNonceAndOwner();
 };
 
 window.anchorWallet = async () => {
+  if (cardData !== undefined) {
+    if (cardData.underMaintenance) {
+      alert('under maintenance');
+      return;
+    }
+  }
   walletKind = 'anchor';
   resetNonceAndOwner();
 };
@@ -186,9 +198,14 @@ window.getLastNonce = async () => {
           if (json.actions !== undefined) {
             let lastNonce;
             chainTimestamp = '';
-            if (json.actions[0].act !== undefined) {
-              chainTimestamp = json.actions[0].timestamp;
-              lastNonce = json.actions[0].act.data.assoc_id;
+            // console.log('history_get_actions', 'json', json);
+            if (json.actions.length > 0) {
+              if (json.actions[0].act !== undefined) {
+                chainTimestamp = json.actions[0].timestamp;
+                lastNonce = json.actions[0].act.data.assoc_id;
+              }
+            } else {
+              chainTimestamp = 'Unknown';
             }
             json.actions.forEach((action) => {
               if (action.act.data.assoc_id == nonceHashElt.innerText) {
@@ -577,23 +594,16 @@ const truncate = (number) => {
 
 const setEverythingNotGray = () => {
   getSvgSlotMachineElementById('slotmachine').removeAttribute('filter');
-  // document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:url("forest-background.png"');
-  // document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:green;');
-
-  // document.getElementById('play').removeAttribute('style');
+  document.getElementsByTagName('body')[0].setAttribute('class', 'disabled_body');
   document.getElementById('play').disabled = '';
 
-  // document.getElementById('additionlDetailsButton').removeAttribute('style');
   document.getElementById('additionlDetailsButton').disabled = '';
 };
 
 const setEverythingGray = () => {
   getSvgSlotMachineElementById('slotmachine').setAttribute('filter', 'url(#grayscale)');
-  // document.getElementsByTagName('body')[0].setAttribute('style', 'background-image:linear-gradient(black, black),url("forest-background.png"');
-  // document.getElementsByTagName('html')[0].setAttribute('style', 'background-color:gray;');
-  // document.getElementById('play').setAttribute('style', 'background-color:gray;');
+  document.getElementsByTagName('body')[0].setAttribute('class', '');
   document.getElementById('play').disabled = 'disabled';
-  // document.getElementById('additionlDetailsButton').setAttribute('style', 'background-color:gray;');
   document.getElementById('additionlDetailsButton').disabled = 'disabled';
 };
 
@@ -670,6 +680,7 @@ const addCards = async () => {
     addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
   };
   if ((cardData === undefined) || (!cardData.ready)) {
+    setEverythingGray();
     accountElt.innerText = '';
     houseAccountElt.innerText = '';
     setAccountCacheBalance('', '');

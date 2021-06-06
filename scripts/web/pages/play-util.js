@@ -114,6 +114,15 @@ const centralAccountReceivePending = async () => {
 };
 
 const postWithoutCatch = async (context, req, res) => {
+  if(config.underMaintenance) {
+    loggingUtil.log(dateUtil.getDate(), 'play', 'under maintenance');
+    const resp = {};
+    resp.errorMessage = 'under maintenance';
+    resp.underMaintenance = true;
+    resp.ready = false;
+    res.send(resp);
+    return;
+  }
   if (!atomicassetsUtil.isReady()) {
     loggingUtil.log(dateUtil.getDate(), 'play', 'not ready');
     const resp = {};
