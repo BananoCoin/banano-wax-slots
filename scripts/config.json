@@ -1,5 +1,6 @@
 {
   "bananodeApiUrl": "https://kaliumapi.appditto.com/api",
+  "accountSeedLinkEnabled": false,
   "underMaintenance": false,
   "overrideNonce": false,
   "assetDataDir": "data/frozenAssets",

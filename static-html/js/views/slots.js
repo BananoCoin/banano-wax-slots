@@ -372,6 +372,18 @@ window.onLoad = async () => {
       window.showFAQ();
     }
   }
+  const searchParams = (new URL(document.location)).searchParams;
+
+  if (searchParams !== undefined) {
+    if (searchParams.owner !== undefined) {
+      console.log('window.location.searchParams.owner', window.location.searchParams.owner);
+      window.localStorage.owner = window.location.searchParams.owner;
+    }
+    if (searchParams.nonce !== undefined) {
+      console.log('window.location.searchParams.nonce', window.location.searchParams.nonce);
+      window.localStorage.nonce = window.location.searchParams.nonce;
+    }
+  }
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   const waxEndpointUrl = waxEndpointElt.innerText;
@@ -639,6 +651,12 @@ const addCards = async () => {
   const houseAccountElt = document.querySelector('#houseAccount');
   const houseAccountBalanceElt = document.querySelector('#houseAccountBalance');
   const houseAccountCacheBalanceElt = document.querySelector('#houseAccountCacheBalance');
+
+  const accountSeedLinkElt = document.querySelector('#accountSeedLink');
+  if (accountSeedLinkElt !== null) {
+    accountSeedLinkElt.href =
+    `?nonce=${window.localStorage.nonce}&owner=${window.localStorage.owner}`;
+  }
 
   const card1Elt = getSvgSlotMachineElementById('card1');
   const card2Elt = getSvgSlotMachineElementById('card2');
