@@ -377,13 +377,15 @@ window.onLoad = async () => {
   const numSearchParams = Array.from(searchParams).length;
   console.log('searchParams', searchParams, numSearchParams);
   if (numSearchParams > 0) {
-    if (searchParams.owner !== undefined) {
-      console.log('searchParams.owner', searchParams.owner);
-      window.localStorage.owner = searchParams.owner;
+    if (searchParams.has('owner')) {
+      const searchParamsOwner = searchParams.get('owner');
+      console.log('searchParams.owner', searchParamsOwner);
+      window.localStorage.owner = searchParamsOwner;
     }
-    if (searchParams.nonce !== undefined) {
-      console.log('searchParams.nonce', searchParams.nonce);
-      window.localStorage.nonce = searchParams.nonce;
+    if (searchParams.has('nonce')) {
+      const searchParamsNonce = searchParams.get('nonce');
+      console.log('searchParams.nonce', searchParamsNonce);
+      window.localStorage.nonce = searchParamsNonce;
     }
     window.location.href = window.location.pathname;
     return;
