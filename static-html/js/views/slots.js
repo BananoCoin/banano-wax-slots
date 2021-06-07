@@ -859,7 +859,10 @@ const resetScoreText = async () => {
     document.querySelector('#play').disabled = true;
   }
 
-  scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}  Active Users: ${cardData.activeUsers} of ${cardData.totalUsers}`);
+  scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}`);
+
+  document.querySelector('#activeUsers').innerText =
+    `${cardData.activeUsers} of ${cardData.totalUsers}`;
 
   // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;
