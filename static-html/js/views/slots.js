@@ -84,6 +84,16 @@ const play = async (bet) => {
     ownerElt.innerHTML = `<span>${owner}</span>`;
   }
 
+  xmlhttp.timeout = 60000;
+  xmlhttp.ontimeout = function() {
+    cardData = {
+      ready: false,
+      errorMessage: `Server Timeout`,
+    };
+    document.querySelector('#play').disabled = false;
+    setArm('smrest');
+    spinMonKeysFlag = false;
+  };
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
@@ -985,6 +995,11 @@ const withdraw = () => {
   parms.amount = amountElt.value;
 
   setScore('pending...');
+
+  xmlhttp.timeout = 60000;
+  xmlhttp.ontimeout = function() {
+    alert('Timeout, refresh and retry.');
+  };
   xmlhttp.onreadystatechange = function() {
     console.log('withdraw', this);
     if (this.readyState == 4) {
@@ -1028,6 +1043,11 @@ window.blackMonkeyAnswer = (answer) => {
   const blackMonkeyElt = document.getElementById('blackMonkey');
   clear(blackMonkeyElt);
 
+
+  xmlhttp.timeout = 60000;
+  xmlhttp.ontimeout = function() {
+    alert('Timeout, refresh and retry.');
+  };
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
@@ -1063,6 +1083,11 @@ window.blackMonkeyImage = () => {
   const blackMonkeyElt = document.getElementById('blackMonkey');
   clear(blackMonkeyElt);
 
+
+  xmlhttp.timeout = 60000;
+  xmlhttp.ontimeout = function() {
+    alert('Timeout, refresh and retry.');
+  };
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
@@ -1102,6 +1127,11 @@ window.submitHcaptcha = () => {
   parms.nonce = window.localStorage.nonce;
   setScore('pending...');
 
+
+  xmlhttp.timeout = 60000;
+  xmlhttp.ontimeout = function() {
+    alert('Timeout, refresh and retry.');
+  };
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       const response = JSON.parse(this.responseText);
