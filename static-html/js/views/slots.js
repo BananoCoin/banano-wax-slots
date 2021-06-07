@@ -374,15 +374,19 @@ window.onLoad = async () => {
   }
   const searchParams = (new URL(document.location)).searchParams;
 
-  if (searchParams !== undefined) {
+  const numSearchParams = Array.from(searchParams).length;
+  console.log('searchParams', searchParams, numSearchParams);
+  if (numSearchParams > 0) {
     if (searchParams.owner !== undefined) {
-      console.log('window.location.searchParams.owner', window.location.searchParams.owner);
-      window.localStorage.owner = window.location.searchParams.owner;
+      console.log('searchParams.owner', searchParams.owner);
+      window.localStorage.owner = searchParams.owner;
     }
     if (searchParams.nonce !== undefined) {
-      console.log('window.location.searchParams.nonce', window.location.searchParams.nonce);
-      window.localStorage.nonce = window.location.searchParams.nonce;
+      console.log('searchParams.nonce', searchParams.nonce);
+      window.localStorage.nonce = searchParams.nonce;
     }
+    window.location.href = window.location.pathname;
+    return;
   }
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
