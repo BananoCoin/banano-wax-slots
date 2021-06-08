@@ -87,6 +87,7 @@ const play = async (bet) => {
   xmlhttp.timeout = 60000;
   xmlhttp.ontimeout = function() {
     cardData = {
+      intermittentError: true,
       ready: false,
       errorMessage: `Server Timeout`,
     };
@@ -102,6 +103,7 @@ const play = async (bet) => {
       } else {
         cardData = {
           ready: false,
+          intermittentError: true,
           errorMessage: `${this.status}:${this.statusText}`,
         };
       }
@@ -653,9 +655,9 @@ const addCards = async () => {
       setAllTopToClass('color_red', 'No API:' + urlBase);
     } else {
       if (tryNumber < maxTryNumber) {
-        setAllTopToClass('bold', 'Please Log in, Chain Dt:' + chainTimestamp);
+        setAllTopToClass('bold', 'Please Log in, API Dt:' + chainTimestamp);
       } else {
-        setAllTopToClass('color_red', 'Try Again, Tx Failed, Chain Dt:' + chainTimestamp);
+        setAllTopToClass('color_red', 'Try Again, Tx Failed, API Dt:' + chainTimestamp);
       }
     }
     console.log('tryNumber++', tryNumber);
@@ -730,6 +732,9 @@ const addCards = async () => {
       const scoreText = ['Wax Account Ready', ' An error occurred server side',
         cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
+    }
+    if (cardData.intermittentError) {
+      setEverythingNotGray();
     }
   } else {
     accountElt.innerText = cardData.account;
@@ -859,7 +864,18 @@ const resetScoreText = async () => {
     document.querySelector('#play').disabled = true;
   }
 
-  scoreText.push(`Cards: ${cardData.cardCount} of ${cardData.templateCount}`);
+  let frozenCount = 0;
+  let totalCount = 0;
+  if (cardData.ownedAssets != undefined) {
+    cardData.ownedAssets.forEach((ownedAsset) => {
+      if (ownedAsset.frozen) {
+        frozenCount++;
+      }
+      totalCount++;
+    });
+  }
+
+  scoreText.push(`Card Types: ${cardData.cardCount} of ${cardData.templateCount}, Frozen ${frozenCount} of ${totalCount}`);
 
   document.querySelector('#activeUsers').innerText =
     `${cardData.activeUsers} of ${cardData.totalUsers}`;

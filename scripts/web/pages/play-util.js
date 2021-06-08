@@ -52,6 +52,7 @@ const post = async (context, req, res) => {
     console.log('playUtil error', error.message);
     console.trace(error);
     const resp = {};
+    resp.intermittentError = true;
     resp.ready = false;
     resp.errorMessage = error.message;
     res.send(resp);
@@ -114,7 +115,7 @@ const centralAccountReceivePending = async () => {
 };
 
 const postWithoutCatch = async (context, req, res) => {
-  if(config.underMaintenance) {
+  if (config.underMaintenance) {
     loggingUtil.log(dateUtil.getDate(), 'play', 'under maintenance');
     const resp = {};
     resp.errorMessage = 'under maintenance';
@@ -126,6 +127,7 @@ const postWithoutCatch = async (context, req, res) => {
   if (!atomicassetsUtil.isReady()) {
     loggingUtil.log(dateUtil.getDate(), 'play', 'not ready');
     const resp = {};
+    resp.intermittentError = true;
     resp.errorMessage = 'not ready';
     resp.ready = false;
     res.send(resp);
