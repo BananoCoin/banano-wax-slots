@@ -18,11 +18,11 @@
     </div>
     <tr>
       <td>&nbsp;</td>
-      <td class="w100vmin vertical_align_top">
-        <table id="slotMachineTable" class="w100pct ">
+      <td class="w100vmin vertical_align_top" id="outerTable">
+        <table id="slotMachineTable" class="w100pct">
           <tbody>
             <tr>
-              <td class="h15vmin" colspan="1">
+              <td class="h15vmin" colspan="3">
                 <div class="col-md text-center" style="margin-left: 15%;margin-right: 15%;">
                   <div class="card bg_color_yellow color_black">
                     <div class="card-header">
@@ -40,8 +40,32 @@
               </td>
             </tr>
             <tr>
-              <td colspan="1">
+              <td colspan="1" id="td1" class="20pct">
+                <span id="scoreDiv1" class="display_none">
+                  <div class="card bg_color_yellow color_black">
+                    <div class="card-header">
+                      <h3 class="card-text">Score</h3>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="card-title" id="scoreDivInner1"></h6>
+                    </div>
+                  </div>
+                </span>
+              </td>
+              <td colspan="1" id="td2" class="w60pct">
                 <object id="slotMachine" class="w100pct h68vmin bpm0" type="image/svg+xml" data="slot-machine.svg"></object>
+              </td>
+              <td colspan="1" id="td3" class="20pct">
+                <span id="scoreDiv2" class="display_none">
+                  <div class="card bg_color_yellow color_black">
+                    <div class="card-header">
+                      <h3 class="card-text">Score</h3>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="card-title" id="scoreDivInner2"></h6>
+                    </div>
+                  </div>
+                </span>
               </td>
             </tr>
           </tbody>

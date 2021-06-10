@@ -960,10 +960,48 @@ const getSvgSlotMachineElementById = (id) => {
   return elt;
 };
 
+const hideShowScoreDiv = () => {
+  const innerWidth = window.innerWidth;
+  const innerHeight = window.innerHeight;
+  if (innerWidth > (innerHeight*2)) {
+    document.querySelector('#td1').className = '';
+    document.querySelector('#td2').className = '';
+    document.querySelector('#td3').className = '';
+    document.querySelector('#scoreDiv1').className = 'display_none';
+    document.querySelector('#scoreDiv2').className = 'display_none';
+    document.querySelector('#outerTable').className = 'w100vmin vertical_align_top';
+  } else {
+    document.querySelector('#td1').className = 'w20pct';
+    document.querySelector('#td2').className = 'w60pct';
+    document.querySelector('#td3').className = 'w20pct';
+    document.querySelector('#scoreDiv1').className = '';
+    document.querySelector('#scoreDiv2').className = '';
+    document.querySelector('#outerTable').className = 'w200vmin vertical_align_top';
+  }
+  // addScoreDivInnerHeader();
+};
+
+const addScoreDivInnerHeader = () => {
+  const hide = innerWidth > (innerHeight*2);
+  const scoreDivInnerElt = document.querySelector('#scoreDivInner');
+  scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight*2}h:hide:${hide}<br>`;
+};
+
+window.onresize = () => {
+  hideShowScoreDiv();
+};
+
 const setScore = (scoreText, fill, stroke) => {
+  hideShowScoreDiv();
+
+  const scoreDivInner1Elt = document.querySelector('#scoreDivInner1');
+  const scoreDivInner2Elt = document.querySelector('#scoreDivInner2');
+  scoreDivInner1Elt.innerHTML = '';
+  scoreDivInner2Elt.innerHTML = '';
+  // addScoreDivInnerHeader();
+
   const scoreElt = getSvgSlotMachineElementById('score');
   clear(scoreElt);
-
 
   if ((fill != undefined) && (stroke != undefined)) {
     addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 285, 'height': 90, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
@@ -972,6 +1010,10 @@ const setScore = (scoreText, fill, stroke) => {
   let y = 750;
 
   const addTextElt = (text) => {
+    scoreDivInner1Elt.innerHTML += text;
+    scoreDivInner1Elt.innerHTML += '<br>';
+    scoreDivInner2Elt.innerHTML += text;
+    scoreDivInner2Elt.innerHTML += '<br>';
     // console.log('addTextElt', text);
     const textElt = addChildSvgElement(scoreElt, 'text', {
       'x': 120, 'y': y, 'font-family': 'monospace', 'font-size': 12, 'stroke': 'black',

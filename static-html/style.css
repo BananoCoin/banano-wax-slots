@@ -158,6 +158,18 @@ body {
   width: 33%;
 }
 
+.w60pct {
+  width: 60%;
+}
+
+.w20pct {
+  width: 20%;
+}
+
+.w200vmin {
+  width: 200vmin;
+}
+
 .w100vmin {
   width: 100vmin;
 }
