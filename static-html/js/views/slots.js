@@ -963,7 +963,9 @@ const getSvgSlotMachineElementById = (id) => {
 const hideShowScoreDiv = () => {
   const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
-  if (innerWidth > (innerHeight*2)) {
+  const orientation = getOrientation();
+  const hide = getHideFlag(innerWidth, innerHeight, orientation);
+  if (hide) {
     document.querySelector('#td1').className = '';
     document.querySelector('#td2').className = '';
     document.querySelector('#td3').className = '';
@@ -981,17 +983,51 @@ const hideShowScoreDiv = () => {
   // addScoreDivInnerHeader();
 };
 
+const getHideFlag = (innerWidth, innerHeight, orientation) => {
+  const hide = (innerWidth > (innerHeight*2)) || (orientation == 'portrait');
+  return hide;
+};
+
+const getOrientation = () => {
+  try {
+    let orientation;
+    if (window.orientation !== undefined) {
+      if ((window.orientation == 0) || (window.orientation == 180)) {
+        orientation = 'portrait';
+      } else {
+        orientation = 'landscape';
+      }
+    } else {
+      orientation = !navigator.maxTouchPoints ? 'desktop' : !window.screen.orientation.angle ? 'portrait' : 'landscape';
+    }
+    return orientation;
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
 const addScoreDivInnerHeader = () => {
-  const innerWidth = window.innerWidth;
-  const innerHeight = window.innerHeight;
-  const hide = innerWidth > (innerHeight*2);
-  const scoreDivInnerElt = document.querySelector('#scoreDivInner1');
-  scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight}h:hide:${hide}<br>`;
+  try {
+    const orientation = getOrientation();
+    const innerWidth = window.innerWidth;
+    const innerHeight = window.innerHeight;
+    const hide = getHideFlag(innerWidth, innerHeight, orientation);
+    const scoreDivInnerElt = document.querySelector('#scoreDivInner1');
+    scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight}h:hide:${hide} orientation:${orientation}<br>`;
+  } catch (error) {
+    alert(error.message);
+  }
 };
 
 window.onresize = () => {
   hideShowScoreDiv();
 };
+
+if (window.screen.addEventListener) {
+  window.screen.addEventListener('orientationchange', function() {
+    hideShowScoreDiv();
+  });
+}
 
 const setScore = (scoreText, fill, stroke) => {
   hideShowScoreDiv();
