@@ -982,9 +982,11 @@ const hideShowScoreDiv = () => {
 };
 
 const addScoreDivInnerHeader = () => {
+  const innerWidth = window.innerWidth;
+  const innerHeight = window.innerHeight;
   const hide = innerWidth > (innerHeight*2);
-  const scoreDivInnerElt = document.querySelector('#scoreDivInner');
-  scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight*2}h:hide:${hide}<br>`;
+  const scoreDivInnerElt = document.querySelector('#scoreDivInner1');
+  scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight}h:hide:${hide}<br>`;
 };
 
 window.onresize = () => {
