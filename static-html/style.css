@@ -54,11 +54,9 @@ body {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
-
 }
 
 .bg_primary {
-
   background-color: gray;
 }
 
@@ -77,12 +75,15 @@ body {
 .bg_color_lightblue {
   background-color: lightblue;
 }
+
 .bg_color_gray {
   background-color: rgb(73, 72, 72);
 }
+
 .bg_color_green {
   background-color: rgb(76, 191, 75);
 }
+
 .bg_color_darkgreen {
   background-color: rgb(0, 128, 0);
 }
@@ -100,7 +101,7 @@ body {
 }
 
 .color_white {
-  color:  white;
+  color: white;
 }
 
 .color_red {
@@ -265,7 +266,7 @@ body {
   color: #AAA;
 }
 
-.mb-3{
+.mb-3 {
   margin-left: 10%;
   margin-right: 10%;
 }
@@ -275,6 +276,7 @@ body {
   background-color: var(--bs-dark);
   border-color: var(--bs-gray);
 }
+
 .form-control-dark:focus {
   color: #fff;
   background-color: var(--bs-dark);
@@ -299,4 +301,16 @@ body {
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+.fill_lightgreen_stroke_green {
+  background-color: lightgreen;
+  border-color: green;
+  border-width: 0.5vmin;
+}
+
+.fill_pink_stroke_red {
+  background-color: pink;
+  border-color: red;
+  border-width: 0.5vmin;
 }

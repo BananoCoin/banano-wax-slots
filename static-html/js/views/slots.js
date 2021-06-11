@@ -732,9 +732,9 @@ const addCards = async () => {
       const scoreText = ['Wax Account Ready', ' An error occurred server side',
         cardData.errorMessage, 'Please wait 30 seconds past', getDate(), 'For blockchain to update.'];
       setScore(scoreText);
-    }
-    if (cardData.intermittentError) {
-      setEverythingNotGray();
+      if (cardData.intermittentError) {
+        setEverythingNotGray();
+      }
     }
   } else {
     accountElt.innerText = cardData.account;
@@ -960,7 +960,7 @@ const getSvgSlotMachineElementById = (id) => {
   return elt;
 };
 
-const hideShowScoreDiv = () => {
+const hideShowScoreDiv = (fill, stroke) => {
   const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
   const orientation = getOrientation();
@@ -973,9 +973,15 @@ const hideShowScoreDiv = () => {
     document.querySelector('#scoreDiv2').className = 'display_none';
     document.querySelector('#outerTable').className = 'w100vmin vertical_align_top';
   } else {
+    let color = 'card bg_color_yellow color_black';
+    if ((fill != undefined) && (stroke != undefined)) {
+      color = `card fill_${fill}_stroke_${stroke}`;
+    }
     document.querySelector('#td1').className = 'w20pct';
     document.querySelector('#td2').className = 'w60pct';
     document.querySelector('#td3').className = 'w20pct';
+    document.querySelector('#card1').className = color;
+    document.querySelector('#card3').className = color;
     document.querySelector('#scoreDiv1').className = '';
     document.querySelector('#scoreDiv2').className = '';
     document.querySelector('#outerTable').className = 'w200vmin vertical_align_top';
@@ -984,7 +990,7 @@ const hideShowScoreDiv = () => {
 };
 
 const getHideFlag = (innerWidth, innerHeight, orientation) => {
-  const hide = (innerWidth > (innerHeight*2)) || (orientation == 'portrait');
+  const hide = (innerWidth < (innerHeight*1.7)) || (orientation == 'portrait');
   return hide;
 };
 
@@ -1030,7 +1036,7 @@ if (window.screen.addEventListener) {
 }
 
 const setScore = (scoreText, fill, stroke) => {
-  hideShowScoreDiv();
+  hideShowScoreDiv(fill, stroke);
 
   const scoreDivInner1Elt = document.querySelector('#scoreDivInner1');
   const scoreDivInner2Elt = document.querySelector('#scoreDivInner2');
