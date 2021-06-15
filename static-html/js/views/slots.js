@@ -197,6 +197,12 @@ window.getLastNonce = async () => {
           setScore([err.message]);
         })
         .then((json) => {
+          if(json == undefined) {
+            const score = [];
+            score.push('json == undefined');
+            setScore(score);
+            return;
+          }
           if (json.error) {
             const score = [];
             score.push(json.error);
