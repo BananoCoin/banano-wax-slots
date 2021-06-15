@@ -147,8 +147,18 @@ body {
   -webkit-user-select: text;
 }
 
+table.centered {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .w100pct {
   width: 100%;
+}
+
+.w99pct {
+  width: 99%;
 }
 
 .w66pct {

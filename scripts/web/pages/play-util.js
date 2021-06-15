@@ -277,6 +277,8 @@ const postWithoutCatch = async (context, req, res) => {
       const card3 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
       const cards = [card1, card2, card3];
       // loggingUtil.log(dateUtil.getDate(), 'STARTED checkCards');
+
+      const unfrozenCardData = {};
       for (let cardIx = 0; cardIx < cards.length; cardIx++) {
         const card = cards[cardIx];
         const cardData = {};
@@ -292,6 +294,7 @@ const postWithoutCatch = async (context, req, res) => {
         if (unfrozenAssets === undefined) {
         } else if (unfrozenAssets.length == 0) {
         } else {
+          unfrozenCardData[cardIx] = cardData;
           cardData.totalCardCount += unfrozenAssets.length;
           cardData.frozen = false;
         }
@@ -319,7 +322,17 @@ const postWithoutCatch = async (context, req, res) => {
           const card = cards[cardIx];
           const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
           if (assets !== undefined) {
-            assetUtil.freezeAsset(assets[0]);
+            const assetId = assets[0];
+            assetUtil.freezeAsset(assetId);
+
+            resp.ownedAssets.forEach((ownedAsset) => {
+              if (ownedAsset.assetId == assetId) {
+                ownedAsset.newFrozen = true;
+              }
+            });
+            if (assets.length == 1) {
+              resp.cardCount--;
+            }
           }
         }
       }

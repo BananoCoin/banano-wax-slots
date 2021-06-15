@@ -803,12 +803,13 @@ const getOwnedAssetHtml = (ownedAsset) => {
   let ownedAssetsHtml = '';
   let border = '';
   let filter = '';
-  if (ownedAsset.frozen) {
+  const frozen = ownedAsset.frozen || (ownedAsset.newFrozen == true);
+  if (frozen) {
     border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;color:black;';
   } else {
     border = 'border-width:0.2vh;border-color:black;background-color:white;color:black;';
   }
-  if (ownedAsset.frozen) {
+  if (frozen) {
     filter += ` filter:blur(${blurSize});`;
   }
   const src = `/ipfs/${ownedAsset.img}.webp`;
@@ -820,7 +821,7 @@ const getOwnedAssetHtml = (ownedAsset) => {
   ownedAssetsHtml += `(${ownedAsset.assetId})`;
   ownedAssetsHtml += '</span>';
   ownedAssetsHtml += '<br>';
-  ownedAssetsHtml += `Frozen:${ownedAsset.frozen}`;
+  ownedAssetsHtml += `Frozen:${frozen}`;
 
   if (ownedAsset.thawTimeMs !== undefined) {
     if (ownedAsset.thawTimeMs > 0) {
