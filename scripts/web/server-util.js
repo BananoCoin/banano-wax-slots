@@ -278,13 +278,13 @@ const initWebServer = async () => {
     res.send(resp);
   });
 
-  app.post('v1/chain/get_info', async (req, res) => {
+  app.post('/v1/chain/get_info', async (req, res) => {
     loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_info');
     const resp = await nonceUtil.getWaxRpc().chain_get_info();
     res.send(resp);
   });
 
-  app.post('v1/chain/get_block', async (req, res) => {
+  app.post('/v1/chain/get_block', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -296,7 +296,7 @@ const initWebServer = async () => {
     });
   });
 
-  app.post('v1/chain/get_raw_code_and_abi', async (req, res) => {
+  app.post('/v1/chain/get_raw_code_and_abi', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -308,7 +308,7 @@ const initWebServer = async () => {
     });
   });
 
-  app.post('v1/chain/get_required_keys', async (req, res) => {
+  app.post('/v1/chain/get_required_keys', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -320,7 +320,7 @@ const initWebServer = async () => {
     });
   });
 
-  app.post('v1/chain/push_transaction', async (req, res) => {
+  app.post('/v1/chain/push_transaction', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
