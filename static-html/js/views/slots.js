@@ -174,12 +174,15 @@ window.getLastNonce = async () => {
   if (waxEndpointVersion == 'v2' || waxEndpointVersion == 'v2proxy') {
     const waxEndpointElt = document.querySelector('#waxEndpoint');
     let urlBase = waxEndpointElt.innerText;
-    if(urlBase.length == 0) {
+    if (urlBase.length == 0) {
       urlBase = window.location.href;
+      if (urlBase.endsWith('/')) {
+        urlBase = urlBase.substring(0, urlBase.length-1);
+      }
     }
     const urlStr = '/v2/history/get_actions';
     console.log('history_get_actions', 'urlBase', urlBase);
-    console.log('history_get_actions', 'urlStr', urlStr);
+    // console.log('history_get_actions', 'urlStr', urlStr);
     const url = new URL(urlStr, urlBase);
     url.searchParams.append('act.name', 'requestrand');
     // url.searchParams.append('act.data.assoc_id', nonceHashElt.innerText);
@@ -202,7 +205,7 @@ window.getLastNonce = async () => {
           setScore([err.message]);
         })
         .then((json) => {
-          if(json == undefined) {
+          if (json == undefined) {
             const score = [];
             score.push('json == undefined');
             setScore(score);
@@ -416,9 +419,13 @@ window.onLoad = async () => {
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   let waxEndpointUrl = waxEndpointElt.innerText;
-  if(waxEndpointUrl.length == 0) {
+  if (waxEndpointUrl.length == 0) {
     waxEndpointUrl = window.location.href;
+    if (waxEndpointUrl.endsWith('/')) {
+      waxEndpointUrl = waxEndpointUrl.substring(0, waxEndpointUrl.length-1);
+    }
   }
+  console.log('waxjs.WaxJS', 'waxEndpointUrl', waxEndpointUrl);
   waxEndpoint = new waxjs.WaxJS(waxEndpointUrl, null, null, false);
 
   addBetListeners('1ban');
