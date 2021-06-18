@@ -171,11 +171,16 @@ window.getLastNonce = async () => {
     // console.log(ownerAction);
     setLastNonceAndStart(lastNonce);
   }
-  if (waxEndpointVersion == 'v2') {
+  if (waxEndpointVersion == 'v2' || waxEndpointVersion == 'v2proxy') {
     const waxEndpointElt = document.querySelector('#waxEndpoint');
-    const urlBase = waxEndpointElt.innerText;
-    const urlStr = `${urlBase}/v2/history/get_actions`;
-    const url = new URL(urlStr);
+    let urlBase = waxEndpointElt.innerText;
+    if(urlBase.length == 0) {
+      urlBase = window.location.href;
+    }
+    const urlStr = '/v2/history/get_actions';
+    console.log('history_get_actions', 'urlBase', urlBase);
+    console.log('history_get_actions', 'urlStr', urlStr);
+    const url = new URL(urlStr, urlBase);
     url.searchParams.append('act.name', 'requestrand');
     // url.searchParams.append('act.data.assoc_id', nonceHashElt.innerText);
     url.searchParams.append('account', owner);
@@ -212,7 +217,7 @@ window.getLastNonce = async () => {
             setScore(score);
             return;
           }
-          // console.log('history_get_actions', 'json', json);
+          console.log('history_get_actions', 'json', json);
           if (json.actions !== undefined) {
             let lastNonce;
             chainTimestamp = '';

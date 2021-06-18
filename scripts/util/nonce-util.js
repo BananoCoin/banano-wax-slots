@@ -30,7 +30,7 @@ const init = (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   waxRpc = {};
-  waxRpc.history_get_actions = async (t, skip, limit, nonce) => {
+  waxRpc.history_get_actions = async (t, skip, limit) => {
     return new Promise((resolve, reject) => {
       if (config.waxEndpointVersion == 'v1') {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
@@ -50,7 +50,7 @@ const init = (_config, _loggingUtil) => {
             });
         return;
       }
-      if (config.waxEndpointVersion == 'v2') {
+      if ((config.waxEndpointVersion == 'v2') || (config.waxEndpointVersion == 'v2proxy')) {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
         // console.log('history_get_actions', 'req', req);
         const urlStr = `${urlBase}/v2/history/get_actions`;
@@ -142,7 +142,7 @@ const isBadNonce = async (owner, nonce) => {
   }
   // console.log('isBadNonce', 'owner', owner);
   // console.log('isBadNonce', 'nonce', nonce);
-  const ownerActions = await waxRpc.history_get_actions(owner, 0, 10, nonce);
+  const ownerActions = await waxRpc.history_get_actions(owner, 0, 10);
   // console.log('isBadNonce', 'ownerActions', ownerActions);
   let badNonce = false;
   if (ownerActions.actions == undefined) {
@@ -181,6 +181,11 @@ const isBadNonce = async (owner, nonce) => {
   return badNonce;
 };
 
+const getWaxRpc = () => {
+  return waxRpc;
+}
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.isBadNonce = isBadNonce;
+module.exports.getWaxRpc = getWaxRpc;

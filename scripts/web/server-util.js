@@ -96,6 +96,9 @@ const initWebServer = async () => {
     data.overrideNonce = config.overrideNonce;
     data.waxEndpointVersion = config.waxEndpointVersion;
 
+    if (config.waxEndpointVersion == 'v2proxy') {
+      data.waxEndpoint = '';
+    }
     if (config.waxEndpointVersion == 'v2') {
       data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
     }
@@ -267,6 +270,14 @@ const initWebServer = async () => {
     res.send(resp);
   });
 
+  app.get('/v2/history/get_actions', async (req, res) => {
+    // loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', req.query);
+    const account = req.query.account;
+    const skip = req.query.skip;
+    const limit = req.query.limit;
+    const resp = await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
+    res.send(resp);
+  });
 
   app.get('/favicon.ico', async (req, res) => {
     res.redirect(302, '/favicon-16x16.png');
