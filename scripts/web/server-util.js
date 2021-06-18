@@ -6,7 +6,6 @@ const request = require('request');
 // const cors = require('cors');
 const express = require('express');
 const exphbs = require('express-handlebars');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 // const crypto = require('crypto');
 
@@ -68,7 +67,7 @@ const initWebServer = async () => {
     limit: '50mb',
     extended: true,
   }));
-  app.use(bodyParser.json({
+  app.use(express.json({
     limit: '50mb',
     extended: true,
   }));
@@ -271,12 +270,66 @@ const initWebServer = async () => {
   });
 
   app.get('/v2/history/get_actions', async (req, res) => {
-    // loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', req.query);
     const account = req.query.account;
     const skip = req.query.skip;
     const limit = req.query.limit;
+    loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', account, skip, limit);
     const resp = await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
     res.send(resp);
+  });
+
+  app.post('//v1/chain/get_info', async (req, res) => {
+    loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_info');
+    const resp = await nonceUtil.getWaxRpc().chain_get_info();
+    res.send(resp);
+  });
+
+  app.post('//v1/chain/get_block', async (req, res) => {
+    let bodyStr = '';
+    req.on('data', (chunk) => {
+      bodyStr += chunk.toString();
+    });
+    req.on('end', async () => {
+      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_block', req.method, req.url, req.body, bodyStr);
+      const resp = await nonceUtil.getWaxRpc().chain_get_block(bodyStr);
+      res.send(resp);
+    });
+  });
+
+  app.post('//v1/chain/get_raw_code_and_abi', async (req, res) => {
+    let bodyStr = '';
+    req.on('data', (chunk) => {
+      bodyStr += chunk.toString();
+    });
+    req.on('end', async () => {
+      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_raw_code_and_abi', bodyStr);
+      const resp = await nonceUtil.getWaxRpc().chain_get_raw_code_and_abi(bodyStr);
+      res.send(resp);
+    });
+  });
+
+  app.post('//v1/chain/get_required_keys', async (req, res) => {
+    let bodyStr = '';
+    req.on('data', (chunk) => {
+      bodyStr += chunk.toString();
+    });
+    req.on('end', async () => {
+      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_required_keys', bodyStr);
+      const resp = await nonceUtil.getWaxRpc().chain_get_required_keys(bodyStr);
+      res.send(resp);
+    });
+  });
+
+  app.post('//v1/chain/push_transaction', async (req, res) => {
+    let bodyStr = '';
+    req.on('data', (chunk) => {
+      bodyStr += chunk.toString();
+    });
+    req.on('end', async () => {
+      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/push_transaction', bodyStr);
+      const resp = await nonceUtil.getWaxRpc().chain_push_transaction(bodyStr);
+      res.send(resp);
+    });
   });
 
   app.get('/favicon.ico', async (req, res) => {
@@ -288,6 +341,7 @@ const initWebServer = async () => {
   });
 
   app.use((req, res, next) => {
+    loggingUtil.log(dateUtil.getDate(), '?', req.method, req.url, req.query, req.body);
     res.status(404);
     res.type('text/plain;charset=UTF-8').send('');
   });

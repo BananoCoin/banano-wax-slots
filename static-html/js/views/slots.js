@@ -415,7 +415,10 @@ window.onLoad = async () => {
   }
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
-  const waxEndpointUrl = waxEndpointElt.innerText;
+  let waxEndpointUrl = waxEndpointElt.innerText;
+  if(waxEndpointUrl.length == 0) {
+    waxEndpointUrl = window.location.href;
+  }
   waxEndpoint = new waxjs.WaxJS(waxEndpointUrl, null, null, false);
 
   addBetListeners('1ban');

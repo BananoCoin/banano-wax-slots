@@ -29,7 +29,71 @@ const init = (_config, _loggingUtil) => {
   config = _config;
   loggingUtil = _loggingUtil;
 
+  const newFetchPromise = async (url, method, body) => {
+    return new Promise((resolve, reject) => {
+      let endEarly = false;
+      fetch(url, {
+        method: method,
+        body: body,
+        headers: {'Content-Type': 'application/json'},
+      })
+          .catch((err) => {
+            endEarly = true;
+            reject(err);
+          })
+          .then((res) => {
+            if (endEarly) {
+              return;
+            }
+            return res.json();
+          })
+          .catch((err) => {
+            endEarly = true;
+            reject(err);
+          })
+          .then((json) => {
+            if (endEarly) {
+              return;
+            }
+            // console.log(url.href, 'json', json);
+            resolve(json);
+          });
+      return;
+    });
+  };
+
   waxRpc = {};
+
+  waxRpc.chain_push_transaction = async (bodyStr) => {
+    const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    const urlStr = '/v1/chain/push_transaction';
+    const url = new URL(urlStr, urlBase);
+    return newFetchPromise(url, 'post', bodyStr);
+  };
+  waxRpc.chain_get_required_keys = async (bodyStr) => {
+    const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    const urlStr = '/v1/chain/get_required_keys';
+    const url = new URL(urlStr, urlBase);
+    return newFetchPromise(url, 'post', bodyStr);
+  };
+  waxRpc.chain_get_raw_code_and_abi = async (bodyStr) => {
+    const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    const urlStr = '/v1/chain/get_raw_code_and_abi';
+    const url = new URL(urlStr, urlBase);
+    return newFetchPromise(url, 'post', bodyStr);
+  };
+  waxRpc.chain_get_info = async () => {
+    const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    const urlStr = '/v1/chain/get_info';
+    const url = new URL(urlStr, urlBase);
+    return newFetchPromise(url, 'get');
+  };
+  waxRpc.chain_get_block = async (bodyStr) => {
+    const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+    const urlStr = '/v1/chain/get_block';
+    const url = new URL(urlStr, urlBase);
+    return newFetchPromise(url, 'post', bodyStr);
+  };
   waxRpc.history_get_actions = async (t, skip, limit) => {
     return new Promise((resolve, reject) => {
       if (config.waxEndpointVersion == 'v1') {
@@ -183,7 +247,7 @@ const isBadNonce = async (owner, nonce) => {
 
 const getWaxRpc = () => {
   return waxRpc;
-}
+};
 
 module.exports.init = init;
 module.exports.deactivate = deactivate;
