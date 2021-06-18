@@ -278,55 +278,55 @@ const initWebServer = async () => {
     res.send(resp);
   });
 
-  app.post('//v1/chain/get_info', async (req, res) => {
-    loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_info');
+  app.post('v1/chain/get_info', async (req, res) => {
+    loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_info');
     const resp = await nonceUtil.getWaxRpc().chain_get_info();
     res.send(resp);
   });
 
-  app.post('//v1/chain/get_block', async (req, res) => {
+  app.post('v1/chain/get_block', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
     });
     req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_block', req.method, req.url, req.body, bodyStr);
+      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_block', req.method, req.url, req.body, bodyStr);
       const resp = await nonceUtil.getWaxRpc().chain_get_block(bodyStr);
       res.send(resp);
     });
   });
 
-  app.post('//v1/chain/get_raw_code_and_abi', async (req, res) => {
+  app.post('v1/chain/get_raw_code_and_abi', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
     });
     req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_raw_code_and_abi', bodyStr);
+      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_raw_code_and_abi', bodyStr);
       const resp = await nonceUtil.getWaxRpc().chain_get_raw_code_and_abi(bodyStr);
       res.send(resp);
     });
   });
 
-  app.post('//v1/chain/get_required_keys', async (req, res) => {
+  app.post('v1/chain/get_required_keys', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
     });
     req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/get_required_keys', bodyStr);
+      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_required_keys', bodyStr);
       const resp = await nonceUtil.getWaxRpc().chain_get_required_keys(bodyStr);
       res.send(resp);
     });
   });
 
-  app.post('//v1/chain/push_transaction', async (req, res) => {
+  app.post('v1/chain/push_transaction', async (req, res) => {
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
     });
     req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', '//v1/chain/push_transaction', bodyStr);
+      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/push_transaction', bodyStr);
       const resp = await nonceUtil.getWaxRpc().chain_push_transaction(bodyStr);
       res.send(resp);
     });
