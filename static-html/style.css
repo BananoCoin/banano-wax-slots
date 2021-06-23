@@ -324,3 +324,7 @@ table.centered {
   border-color: red;
   border-width: 0.5vmin;
 }
+
+.monospace {
+  font-family: monospace;
+}

@@ -34,10 +34,7 @@ function ADD64AC(v, a, b0, b1) {
 
 // Little-endian byte access
 function B2B_GET32(arr, i) {
-  return (arr[i] ^
-(arr[i + 1] << 8) ^
-(arr[i + 2] << 16) ^
-(arr[i + 3] << 24));
+  return arr[i] ^ (arr[i + 1] << 8) ^ (arr[i + 2] << 16) ^ (arr[i + 3] << 24);
 }
 
 // G Mixing function
@@ -85,40 +82,233 @@ function B2B_G(a, b, c, d, ix, iy) {
 
 // Initialization Vector
 const BLAKE2B_IV32 = new Uint32Array([
-  0xF3BCC908, 0x6A09E667, 0x84CAA73B, 0xBB67AE85,
-  0xFE94F82B, 0x3C6EF372, 0x5F1D36F1, 0xA54FF53A,
-  0xADE682D1, 0x510E527F, 0x2B3E6C1F, 0x9B05688C,
-  0xFB41BD6B, 0x1F83D9AB, 0x137E2179, 0x5BE0CD19,
+  0xf3bcc908,
+  0x6a09e667,
+  0x84caa73b,
+  0xbb67ae85,
+  0xfe94f82b,
+  0x3c6ef372,
+  0x5f1d36f1,
+  0xa54ff53a,
+  0xade682d1,
+  0x510e527f,
+  0x2b3e6c1f,
+  0x9b05688c,
+  0xfb41bd6b,
+  0x1f83d9ab,
+  0x137e2179,
+  0x5be0cd19,
 ]);
 
 const SIGMA8 = [
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3,
-  11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4,
-  7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8,
-  9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13,
-  2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9,
-  12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11,
-  13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10,
-  6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5,
-  10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0,
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  14,
+  10,
+  4,
+  8,
+  9,
+  15,
+  13,
+  6,
+  1,
+  12,
+  0,
+  2,
+  11,
+  7,
+  5,
+  3,
+  11,
+  8,
+  12,
+  0,
+  5,
+  2,
+  15,
+  13,
+  10,
+  14,
+  3,
+  6,
+  7,
+  1,
+  9,
+  4,
+  7,
+  9,
+  3,
+  1,
+  13,
+  12,
+  11,
+  14,
+  2,
+  6,
+  5,
+  10,
+  4,
+  0,
+  15,
+  8,
+  9,
+  0,
+  5,
+  7,
+  2,
+  4,
+  10,
+  15,
+  14,
+  1,
+  11,
+  12,
+  6,
+  8,
+  3,
+  13,
+  2,
+  12,
+  6,
+  10,
+  0,
+  11,
+  8,
+  3,
+  4,
+  13,
+  7,
+  5,
+  15,
+  14,
+  1,
+  9,
+  12,
+  5,
+  1,
+  15,
+  14,
+  13,
+  4,
+  10,
+  0,
+  7,
+  6,
+  3,
+  9,
+  2,
+  8,
+  11,
+  13,
+  11,
+  7,
+  14,
+  12,
+  1,
+  3,
+  9,
+  5,
+  0,
+  15,
+  4,
+  8,
+  6,
+  2,
+  10,
+  6,
+  15,
+  14,
+  9,
+  11,
+  3,
+  0,
+  8,
+  12,
+  2,
+  13,
+  7,
+  1,
+  4,
+  10,
+  5,
+  10,
+  2,
+  8,
+  4,
+  7,
+  6,
+  1,
+  5,
+  15,
+  11,
+  9,
+  14,
+  3,
+  12,
+  13,
+  0,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  14,
+  10,
+  4,
+  8,
+  9,
+  15,
+  13,
+  6,
+  1,
+  12,
+  0,
+  2,
+  11,
+  7,
+  5,
+  3,
 ];
 
 // These are offsets into a uint64 buffer.
 // Multiply them all by 2 to make them offsets into a uint32 buffer,
 // because this is Javascript and we don't have uint64s
-const SIGMA82 = new Uint8Array(SIGMA8.map(function(x) {
-  return x * 2;
-}));
+const SIGMA82 = new Uint8Array(
+    SIGMA8.map(function(x) {
+      return x * 2;
+    }),
+);
 
 // Compression function. 'last' flag indicates last block.
 // Note we're representing 16 uint64s as 32 uint32s
-var v = new Uint32Array(32);
-var m = new Uint32Array(32);
-
-export function blake2bCompress(ctx, last) {
+const v = new Uint32Array(32);
+const m = new Uint32Array(32);
+function blake2bCompress(ctx, last) {
   let i = 0;
 
   // init work variables
@@ -148,7 +338,7 @@ export function blake2bCompress(ctx, last) {
   // and match the RFC sample documentation
   // util.debugPrint('          m[16]', m, 64)
   for (i = 0; i < 12; i++) {
-  // util.debugPrint('   (i=' + (i < 10 ? ' ' : '') + i + ') v[16]', v, 64)
+    // util.debugPrint('   (i=' + (i < 10 ? ' ' : '') + i + ') v[16]', v, 64)
     B2B_G(0, 8, 16, 24, SIGMA82[i * 16 + 0], SIGMA82[i * 16 + 1]);
     B2B_G(2, 10, 18, 26, SIGMA82[i * 16 + 2], SIGMA82[i * 16 + 3]);
     B2B_G(4, 12, 20, 28, SIGMA82[i * 16 + 4], SIGMA82[i * 16 + 5]);
@@ -163,7 +353,7 @@ export function blake2bCompress(ctx, last) {
   for (i = 0; i < 16; i++) {
     ctx.h[i] = ctx.h[i] ^ v[i] ^ v[i + 16];
   }
-// util.debugPrint('h[8]', ctx.h, 64)
+  // util.debugPrint('h[8]', ctx.h, 64)
 }
 
 // Creates a BLAKE2b hashing context
@@ -207,7 +397,8 @@ export function blake2bInit(outlen, key) {
 // Requires hash context and Uint8Array (byte array)
 export function blake2bUpdate(ctx, input) {
   for (let i = 0; i < input.length; i++) {
-    if (ctx.c === 128) { // buffer full ?
+    if (ctx.c === 128) {
+      // buffer full ?
       ctx.t += ctx.c; // add counters
       blake2bCompress(ctx, false); // compress (not last)
       ctx.c = 0; // counter to zero
@@ -221,7 +412,8 @@ export function blake2bUpdate(ctx, input) {
 export function blake2bFinal(ctx) {
   ctx.t += ctx.c; // mark last block offset
 
-  while (ctx.c < 128) { // fill up with zeros
+  while (ctx.c < 128) {
+    // fill up with zeros
     ctx.b[ctx.c++] = 0;
   }
   blake2bCompress(ctx, true); // final block flag = 1
@@ -242,8 +434,8 @@ export function blake2bFinal(ctx) {
 // - input - the input bytes, as a string, Buffer or Uint8Array
 // - key - optional key Uint8Array, up to 64 bytes
 // - outlen - optional output length in bytes, default 64
-export function blake2b(input, key, outlen) {
-// preprocess inputs
+function blake2b(input, key, outlen) {
+  // preprocess inputs
   outlen = outlen || 64;
   input = util.normalizeInput(input);
 
@@ -261,7 +453,17 @@ export function blake2b(input, key, outlen) {
 // - input - the input bytes, as a string, Buffer, or Uint8Array
 // - key - optional key Uint8Array, up to 64 bytes
 // - outlen - optional output length in bytes, default 64
-export function blake2bHex(input, key, outlen) {
+function blake2bHex(input, key, outlen) {
   const output = blake2b(input, key, outlen);
   return util.toHex(output);
+}
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = {
+    blake2b: blake2b,
+    blake2bHex: blake2bHex,
+    blake2bInit: blake2bInit,
+    blake2bUpdate: blake2bUpdate,
+    blake2bFinal: blake2bFinal,
+  };
 }

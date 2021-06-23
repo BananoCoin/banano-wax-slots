@@ -12,7 +12,7 @@ export const util = function() {
       ret = input;
     } else if (input instanceof Buffer) {
       ret = new Uint8Array(input);
-    } else if (typeof (input) === 'string') {
+    } else if (typeof input === 'string') {
       ret = new Uint8Array(Buffer.from(input, 'utf8'));
     } else {
       throw new Error(ERROR_MSG_INPUT);
@@ -23,9 +23,11 @@ export const util = function() {
   // Converts a Uint8Array to a hexadecimal string
   // For example, toHex([255, 0, 255]) returns "ff00ff"
   function toHex(bytes) {
-    return Array.prototype.map.call(bytes, function(n) {
-      return (n < 16 ? '0' : '') + n.toString(16);
-    }).join('');
+    return Array.prototype.map
+        .call(bytes, function(n) {
+          return (n < 16 ? '0' : '') + n.toString(16);
+        })
+        .join('');
   }
 
   // Converts any value in [0...2^32-1] to an 8-character hex string
@@ -61,36 +63,36 @@ export const util = function() {
     let startMs = new Date().getTime();
 
     const input = new Uint8Array(N);
-    for (var i = 0; i < N; i++) {
+    for (let i = 0; i < N; i++) {
       input[i] = i % 256;
     }
     const genMs = new Date().getTime();
     console.log('Generated random input in ' + (genMs - startMs) + 'ms');
     startMs = genMs;
 
-    for (i = 0; i < M; i++) {
+    for (let i = 0; i < M; i++) {
       const hashHex = hashFn(input);
       const hashMs = new Date().getTime();
       const ms = hashMs - startMs;
       startMs = hashMs;
       console.log('Hashed in ' + ms + 'ms: ' + hashHex.substring(0, 20) + '...');
-      console.log(Math.round(N / (1 << 20) / (ms / 1000) * 100) / 100 + ' MB PER SECOND');
+      console.log(
+          Math.round((N / (1 << 20) / (ms / 1000)) * 100) / 100 + ' MB PER SECOND',
+      );
     }
   }
 
-  // STARTED BOTTOM nodejs/browser hack
-  const exports = (() => {
-    const exports = {};
-    exports.normalizeInput= normalizeInput;
-    exports.toHex= toHex;
-    exports.debugPrint= debugPrint;
-    exports.testSpeed= testSpeed;
-    return exports;
-  })();
+  module.exports = {
+    normalizeInput: normalizeInput,
+    toHex: toHex,
+    debugPrint: debugPrint,
+    testSpeed: testSpeed,
+  };
+
 
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = exports;
   } else {
     window.blakejsUtil = exports;
   }
-}
+};

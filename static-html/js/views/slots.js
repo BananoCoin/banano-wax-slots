@@ -152,16 +152,6 @@ window.getLastNonce = async () => {
     return;
   }
 
-  const setLastNonceAndStart = (lastNonce) => {
-    try {
-      lastNonceElt.innerText = lastNonce;
-      setScore('');
-      addCards();
-    } catch (error) {
-      setScore('Nonce Error:' + error.message);
-    }
-  };
-
   const waxEndpointVersionElt = document.querySelector('#waxEndpointVersion');
   const waxEndpointVersion = waxEndpointVersionElt.innerText;
   if (waxEndpointVersion == 'v1') {
@@ -169,7 +159,7 @@ window.getLastNonce = async () => {
     const ownerAction = ownerActions.actions[0];
     const lastNonce = ownerAction.action_trace.act.data.assoc_id;
     // console.log(ownerAction);
-    setLastNonceAndStart(lastNonce);
+    lastNonceElt.innerText = lastNonce;
   }
   if (waxEndpointVersion == 'v2' || waxEndpointVersion == 'v2proxy') {
     const waxEndpointElt = document.querySelector('#waxEndpoint');
@@ -245,7 +235,7 @@ window.getLastNonce = async () => {
             }
             // console.log('history_get_actions', 'lastNonce', lastNonce);
             // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
-            setLastNonceAndStart(lastNonce);
+            lastNonceElt.innerText = lastNonce;
           }
         });
   }
@@ -391,6 +381,20 @@ const addBetListeners = (selectedId) => {
   });
 };
 
+window.debug = () => {
+  const scoreText = [];
+  scoreText.push(`owner:${window.localStorage.owner}`);
+  scoreText.push(`nonce.length:${window.localStorage.nonce.length}`);
+  scoreText.push(`endpoint:${waxEndpoint.rpc.endpoint}`);
+  scoreText.push(`chainTimestamp:${chainTimestamp}`);
+  const nonceHashElt = document.querySelector('#nonceHash');
+  scoreText.push(`clientNonceHash:${nonceHashElt.innerText}`);
+  const lastNonceElt = document.querySelector('#lastNonceHash');
+  scoreText.push(`chainNonceHash:${lastNonceElt.innerText}`);
+  scoreText.push(`matchNonceHash:${lastNonceElt.innerText == nonceHashElt.innerText}`);
+  setScore(scoreText);
+};
+
 window.onLoad = async () => {
   if (window.location.hash) {
     console.log('window.location.hash', window.location.hash);
@@ -486,6 +490,12 @@ window.onLoad = async () => {
 
     const getLastNonceAndAddTemplates = async () => {
       await window.getLastNonce();
+      try {
+        setScore('');
+        addCards();
+      } catch (error) {
+        setScore('Nonce Error:' + error.message);
+      }
       play(false);
     };
 
