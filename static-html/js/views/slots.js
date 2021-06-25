@@ -794,7 +794,6 @@ const addCards = async () => {
     }
     resetScoreText();
 
-    let ownedAssetsHtml = '';
     cardData.ownedAssets.sort((a, b) => {
       if (a.templateId != b.templateId) {
         return b.templateId - a.templateId;
@@ -818,16 +817,70 @@ const addCards = async () => {
         return b.assetId - a.assetId;
       }
     });
+
+    const assetsByTemplateId = {};
+    for (let ix = 0; ix < cardData.ownedAssets.length; ix++) {
+      const ownedAsset = cardData.ownedAssets[ix];
+      if (assetsByTemplateId[ownedAsset.templateId] == undefined) {
+        assetsByTemplateId[ownedAsset.templateId] = [];
+      }
+      assetsByTemplateId[ownedAsset.templateId].push(ownedAsset);
+    }
+    const templateIds = [...Object.keys(assetsByTemplateId)];
+    templateIds.sort((a, b) => {
+      const aOwnedAssets = assetsByTemplateId[a];
+      const bOwnedAssets = assetsByTemplateId[b];
+      const maxSupplyDiff = bOwnedAssets[0].maxSupply - aOwnedAssets[0].maxSupply;
+      if (maxSupplyDiff !== 0) {
+        return maxSupplyDiff;
+      }
+
+      return aOwnedAssets.length - bOwnedAssets.length;
+    });
+
+    let ownedAssetsTemplatesHtml = '';
+    for (let ix = 0; ix < templateIds.length; ix++) {
+      const templateId = templateIds[ix];
+      const ownedAssets = assetsByTemplateId[templateId];
+      ownedAssetsTemplatesHtml += getOwnedAssetTemplateHtml(templateId, ownedAssets);
+    }
+
+    document.getElementById('ownedAssetsTemplatesInner').innerHTML = ownedAssetsTemplatesHtml;
+
+    let ownedAssetsHtml = '';
     for (let ix = 0; ix < cardData.ownedAssets.length; ix++) {
       const ownedAsset = cardData.ownedAssets[ix];
       ownedAssetsHtml += getOwnedAssetHtml(ownedAsset);
     }
+
     document.getElementById('ownedAssetsInner').innerHTML = ownedAssetsHtml;
 
     if (cardData.score[0] == 'Won') {
       winConfetti();
     }
   }
+};
+
+const getOwnedAssetTemplateHtml = (templateId, ownedAssets) => {
+  if (ownedAssets.length == 0) {
+    return '';
+  }
+
+  let frozenCount = 0;
+  for (let ix = 0; ix < ownedAssets.length; ix++) {
+    const ownedAsset = ownedAssets[ix];
+    frozenCount += ownedAsset.frozen;
+  }
+
+  let ownedAssetsHtml = '';
+  ownedAssetsHtml += '<div class="card-body bg_color_yellow float_left" style="margin:0.4vmin">';
+  ownedAssetsHtml += `${ownedAssets[0].name}[${ownedAssets[0].rarity}] (count ${ownedAssets.length}, frozen ${frozenCount})`;
+  ownedAssetsHtml += ` `;
+  ownedAssetsHtml += `<a class="card-title" target="_blank" href="https://wax.atomichub.io/market?template_id=${templateId}&order=asc&sort=price&symbol=WAX">`;
+  ownedAssetsHtml += `Store`;
+  ownedAssetsHtml += `</a>`;
+  ownedAssetsHtml += '</div>';
+  return ownedAssetsHtml;
 };
 
 const getOwnedAssetHtml = (ownedAsset) => {

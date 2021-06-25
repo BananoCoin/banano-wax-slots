@@ -75,6 +75,7 @@ const addAllTemplates = async () => {
 
       for (let pageTemplateIx = 0; pageTemplateIx < pageTemplates.length; pageTemplateIx++) {
         const pageTemplate = pageTemplates[pageTemplateIx];
+        // loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates pageTemplate', pageTemplate);
         const pageTemplateData = {};
         pageTemplateData.template_id = pageTemplate.template_id;
         pageTemplateData.name = pageTemplate.immutable_data.name;
@@ -115,9 +116,9 @@ const cacheAllCardImages = async () => {
         const shrink = () => {
           loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', fileName);
           sharp(tempFileName)
-              .resize(265,370)
+              .resize(265, 370)
               .toFile(fileName, (err, info) => {
-                if(err != null) {
+                if (err != null) {
                   loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'err', err);
                 }
                 loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'info', info);
@@ -209,6 +210,8 @@ const getPayoutInformation = async (owner) => {
     const ownedAsset = {};
     ownedAsset.name = ownedCard.template.immutable_data.name;
     ownedAsset.img = ownedCard.template.immutable_data.img;
+    ownedAsset.rarity = ownedCard.template.immutable_data.rarity;
+    ownedAsset.maxSupply = parseInt(ownedCard.template.max_supply, 10);
     ownedAsset.assetId = assetId;
     ownedAsset.templateId = templateId;
     ownedAsset.frozen = isAssetFrozenFlag;
