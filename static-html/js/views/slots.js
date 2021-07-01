@@ -55,6 +55,7 @@ window.anchorWallet = async () => {
 };
 
 window.resetNonceAndOwner = async () => {
+  delete window.localStorage.nonceTimestamp;
   delete window.localStorage.nonce;
   delete window.localStorage.owner;
   owner = undefined;
@@ -381,17 +382,48 @@ const addBetListeners = (selectedId) => {
   });
 };
 
+window.reload = () => {
+  location.reload();
+};
+
 window.debug = () => {
   const scoreText = [];
   scoreText.push(`owner:${window.localStorage.owner}`);
   scoreText.push(`nonce.length:${window.localStorage.nonce.length}`);
   scoreText.push(`endpoint:${waxEndpoint.rpc.endpoint}`);
+  scoreText.push(`clientTimestamp:${window.localStorage.nonceTimestamp}`);
   scoreText.push(`chainTimestamp:${chainTimestamp}`);
   const nonceHashElt = document.querySelector('#nonceHash');
   scoreText.push(`clientNonceHash:${nonceHashElt.innerText}`);
   const lastNonceElt = document.querySelector('#lastNonceHash');
   scoreText.push(`chainNonceHash:${lastNonceElt.innerText}`);
   scoreText.push(`matchNonceHash:${lastNonceElt.innerText == nonceHashElt.innerText}`);
+
+  let addVerificationParagraph = false;
+  if (chainTimestamp == '') {
+    scoreText.push('Reccomendation:chainTimestamp blank, click reload button.');
+    addVerificationParagraph = true;
+  }
+  if (window.localStorage.nonceTimestamp == undefined) {
+    scoreText.push('Reccomendation:clientTimestamp blank.');
+    scoreText.push('click login button. Login only once. If login fails, click debug button.');
+    addVerificationParagraph = true;
+  }
+  if ((chainTimestamp !== '') &&
+    (window.localStorage.nonceTimestamp !== undefined) &&
+    (lastNonceElt.innerText !== nonceHashElt.innerText)) {
+    addVerificationParagraph = true;
+    scoreText.push('Reccomendation:Time Stamps are unequal.');
+    scoreText.push('click login button. Login only once. If login fails, click debug button.');
+  }
+  if (addVerificationParagraph) {
+    scoreText.push('Verify securerand exists on wax chain. Go to:');
+    scoreText.push(`https://wax.bloks.io/account/${window.localStorage.owner}`);
+    scoreText.push('and search for a transaction orng.wax requestrand.');
+  } else {
+    scoreText.push('No idea what went wrong. Maybe ask in discord.');
+  }
+
   setScore(scoreText);
 };
 
@@ -416,6 +448,13 @@ window.onLoad = async () => {
       const searchParamsNonce = searchParams.get('nonce');
       console.log('searchParams.nonce', searchParamsNonce);
       window.localStorage.nonce = searchParamsNonce;
+
+      let nonceTimestamp = getDate();
+      const tIx = nonceTimestamp.indexOf(' ');
+      if (tIx != -1) {
+        nonceTimestamp = nonceTimestamp.substring(0, tIx);
+      }
+      window.localStorage.nonceTimestamp = nonceTimestamp;
     }
     window.location.href = window.location.pathname;
     return;
@@ -681,9 +720,7 @@ const addCards = async () => {
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
     if (chainTimestamp == '') {
-      const waxEndpointElt = document.querySelector('#waxEndpoint');
-      const urlBase = waxEndpointElt.innerText;
-      setAllTopToClass('color_red', 'No API:' + urlBase);
+      setAllTopToClass('color_red', 'No Chain Timestamp, Please reload.');
     } else {
       if (tryNumber < maxTryNumber) {
         setAllTopToClass('bold', 'Please Log in, API Dt:' + chainTimestamp);
