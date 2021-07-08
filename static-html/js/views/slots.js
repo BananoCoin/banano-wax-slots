@@ -892,10 +892,76 @@ const addCards = async () => {
 
     document.getElementById('ownedAssetsInner').innerHTML = ownedAssetsHtml;
 
+    const frozenHistogramHtml = getFrozenHistogramHtml(cardData.ownedAssets);
+
+    document.getElementById('frozenHistogramInner').innerHTML = frozenHistogramHtml;
+
     if (cardData.score[0] == 'Won') {
       winConfetti();
     }
   }
+};
+
+const getFrozenHistogramHtml = (ownedAssets) => {
+  if (ownedAssets.length == 0) {
+    return '';
+  }
+  let maxThawTimeHours = 0;
+  let newFrozenCount = 0;
+
+  const histogram = {};
+  histogram['0.0'] = 0;
+
+  for (let ix = 0; ix < ownedAssets.length; ix++) {
+    const ownedAsset = ownedAssets[ix];
+    if (ownedAsset.thawTimeMs !== undefined) {
+      const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000));
+      if (thawTimeHours > maxThawTimeHours) {
+        maxThawTimeHours = thawTimeHours;
+      }
+      const thawTimeHoursStr = thawTimeHours.toFixed(1);
+      if (histogram[thawTimeHoursStr] == undefined) {
+        histogram[thawTimeHoursStr] = 1;
+      } else {
+        histogram[thawTimeHoursStr] ++;
+      }
+    } else {
+      if (ownedAsset.newFrozen) {
+        newFrozenCount ++;
+      } else {
+        histogram['0.0'] ++;
+      }
+    }
+  }
+
+  // round off errors cause the tail to be cut.
+  const newFrozenHours = maxThawTimeHours.toFixed(1) + '+';
+  maxThawTimeHours += 0.2;
+
+  console.log('FrozenHistogram', histogram);
+  let html = '';
+
+  const addHistogramEntry = (count, hourStr) => {
+    html += '<div class="card-body bg_color_yellow float_left" style="margin:0.4vmin">';
+    html += count;
+    html += ' cards in ';
+    html += hourStr;
+    html += ' hours ';
+    html += '</div>';
+  };
+
+  for (let hour = 0; hour < maxThawTimeHours; hour+= 0.1) {
+    const hourStr = hour.toFixed(1);
+    console.log('FrozenHistogram', 'hourStr', hourStr);
+    if (histogram[hourStr] !== undefined) {
+      const count = histogram[hourStr];
+      addHistogramEntry(count, hourStr);
+    }
+  }
+  if (newFrozenCount > 0) {
+    addHistogramEntry(newFrozenCount, newFrozenHours);
+  }
+  return html;
 };
 
 const getOwnedAssetTemplateHtml = (templateId, ownedAssets) => {
@@ -1382,6 +1448,11 @@ window.showFAQ = () => {
   document.querySelector('#additionlDetailsTable').className = 'display_none';
   document.querySelector('#slotMachineTable').className = 'display_none';
   document.querySelector('#ownedAssets').className = 'display_none';
+  document.querySelector('#ownedAssetsInner').className = 'display_none';
+  document.querySelector('#ownedAssetsTemplates').className = 'display_none';
+  document.querySelector('#ownedAssetsTemplatesInner').className = 'display_none';
+  document.querySelector('#frozenHistogram').className = 'display_none';
+  document.querySelector('#frozenHistogramInner').className = 'display_none';
 };
 
 window.showSlotMachine = () => {
@@ -1392,6 +1463,11 @@ window.showSlotMachine = () => {
   document.querySelector('#additionlDetailsTable').className = 'display_none';
   document.querySelector('#slotMachineTable').className = 'w100pct';
   document.querySelector('#ownedAssets').className = 'display_none';
+  document.querySelector('#ownedAssetsInner').className = 'display_none';
+  document.querySelector('#ownedAssetsTemplates').className = 'display_none';
+  document.querySelector('#ownedAssetsTemplatesInner').className = 'display_none';
+  document.querySelector('#frozenHistogram').className = 'display_none';
+  document.querySelector('#frozenHistogramInner').className = 'display_none';
 };
 
 window.showAdditionalDetails = () => {
@@ -1402,6 +1478,11 @@ window.showAdditionalDetails = () => {
   document.querySelector('#additionlDetailsTable').className = 'w100pct';
   document.querySelector('#slotMachineTable').className = 'display_none';
   document.querySelector('#ownedAssets').className = '';
+  document.querySelector('#ownedAssetsInner').className = '';
+  document.querySelector('#ownedAssetsTemplates').className = '';
+  document.querySelector('#ownedAssetsTemplatesInner').className = '';
+  document.querySelector('#frozenHistogram').className = '';
+  document.querySelector('#frozenHistogramInner').className = '';
 };
 
 const winConfetti = () => {

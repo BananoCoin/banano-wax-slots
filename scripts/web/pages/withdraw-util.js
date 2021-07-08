@@ -90,7 +90,7 @@ const postWithoutCatch = async (context, req, res) => {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE withdraw', 'bad account', account);
     return;
   }
-  
+
   const amountRaw = BigInt(bananojs.getRawStrFromBananoStr(amount.toString()));
   if (amountRaw <= BigInt(0)) {
     const resp = {};
