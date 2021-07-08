@@ -18,7 +18,7 @@
 ## to force local version to match origin/main, and install and restart
 
     git fetch --all;
-    git reset --hard origin/main;
+    git reset --hard origin/master;
     npm i;   
     npm audit fix;
     rm screenlog.0;
