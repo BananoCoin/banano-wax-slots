@@ -938,7 +938,7 @@ const getFrozenHistogramHtml = (ownedAssets) => {
   const newFrozenHours = maxThawTimeHours.toFixed(1) + '+';
   maxThawTimeHours += 0.2;
 
-  console.log('FrozenHistogram', histogram);
+  // console.log('FrozenHistogram', histogram);
   let html = '';
 
   const addHistogramEntry = (count, hourStr) => {
@@ -952,7 +952,7 @@ const getFrozenHistogramHtml = (ownedAssets) => {
 
   for (let hour = 0; hour < maxThawTimeHours; hour+= 0.1) {
     const hourStr = hour.toFixed(1);
-    console.log('FrozenHistogram', 'hourStr', hourStr);
+    // console.log('FrozenHistogram', 'hourStr', hourStr);
     if (histogram[hourStr] !== undefined) {
       const count = histogram[hourStr];
       addHistogramEntry(count, hourStr);
@@ -1468,6 +1468,7 @@ window.showSlotMachine = () => {
   document.querySelector('#ownedAssetsTemplatesInner').className = 'display_none';
   document.querySelector('#frozenHistogram').className = 'display_none';
   document.querySelector('#frozenHistogramInner').className = 'display_none';
+  play();
 };
 
 window.showAdditionalDetails = () => {
