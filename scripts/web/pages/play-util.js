@@ -18,6 +18,8 @@ const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 let config;
 let loggingUtil;
 const checkPendingSeeds = new Set();
+let totalWinsSinceRestart = 0;
+let totalLossesSinceRestart = 0;
 /* eslint-enable no-unused-vars */
 
 // functions
@@ -340,8 +342,10 @@ const postWithoutCatch = async (context, req, res) => {
       const payout = async () => {
         try {
           if (won) {
+            totalWinsSinceRestart++;
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
           } else {
+            totalLossesSinceRestart++;
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, houseAccount, bet);
           }
           await updateBalances();
@@ -360,6 +364,8 @@ const postWithoutCatch = async (context, req, res) => {
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
   resp.totalFrozenCards = assetUtil.getTotalFrozenAssetCount();
   resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
+  resp.totalWinsSinceRestart = totalWinsSinceRestart;
+  resp.totalLossesSinceRestart = totalLossesSinceRestart;
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

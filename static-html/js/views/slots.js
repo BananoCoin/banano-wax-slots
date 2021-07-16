@@ -4,6 +4,7 @@ import {bananojs} from '../../js-lib/bananocoin-bananojs-2.2.2.js';
 import {getDate} from '../../js-lib/date-util.js';
 
 const blurSize = '0.5vmin';
+const CHAIN_NOT_LOADED = 'Not Loaded';
 
 let tryNumber = 0;
 const maxTryNumber = 2;
@@ -16,7 +17,7 @@ let spinMonKeysFlag = false;
 let spinMonkeysIx = 0;
 let waxEndpoint;
 let stopWinConfetti = true;
-let chainTimestamp = 'Not Loaded';
+let chainTimestamp = CHAIN_NOT_LOADED;
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -211,10 +212,10 @@ window.getLastNonce = async () => {
             setScore(score);
             return;
           }
+          chainTimestamp = '';
           console.log('history_get_actions', 'json', json);
           if (json.actions !== undefined) {
             let lastNonce;
-            chainTimestamp = '';
             // console.log('history_get_actions', 'json', json);
             if (json.actions.length > 0) {
               if (json.actions[0].act !== undefined) {
@@ -726,10 +727,14 @@ const addCards = async () => {
     if (chainTimestamp == '') {
       setAllTopToClass('color_red', 'No Chain Timestamp, Please reload.');
     } else {
-      if (tryNumber < maxTryNumber) {
-        setAllTopToClass('bold', 'Please Log in, API Dt:' + chainTimestamp);
+      if (chainTimestamp == CHAIN_NOT_LOADED) {
+        setAllTopToClass('bold', 'Please Refresh, API Not Reachable');
       } else {
-        setAllTopToClass('color_red', 'Try Again, Tx Failed, API Dt:' + chainTimestamp);
+        if (tryNumber < maxTryNumber) {
+          setAllTopToClass('bold', 'Please Log in, API Dt:' + chainTimestamp);
+        } else {
+          setAllTopToClass('color_red', 'Try Again, Tx Failed, API Dt:' + chainTimestamp);
+        }
       }
     }
     console.log('tryNumber++', tryNumber);
@@ -1070,8 +1075,11 @@ const resetScoreText = async () => {
   scoreText.push(`Card Types: ${cardData.cardCount} of ${cardData.templateCount}, Frozen ${frozenCount} of ${totalCount}`);
 
   document.querySelector('#activeUsers').innerText =
-    `${cardData.activeUsers} of ${cardData.totalUsers} total, `+
+    `${cardData.activeUsers} of ${cardData.totalUsers} total, ` +
     `${cardData.activeUsersSinceRestart} since last restart.`;
+  document.querySelector('#totalWinsAndLosses').innerText =
+      `${cardData.totalWinsSinceRestart} wins ` +
+      `${cardData.totalLossesSinceRestart} losses in total since last restart.`;
   document.querySelector('#totalFrozenCards').innerText =
       `${cardData.totalFrozenCards}`;
   document.querySelector('#totalActiveCards').innerText =

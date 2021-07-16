@@ -64,7 +64,9 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
 const getCacheSize = (map) => {
   let cacheSize = 0;
   for (const [key, cacheData] of map) {
-    cacheSize += cacheData.data.length;
+    if (key !== undefined) {
+      cacheSize += cacheData.data.length;
+    }
   }
   return cacheSize;
 };

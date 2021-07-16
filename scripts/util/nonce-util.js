@@ -5,7 +5,6 @@ const fetch = require('node-fetch');
 
 // modules
 const randomUtil = require('./random-util.js');
-const timedCacheUtil = require('./timed-cache-util.js');
 
 // constants
 const lastNonceByOwnerMap = new Map();
