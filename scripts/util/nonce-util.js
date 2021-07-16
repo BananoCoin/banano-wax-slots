@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 
 // modules
 const randomUtil = require('./random-util.js');
+const timedCacheUtil = require('./timed-cache-util.js');
 
 // constants
 const lastNonceByOwnerMap = new Map();
@@ -249,7 +250,12 @@ const getWaxRpc = () => {
   return waxRpc;
 };
 
+const getCachedNonceCount = () => {
+  return lastNonceByOwnerMap.size;
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.isBadNonce = isBadNonce;
 module.exports.getWaxRpc = getWaxRpc;
+module.exports.getCachedNonceCount = getCachedNonceCount;

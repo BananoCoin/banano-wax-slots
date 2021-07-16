@@ -93,9 +93,18 @@ const thawAssetIfItIsTime = (assetId) => {
   }
 };
 
+const getTotalFrozenAssetCount = () => {
+  if (fs.existsSync(config.assetDataDir)) {
+    return fs.readdirSync(config.assetDataDir).length;
+  } else {
+    return 0;
+  }
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.isAssetFrozen = isAssetFrozen;
 module.exports.freezeAsset = freezeAsset;
 module.exports.getThawTimeMs = getThawTimeMs;
 module.exports.thawAssetIfItIsTime = thawAssetIfItIsTime;
+module.exports.getTotalFrozenAssetCount = getTotalFrozenAssetCount;

@@ -26,6 +26,14 @@ this step is optional.
 
     git config --global credential.helper store
 
+## add user so you aren't running as root
+
+this step is optional.
+
+    adduser waxslots;
+
+    su - waxslots;
+
 ## download the repo.
 
     git clone https://github.com/BananoCoin/banano-wax-slots.git

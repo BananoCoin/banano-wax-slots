@@ -16,7 +16,7 @@ let spinMonKeysFlag = false;
 let spinMonkeysIx = 0;
 let waxEndpoint;
 let stopWinConfetti = true;
-let chainTimestamp = '';
+let chainTimestamp = 'Not Loaded';
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -421,6 +421,7 @@ window.debug = () => {
     scoreText.push(`https://wax.bloks.io/account/${window.localStorage.owner}`);
     scoreText.push('and search for a transaction orng.wax requestrand.');
   } else {
+    scoreText.push('No errors detected.');
     scoreText.push('No idea what went wrong. Maybe ask in discord.');
   }
 
@@ -715,7 +716,10 @@ const addCards = async () => {
   const scoreElt = document.querySelector('#score');
   setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
-    setScore('Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.');
+    const scoreText = ['Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.'];
+    scoreText.push(`local nonce hash:${lastNonceHashElt.innerText}`);
+    scoreText.push(`blockchain nonce hash:${nonceHashElt.innerText}`);
+    setScore(scoreText);
     const logInHtml = 'Log In';
     document.getElementById('owner').innerHTML = logInHtml;
     console.log('tryNumber', tryNumber, 'maxTryNumber', maxTryNumber);
@@ -1066,7 +1070,12 @@ const resetScoreText = async () => {
   scoreText.push(`Card Types: ${cardData.cardCount} of ${cardData.templateCount}, Frozen ${frozenCount} of ${totalCount}`);
 
   document.querySelector('#activeUsers').innerText =
-    `${cardData.activeUsers} of ${cardData.totalUsers}`;
+    `${cardData.activeUsers} of ${cardData.totalUsers} total, `+
+    `${cardData.activeUsersSinceRestart} since last restart.`;
+  document.querySelector('#totalFrozenCards').innerText =
+      `${cardData.totalFrozenCards}`;
+  document.querySelector('#totalActiveCards').innerText =
+      `${cardData.totalActiveCards}`;
 
   // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;

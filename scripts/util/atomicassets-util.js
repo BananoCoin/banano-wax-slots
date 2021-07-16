@@ -9,6 +9,7 @@ const sharp = require('sharp');
 // modules
 const assetUtil = require('./asset-util.js');
 const dateUtil = require('./date-util.js');
+const timedCacheUtil = require('./timed-cache-util.js');
 
 // constants
 
@@ -20,6 +21,8 @@ let waxApi;
 const templates = [];
 let ready = false;
 /* eslint-enable no-unused-vars */
+
+const ownerAssetCacheMap = new Map();
 
 // functions
 const init = (_config, _loggingUtil) => {
@@ -156,7 +159,19 @@ const hasOwnedCards = async (owner) => {
   return pageAssets.length > 0;
 };
 
+const getTotalActiveCardCount = () => {
+  return timedCacheUtil.getCacheSize(ownerAssetCacheMap);
+};
+
 const getOwnedCards = async (owner) => {
+  const getOwnedCardsCallback = () => {
+    return getOwnedCardsToCache(owner);
+  };
+  return await timedCacheUtil.getUsingCache(ownerAssetCacheMap, owner,
+      config.assetCacheTimeMs, getOwnedCardsCallback);
+};
+
+const getOwnedCardsToCache = async (owner) => {
   const assetOptions = getAssetOptions(owner);
   let page = 1;
   const assetsPerPage = config.maxAssetsPerPage;
@@ -267,3 +282,4 @@ module.exports.getOwnedCards = getOwnedCards;
 module.exports.getPayoutInformation = getPayoutInformation;
 module.exports.isReady = isReady;
 module.exports.getTemplates = getTemplates;
+module.exports.getTotalActiveCardCount = getTotalActiveCardCount;

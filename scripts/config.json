@@ -11,6 +11,7 @@
   "centralWalletSeed": "",
   "houseWalletSeed": "",
   "cookieSecret": "",
+  "assetCacheTimeMs": 30000,
   "maxAssetsPerPage": 100,
   "maxTemplatesPerPage": 100,
   "maxPendingBananos": 10,

@@ -356,7 +356,10 @@ const postWithoutCatch = async (context, req, res) => {
     }
   }
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
+  resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
+  resp.totalFrozenCards = assetUtil.getTotalFrozenAssetCount();
+  resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

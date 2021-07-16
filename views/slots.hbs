@@ -14,8 +14,8 @@
           </ul>
           <b class="col-md-3 color_black text-end" style="margin-right:3%">
             Account: <span class="selectable" id="owner"></span>
-            <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button><button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black"
-              onclick="anchorWallet();return false;">Anchor</button>
+            <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button>
+            <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>
           </b>
         </div>
       </td>
@@ -84,7 +84,7 @@
               <td colspan="1" class="w100pct ">
                 <div class="row">
                   <div class="col-md text-center ">
-                    <div class="card bg_color_yellow" style="height:17vmin">
+                    <div class="card bg_color_yellow" style="height:21vmin">
                       <div class="card-header">
                         <h4 class="card-text">House Balance: <span class="selectable" id="houseAccountBalance"></span>
                         </h4>
@@ -99,12 +99,16 @@
                       <div class="card-body">
                         <h5 class="card-text">
                           Active Users <span class="selectable" id="activeUsers"></span>
+                          <br>
+                          Total Frozen Cards <span class="selectable" id="totalFrozenCards"></span>
+                          <br>
+                          Total Active Cards <span class="selectable" id="totalActiveCards"></span>
                         </h5>
                       </div>
                     </div>
                   </div>
                   <div class="col-md text-center ">
-                    <div class="card bg_color_yellow" style="height:17vmin">
+                    <div class="card bg_color_yellow" style="height:21vmin">
                       <div class="card-header">
                         <h4 class="card-text">Your Account Balance:
                         </h4>
@@ -450,19 +454,19 @@
         </span>
       </td>
     </tr>
-      <tr>
-        <td>
-          <span class="display_none" id="ownedAssets">
-            <div class="col-md text-center md-3">
-              <div class="card bg_color_yellow">
-                <div class="card-header">
-                  <h3 class="card-text">Cards
-                  </h3>
-                </div>
+    <tr>
+      <td>
+        <span class="display_none" id="ownedAssets">
+          <div class="col-md text-center md-3">
+            <div class="card bg_color_yellow">
+              <div class="card-header">
+                <h3 class="card-text">Cards
+                </h3>
               </div>
             </div>
-        </td>
-      </tr>
+          </div>
+      </td>
+    </tr>
     <tr>
       <td>
         <span class="centered display_none" id="ownedAssetsInner">
