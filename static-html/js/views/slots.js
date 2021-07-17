@@ -718,8 +718,8 @@ const addCards = async () => {
   setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     const scoreText = ['Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.'];
-    scoreText.push(`local nonce hash:${lastNonceHashElt.innerText}`);
-    scoreText.push(`blockchain nonce hash:${nonceHashElt.innerText}`);
+    scoreText.push(`local nonce hash:${nonceHashElt.innerText}`);
+    scoreText.push(`blockchain nonce hash:${lastNonceHashElt.innerText}`);
     setScore(scoreText);
     const logInHtml = 'Log In';
     document.getElementById('owner').innerHTML = logInHtml;
