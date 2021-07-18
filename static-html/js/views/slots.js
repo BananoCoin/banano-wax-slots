@@ -1084,6 +1084,20 @@ const resetScoreText = async () => {
       `${cardData.totalFrozenCards}`;
   document.querySelector('#totalActiveCards').innerText =
       `${cardData.totalActiveCards}`;
+  document.querySelector('#cacheMissCount').innerText =
+      `${cardData.cacheMissCount}`;
+
+  document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
+
+  document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;
+
+  document.querySelector('#totalFrozenCards2').innerText = document.querySelector('#totalFrozenCards').innerText;
+
+  document.querySelector('#totalActiveCards2').innerText = document.querySelector('#totalActiveCards').innerText;
+
+  document.querySelector('#cacheMissCount2').innerText = document.querySelector('#cacheMissCount').innerText;
+
+
 
   // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;

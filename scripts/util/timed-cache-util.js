@@ -6,6 +6,8 @@
 // constants
 
 // variables
+let cacheMissCount = 0;
+
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
@@ -49,6 +51,7 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
     }
   }
   loggingUtil.debug('getUsingCache', 'cacheMiss', key);
+  cacheMissCount++;
   const data = await getFn();
   const expireTimeMs = nowTimeMs + cacheDurationMs;
   const cacheData = {
@@ -71,7 +74,12 @@ const getCacheSize = (map) => {
   return cacheSize;
 };
 
+const getCacheMissCount = () => {
+  return cacheMissCount;
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getUsingCache = getUsingCache;
 module.exports.getCacheSize = getCacheSize;
+module.exports.getCacheMissCount = getCacheMissCount;

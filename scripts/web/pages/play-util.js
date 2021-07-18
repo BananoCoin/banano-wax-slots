@@ -9,6 +9,7 @@ const nonceUtil = require('../../util/nonce-util.js');
 const assetUtil = require('../../util/asset-util.js');
 const atomicassetsUtil = require('../../util/atomicassets-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
+const timedCacheUtil = require('../../util/timed-cache-util.js');
 
 // constants
 
@@ -366,6 +367,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
   resp.totalWinsSinceRestart = totalWinsSinceRestart;
   resp.totalLossesSinceRestart = totalLossesSinceRestart;
+  resp.cacheMissCount = timedCacheUtil.getCacheMissCount();
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

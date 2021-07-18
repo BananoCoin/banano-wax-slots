@@ -19,11 +19,13 @@ const blackMonkeyUtil = require('../util/black-monkey-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
 const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 const randomUtil = require('../util/random-util.js');
+const timedCacheUtil = require('../util/timed-cache-util.js');
 
 // constants
 const blackMonkeyImagesByOwner = {};
 const blackMonkeyFrozenByOwner = {};
 const version = require('../../package.json').version;
+const historyGetActionsCacheMap = new Map();
 
 // variables
 let config;
@@ -274,7 +276,13 @@ const initWebServer = async () => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', account, skip, limit);
-    const resp = await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
+
+    const historyGetActionsCallback = async () => {
+      return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
+    };
+
+    const resp = await timedCacheUtil.getUsingCache(historyGetActionsCacheMap, account,
+        config.historyGetActionsTimeMs, historyGetActionsCallback);
     res.send(resp);
   });
 
