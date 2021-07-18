@@ -368,6 +368,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.totalWinsSinceRestart = totalWinsSinceRestart;
   resp.totalLossesSinceRestart = totalLossesSinceRestart;
   resp.cacheMissCount = timedCacheUtil.getCacheMissCount();
+  resp.cacheHitCount = timedCacheUtil.getCacheHitCount();
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

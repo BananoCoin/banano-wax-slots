@@ -7,6 +7,7 @@
 
 // variables
 let cacheMissCount = 0;
+let cacheHitCount = 0;
 
 /* eslint-disable no-unused-vars */
 let config;
@@ -47,11 +48,11 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
       loggingUtil.log('getUsingCache', 'cacheHitReturn', key,
           cacheData.expireTimeMs, '<', nowTimeMs, 'by',
           cacheData.expireTimeMs-nowTimeMs, 'ms', getFn);
+      cacheHitCount++;
       return cacheData.data;
     }
   }
   loggingUtil.debug('getUsingCache', 'cacheMiss', key);
-  cacheMissCount++;
   const data = await getFn();
   const expireTimeMs = nowTimeMs + cacheDurationMs;
   const cacheData = {
@@ -61,6 +62,7 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
   loggingUtil.debug('getUsingCache', 'cacheStore', key);
   map.set(key, cacheData);
   loggingUtil.debug('getUsingCache', 'cacheMissReturn', key);
+  cacheMissCount++;
   return data;
 };
 
@@ -78,8 +80,13 @@ const getCacheMissCount = () => {
   return cacheMissCount;
 };
 
+const getCacheHitCount = () => {
+  return cacheHitCount;
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getUsingCache = getUsingCache;
 module.exports.getCacheSize = getCacheSize;
 module.exports.getCacheMissCount = getCacheMissCount;
+module.exports.getCacheHitCount = getCacheHitCount;

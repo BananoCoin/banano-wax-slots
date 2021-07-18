@@ -1084,8 +1084,9 @@ const resetScoreText = async () => {
       `${cardData.totalFrozenCards}`;
   document.querySelector('#totalActiveCards').innerText =
       `${cardData.totalActiveCards}`;
-  document.querySelector('#cacheMissCount').innerText =
-      `${cardData.cacheMissCount}`;
+  document.querySelector('#cacheStats').innerText =
+      `Cache Miss Count:${cardData.cacheMissCount}, `+
+      `Cache Hit Count:${cardData.cacheHitCount}`;
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
@@ -1095,8 +1096,7 @@ const resetScoreText = async () => {
 
   document.querySelector('#totalActiveCards2').innerText = document.querySelector('#totalActiveCards').innerText;
 
-  document.querySelector('#cacheMissCount2').innerText = document.querySelector('#cacheMissCount').innerText;
-
+  document.querySelector('#cacheStats2').innerText = document.querySelector('#cacheStats').innerText;
 
 
   // console.log(53*(1-Math.cbrt(2/3)))
