@@ -6,8 +6,8 @@
 // constants
 
 // variables
-let cacheMissCount = 0;
-let cacheHitCount = 0;
+const cacheMissCountMap = new Map();
+const cacheHitCountMap = new Map();
 
 /* eslint-disable no-unused-vars */
 let config;
@@ -35,7 +35,22 @@ const deactivate = () => {
   /* eslint-enable no-unused-vars */
 };
 
-const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
+const getUsingNamedCache = async (name, map, key, cacheDurationMs, getFn) => {
+  if (name === undefined) {
+    throw new Error('name is required.');
+  }
+  if (map === undefined) {
+    throw new Error('map is required.');
+  }
+  if (key === undefined) {
+    throw new Error('key is required.');
+  }
+  if (cacheDurationMs === undefined) {
+    throw new Error('cacheDurationMs is required.');
+  }
+  if (getFn === undefined) {
+    throw new Error('getFn is required.');
+  }
   const nowTimeMs = Date.now();
   loggingUtil.debug('getUsingCache', 'init', key);
   if (map.has(key)) {
@@ -48,7 +63,7 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
       loggingUtil.log('getUsingCache', 'cacheHitReturn', key,
           cacheData.expireTimeMs, '<', nowTimeMs, 'by',
           cacheData.expireTimeMs-nowTimeMs, 'ms', getFn);
-      cacheHitCount++;
+      increment(cacheHitCountMap, name);
       return cacheData.data;
     }
   }
@@ -62,7 +77,7 @@ const getUsingCache = async (map, key, cacheDurationMs, getFn) => {
   loggingUtil.debug('getUsingCache', 'cacheStore', key);
   map.set(key, cacheData);
   loggingUtil.debug('getUsingCache', 'cacheMissReturn', key);
-  cacheMissCount++;
+  increment(cacheMissCountMap, name);
   return data;
 };
 
@@ -76,17 +91,25 @@ const getCacheSize = (map) => {
   return cacheSize;
 };
 
-const getCacheMissCount = () => {
-  return cacheMissCount;
+const increment = (map, key) => {
+  if (!map.has(key)) {
+    map.set(key, 1);
+  } else {
+    map.set(key, map.get(key)+1);
+  }
 };
 
-const getCacheHitCount = () => {
-  return cacheHitCount;
+const getCacheMissCountMap = () => {
+  return cacheMissCountMap;
+};
+
+const getCacheHitCountMap = () => {
+  return cacheMissCountMap;
 };
 
 module.exports.init = init;
 module.exports.deactivate = deactivate;
-module.exports.getUsingCache = getUsingCache;
+module.exports.getUsingNamedCache = getUsingNamedCache;
 module.exports.getCacheSize = getCacheSize;
-module.exports.getCacheMissCount = getCacheMissCount;
-module.exports.getCacheHitCount = getCacheHitCount;
+module.exports.getCacheMissCountMap = getCacheMissCountMap;
+module.exports.getCacheHitCountMap = getCacheHitCountMap;

@@ -12,6 +12,8 @@
   "houseWalletSeed": "",
   "cookieSecret": "",
   "historyGetActionsTimeMs": 30000,
+  "chainGetInfoTimeMs": 30000,
+  "chainGetBlockTimeMs": 30000,
   "assetCacheTimeMs": 30000,
   "maxAssetsPerPage": 100,
   "maxTemplatesPerPage": 100,

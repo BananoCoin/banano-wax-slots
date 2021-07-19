@@ -367,8 +367,8 @@ const postWithoutCatch = async (context, req, res) => {
   resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
   resp.totalWinsSinceRestart = totalWinsSinceRestart;
   resp.totalLossesSinceRestart = totalLossesSinceRestart;
-  resp.cacheMissCount = timedCacheUtil.getCacheMissCount();
-  resp.cacheHitCount = timedCacheUtil.getCacheHitCount();
+  resp.cacheMissCountMap = [...timedCacheUtil.getCacheMissCountMap()];
+  resp.cacheHitCountMap = [...timedCacheUtil.getCacheHitCountMap()];
 
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 

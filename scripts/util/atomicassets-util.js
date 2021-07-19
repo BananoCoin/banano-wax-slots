@@ -167,7 +167,7 @@ const getOwnedCards = async (owner) => {
   const getOwnedCardsCallback = () => {
     return getOwnedCardsToCache(owner);
   };
-  return await timedCacheUtil.getUsingCache(ownerAssetCacheMap, owner,
+  return await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
       config.assetCacheTimeMs, getOwnedCardsCallback);
 };
 

@@ -281,7 +281,8 @@ const initWebServer = async () => {
       return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
     };
 
-    const resp = await timedCacheUtil.getUsingCache(historyGetActionsCacheMap, account,
+    const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
+        historyGetActionsCacheMap, account,
         config.historyGetActionsTimeMs, historyGetActionsCallback);
     res.send(resp);
   });

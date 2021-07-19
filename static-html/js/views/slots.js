@@ -1084,9 +1084,23 @@ const resetScoreText = async () => {
       `${cardData.totalFrozenCards}`;
   document.querySelector('#totalActiveCards').innerText =
       `${cardData.totalActiveCards}`;
-  document.querySelector('#cacheStats').innerText =
-      `Cache Miss Count:${cardData.cacheMissCount}, `+
-      `Cache Hit Count:${cardData.cacheHitCount}`;
+
+  let cacheStats = '<br>Cache Miss Count:';
+  cardData.cacheMissCountMap.forEach((elt, eltIx) => {
+    if (eltIx > 0) {
+      cacheStats += ', ';
+    }
+    cacheStats += `${elt[0]}:${elt[1]}`;
+  });
+  cacheStats += '<br>Cache Hit Count:';
+  cardData.cacheHitCountMap.forEach((elt, eltIx) => {
+    if (eltIx > 0) {
+      cacheStats += ', ';
+    }
+    cacheStats += `${elt[0]}:${elt[1]}`;
+  });
+
+  document.querySelector('#cacheStats').innerHTML = cacheStats;
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
@@ -1096,7 +1110,7 @@ const resetScoreText = async () => {
 
   document.querySelector('#totalActiveCards2').innerText = document.querySelector('#totalActiveCards').innerText;
 
-  document.querySelector('#cacheStats2').innerText = document.querySelector('#cacheStats').innerText;
+  document.querySelector('#cacheStats2').innerHTML = document.querySelector('#cacheStats').innerHTML;
 
 
   // console.log(53*(1-Math.cbrt(2/3)))
