@@ -104,7 +104,7 @@ const getCacheMissCountMap = () => {
 };
 
 const getCacheHitCountMap = () => {
-  return cacheMissCountMap;
+  return cacheHitCountMap;
 };
 
 module.exports.init = init;
