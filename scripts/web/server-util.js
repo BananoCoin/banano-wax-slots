@@ -2,12 +2,9 @@
 // libraries
 const http = require('http');
 const request = require('request');
-// const https = require('https');
-// const cors = require('cors');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
-// const crypto = require('crypto');
 
 // modules
 const dateUtil = require('../util/date-util.js');

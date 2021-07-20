@@ -1086,19 +1086,23 @@ const resetScoreText = async () => {
       `${cardData.totalActiveCards}`;
 
   let cacheStats = '<br>Cache Miss Count:';
-  cardData.cacheMissCountMap.forEach((elt, eltIx) => {
-    if (eltIx > 0) {
-      cacheStats += ', ';
-    }
-    cacheStats += `${elt[0]}:${elt[1]}`;
-  });
+  if (cardData.cacheMissCountMap !== undefined) {
+    cardData.cacheMissCountMap.forEach((elt, eltIx) => {
+      if (eltIx > 0) {
+        cacheStats += ', ';
+      }
+      cacheStats += `${elt[0]}:${elt[1]}`;
+    });
+  }
   cacheStats += '<br>Cache Hit Count:';
-  cardData.cacheHitCountMap.forEach((elt, eltIx) => {
-    if (eltIx > 0) {
-      cacheStats += ', ';
-    }
-    cacheStats += `${elt[0]}:${elt[1]}`;
-  });
+  if (cardData.cacheHitCountMap !== undefined) {
+    cardData.cacheHitCountMap.forEach((elt, eltIx) => {
+      if (eltIx > 0) {
+        cacheStats += ', ';
+      }
+      cacheStats += `${elt[0]}:${elt[1]}`;
+    });
+  }
 
   document.querySelector('#cacheStats').innerHTML = cacheStats;
 

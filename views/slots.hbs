@@ -389,39 +389,70 @@
                         <ul>
                           <li>
                             <span class="bold">billed CPU time (999 us) is greater than the maximum billable CPU time for the transaction (999 us)</span>
+                            <br>
                             This is a WAX error, where you need to stake wax to run the secure-rand smart contract.
+                            <br>
                             <a class="exit_link" href="https://wax.bloks.io/wallet/resources/stake" target="_blank">Stake some WAX for CPU</a>
                           </li>
                           <br>
                           <li>
                             <span class="bold">Unexpected token < in JSON at position 0</span>
+                                <br>
                                 This is a WAX error, where the wax content delivery network is overloaded. Can't do anything, just wait for them to fix it.
                           </li>
                           <br>
                           <li>
                             <span class="bold">an error occurred server side: connection refused</span>
+                            <br>
                             This is a WAX error, where the wax network api is overloaded. Can't do anything, just wait for them to fix it.
                           </li>
                           <br>
                           <li>
                             <span class="bold">if you see "(3/4) nonce tx.." for more than 60 seconds</span>
+                            <br>
                             Try again. The login to wax failed, and there should be an error in the console.
                           </li>
                           <br>
                           <li>
                             <span class="bold">if you see "user started a new transaction"</span>
+                            <br>
                             Try again. The login to wax failed, and there should be an error in the console.
                           </li>
                           <br>
                           <li>
                             <span class="bold">The roll over the arm is just animation.</span>
+                            <br>
                             The roll over the arm is just animation. The win condition is calculated server side, and does not take into account what cards are shown when the arm is hovered over.
                           </li>
                           <br>
                           <li>
                             <span class="bold">if you see "no cards, play disabled"</span>
+                            <br>
                             Stop playing, all your cards are frozen.
+                            <br>
                             <a class="exit_link" href="https://chat.cryptomonkeys.cc/" target="_blank">Get a Free CryptomonKey</a>
+                          </li>
+                          <br>
+                          <li>
+                            <span class="bold">if you see "Need to log in again. local nonce hash has does not match blockchain nonce hash."</span>
+                            <br>
+                            There are network problems.
+                            <br>
+                            Check if there is a securerand transaction in your transaction history using the links below.
+                            <br>
+                            If the securerand transaction exists, it's just network problems getting to the API, keep refreshing.
+                            <br>
+                            try these two links:
+                            <br>
+                            https://wax.blokcrafters.io/v2/history/get_actions?act.name=requestrand&account=YOUR_ACCOUNT&limit=1
+                            <br>
+                            and
+                            <br>
+                            https://wax.bloks.io/account/YOUR_ACCOUNT
+                            <br>
+                            or try to submit the transaction manually:
+                            <br>
+                            https://wax.bloks.io/account/orng.wax?loadContract=true&tab=Actions&account=orng.wax&scope=orng.wax&limit=100&action=requestrand
                           </li>
                         </ul>
                       </div>
