@@ -275,9 +275,27 @@ const postWithoutCatch = async (context, req, res) => {
       won = false;
       resp.score = ['Lost'];
       resp.scoreError = false;
-      const card1 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
-      const card2 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
-      const card3 = randomUtil.getRandomArrayElt(atomicassetsUtil.getTemplates());
+      const templates = atomicassetsUtil.getTemplates();
+      let card1 = undefined;
+      if (bet == 0) {
+        for (let templateIx = 0; ((templateIx < templates.length) &&
+            (card1 == undefined)); templateIx++) {
+          const card = templates[templateIx];
+          const unfrozenAssets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
+          if (unfrozenAssets !== undefined) {
+            if (unfrozenAssets.length > 0) {
+              card1 = card;
+            }
+          }
+        }
+      }
+      if (card1 == undefined) {
+        card1 = randomUtil.getRandomArrayElt(templates);
+      } else {
+        loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'free win');
+      }
+      const card2 = randomUtil.getRandomArrayElt(templates);
+      const card3 = randomUtil.getRandomArrayElt(templates);
       const cards = [card1, card2, card3];
       // loggingUtil.log(dateUtil.getDate(), 'STARTED checkCards');
 

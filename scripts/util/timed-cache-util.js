@@ -60,7 +60,7 @@ const getUsingNamedCache = async (name, map, key, cacheDurationMs, getFn) => {
       loggingUtil.debug('getUsingCache', 'cacheExpired', key);
       map.delete(key);
     } else {
-      loggingUtil.log('getUsingCache', 'cacheHitReturn', key,
+      loggingUtil.debug('getUsingCache', 'cacheHitReturn', key,
           cacheData.expireTimeMs, '<', nowTimeMs, 'by',
           cacheData.expireTimeMs-nowTimeMs, 'ms', getFn);
       increment(cacheHitCountMap, name);
