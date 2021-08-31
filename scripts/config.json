@@ -32,9 +32,10 @@
   "waxIdSeed": "",
   "waxEndpointVersion": "v2proxy",
   "waxEndpointsV1": ["https://wax.greymass.com"],
+  "!!!waxEndpointsV2": ["https://wax.blokcrafters.io"],
   "!!waxEndpointsV2": ["https://wax.eosrio.io"],
   "!waxEndpointsV2": ["https://api.waxsweden.org"],
-  "waxEndpointsV2": ["https://wax.blokcrafters.io"],
+  "waxEndpointsV2": ["https://wax.cryptolions.io"],
   "web": {
     "port": "8686"
   },

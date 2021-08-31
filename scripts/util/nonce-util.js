@@ -29,36 +29,28 @@ const init = (_config, _loggingUtil) => {
   config = _config;
   loggingUtil = _loggingUtil;
 
+  const toJson = async (res) => {
+    if (res.status !== 200) {
+      throw Error(`status ${res.status}:${res.statusText}`);
+    }
+    const text = await res.text();
+    // console.log('text',text)
+    return JSON.parse(text);
+  };
+
   const newFetchPromise = async (url, method, body) => {
-    return new Promise((resolve, reject) => {
-      let endEarly = false;
-      fetch(url, {
-        method: method,
-        body: body,
-        headers: {'Content-Type': 'application/json'},
-      })
-          .catch((err) => {
-            endEarly = true;
-            reject(err);
-          })
-          .then((res) => {
-            if (endEarly) {
-              return;
-            }
-            return res.json();
-          })
-          .catch((err) => {
-            endEarly = true;
-            reject(err);
-          })
-          .then((json) => {
-            if (endEarly) {
-              return;
-            }
-            // console.log(url.href, 'json', json);
-            resolve(json);
-          });
-      return;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await fetch(url, {
+          method: method,
+          body: body,
+          headers: {'Content-Type': 'application/json'},
+        });
+        const json = await toJson(res);
+        resolve(json);
+      } catch (err) {
+        reject(err);
+      }
     });
   };
 
@@ -95,24 +87,22 @@ const init = (_config, _loggingUtil) => {
     return newFetchPromise(url, 'post', bodyStr);
   };
   waxRpc.history_get_actions = async (t, skip, limit) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (config.waxEndpointVersion == 'v1') {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
         const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
         // console.log('history_get_actions', 'req', req);
-        fetch(`'${urlBase}/v1/history/get_actions'`, {
-          method: 'post',
-          body: req,
-          headers: {'Content-Type': 'application/json'},
-        })
-            .catch((err) => reject(err))
-            .then((res) => res.json())
-            .catch((err) => reject(err))
-            .then((json) => {
-              // console.log('history_get_actions', 'json', json);
-              resolve(json);
-            });
-        return;
+        try {
+          const res = await fetch(`'${urlBase}/v1/history/get_actions'`, {
+            method: 'post',
+            body: req,
+            headers: {'Content-Type': 'application/json'},
+          });
+          const json = await toJson(res);
+          resolve(json);
+        } catch (err) {
+          reject(err);
+        }
       }
       if ((config.waxEndpointVersion == 'v2') || (config.waxEndpointVersion == 'v2proxy')) {
         const urlBase = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
@@ -126,33 +116,16 @@ const init = (_config, _loggingUtil) => {
         url.searchParams.append('limit', limit);
         url.searchParams.append('simple', false);
         // console.log('history_get_actions', 'url', url);
-        let endEarly = false;
-        fetch(url, {
-          method: 'get',
-          headers: {'Content-Type': 'application/json'},
-        })
-            .catch((err) => {
-              endEarly = true;
-              reject(err);
-            })
-            .then((res) => {
-              if (endEarly) {
-                return;
-              }
-              return res.json();
-            })
-            .catch((err) => {
-              endEarly = true;
-              reject(err);
-            })
-            .then((json) => {
-              if (endEarly) {
-                return;
-              }
-              // console.log('history_get_actions', 'json', json);
-              resolve(json);
-            });
-        return;
+        try {
+          const res = await fetch(url, {
+            method: 'get',
+            headers: {'Content-Type': 'application/json'},
+          });
+          const json = await toJson(res);
+          resolve(json);
+        } catch (err) {
+          reject(err);
+        }
       }
       reject(Error(`unsupported value of config.waxEndpointVersion: '${config.waxEndpointVersion}'`));
     });

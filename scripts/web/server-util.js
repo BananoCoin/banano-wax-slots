@@ -278,10 +278,14 @@ const initWebServer = async () => {
       return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
     };
 
-    const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
-        historyGetActionsCacheMap, account,
-        config.historyGetActionsTimeMs, historyGetActionsCallback);
-    res.send(resp);
+    try {
+      const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
+          historyGetActionsCacheMap, account,
+          config.historyGetActionsTimeMs, historyGetActionsCallback);
+      res.send(resp);
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.post('/v1/chain/get_info', async (req, res) => {
