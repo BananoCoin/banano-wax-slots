@@ -1,15 +1,16 @@
 ## to check for outdated deps
 
-  npm outdated;
-  npm update;
-  npm install package@latest;
+    npm update;
+    npm outdated;
+    npm install package@latest;
 
 ## to publish a new version
 
-  (change version)
+    npm --no-git-tag-version version patch;
 
 ### update version in package-lock.json
-  npm i;
 
-  npm run eslint;
-  npm audit fix;
+    npm i;
+
+    npm run eslint;
+    npm audit fix;
