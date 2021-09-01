@@ -18,6 +18,7 @@ let spinMonkeysIx = 0;
 let waxEndpoint;
 let stopWinConfetti = true;
 let chainTimestamp = CHAIN_NOT_LOADED;
+const checkEndpointsFns = [];
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
@@ -143,6 +144,44 @@ const play = async (bet) => {
 
 window.play = () => {
   play(true);
+};
+
+window.checkEndpoints = () => {
+  checkEndpointsFns.forEach((checkEndpointsFn) => {
+    checkEndpointsFn();
+  });
+};
+
+window.addWaxEndpoints = async () => {
+  const waxEndpointsJsonElt = document.querySelector('#waxEndpointsJson');
+  const waxEndpointsJsonTxt = waxEndpointsJsonElt.innerText;
+  const waxEndpointsJson = JSON.parse(waxEndpointsJsonTxt);
+  let html = '';
+  checkEndpointsFns.length = 0;
+  waxEndpointsJson.forEach((waxEndpoint, waxEndpointIx) => {
+    const href = `${waxEndpoint}/v2/history/get_actions?act.name=requestrand&account=${owner}&limit=1`;
+    const id = `waxEndpoint_${waxEndpointIx}`;
+    html += `<a href="${href}" target="_blank"></a>`;
+    html += `<h5>${waxEndpoint}</h5>`;
+    html += `<div id="${id}"></div>`;
+    html += '<hr>';
+    const fetchFn = async () => {
+      const fetchElt = document.querySelector(`#${id}`);
+      try {
+        const res = await fetch(href, {
+          method: 'get',
+          headers: {'Content-Type': 'application/json'},
+        });
+        const text = await res.text();
+        fetchElt.innerText = text;
+      } catch (error) {
+        fetchElt.innerText = error.message;
+      }
+    };
+    checkEndpointsFns.push(fetchFn);
+  });
+  const waxEndpointsElt = document.querySelector('#waxEndpoints');
+  waxEndpointsElt.innerHTML = html;
 };
 
 window.getLastNonce = async () => {
@@ -672,6 +711,12 @@ window.onLoad = async () => {
     console.log('nonceTx', 'error2', e.message);
     document.getElementById('owner').innerHTML = `<span>${e.message}</span>`;
   }
+
+  document.getElementById('manualAssocId').innerText = nonceHash;
+  document.getElementById('manualSigningValue').innerText = nonceHash;
+  document.getElementById('manualCaller').innerText = owner;
+
+  addWaxEndpoints();
 };
 
 const setAllTopToClass = (classNm, message) => {

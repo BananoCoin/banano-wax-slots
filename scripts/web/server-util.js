@@ -96,12 +96,15 @@ const initWebServer = async () => {
 
     if (config.waxEndpointVersion == 'v2proxy') {
       data.waxEndpoint = '';
+      data.waxEndpoints = JSON.stringify(config.waxEndpointsV2);
     }
     if (config.waxEndpointVersion == 'v2') {
       data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
+      data.waxEndpoints = JSON.stringify(config.waxEndpointsV2);
     }
     if (config.waxEndpointVersion == 'v1') {
       data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
+      data.waxEndpoints = JSON.stringify(config.waxEndpointsV1);
     }
     // console.log('/', data);
 

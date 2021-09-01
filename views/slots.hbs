@@ -450,15 +450,45 @@
                             <br>
                             https://wax.bloks.io/account/YOUR_ACCOUNT
                             <br>
-                            or try to submit the transaction manually:
+                          </li>
+                          <br>
+                          <li>
+                            <a name="faq-manual-tx"></a>
+                            <span class="bold">if you want to submit the transaction manually</span>
                             <br>
                             https://wax.bloks.io/account/orng.wax?loadContract=true&tab=Actions&account=orng.wax&scope=orng.wax&limit=100&action=requestrand
+                            <br>
+                            using the following parameters:
+                            <br>
+                            assoc_id:
+                            <span class="bordered" id="manualAssocId"></span>
+                            <br>
+                            signing_value:
+                            <span class="bordered" id="manualSigningValue"></span>
+                            <br>
+                            caller:
+                            <span class="bordered" id="manualCaller"></span>
                           </li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <a name="faq-endpoints"></a>
+                <div class="col-md text-center mb-3">
+                  <div class="card bg_color_yellow">
+                    <div class="card-header">
+                      <h4 class="card-text">What endpoints currently work?</h4>
+                    </div>
+                    <div class="card-body">
+                      <button id="checkEndpointsButton" type="button" class="btn btn-black me-2 bg_color_green color_black" onclick="checkEndpoints();return false;">Check Endpoints</button>
+                      <div class="card-title" id="waxEndpoints">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <br>
               </td>
               <td>&nbsp;</td>
             </tr>
@@ -537,6 +567,7 @@
 <span class="display_none" id="overrideNonce">{{overrideNonce}}</span>
 <span class="display_none" id="waxEndpointVersion">{{waxEndpointVersion}}</span>
 <span class="display_none" id="waxEndpoint">{{waxEndpoint}}</span>
+<span class="display_none" id="waxEndpointsJson">{{waxEndpoints}}</span>
 <audio id="start" src="sounds/69717__lukaso__start-1.wav" preload="auto"></audio>
 <audio id="wheel" src="sounds/69701__lukaso__wheel4.wav" preload="auto"></audio>
 <audio id="winner" src="sounds/69696__lukaso__jackpot8.wav" preload="auto"></audio>
