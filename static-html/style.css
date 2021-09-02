@@ -328,3 +328,10 @@ table.centered {
 .monospace {
   font-family: monospace;
 }
+
+
+.bordered {
+  border-radius: 0.4vmin;
+  border: solid;
+  border-width: 0.1vmin;
+}

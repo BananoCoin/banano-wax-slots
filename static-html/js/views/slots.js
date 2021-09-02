@@ -736,6 +736,7 @@ window.onLoad = async () => {
   document.getElementById('manualAssocId').innerText = nonceHash;
   document.getElementById('manualSigningValue').innerText = nonceHash;
   document.getElementById('manualCaller').innerText = owner;
+  document.getElementById('manualCallerCheck').innerText = owner;
 
   addWaxEndpoints();
 };
