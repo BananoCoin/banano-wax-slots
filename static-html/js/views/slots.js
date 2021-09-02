@@ -5,6 +5,7 @@ import {getDate} from '../../js-lib/date-util.js';
 
 const blurSize = '0.5vmin';
 const CHAIN_NOT_LOADED = 'Not Loaded';
+const LOAD_ALL_ENDPOINTS = true;
 
 let tryNumber = 0;
 const maxTryNumber = 2;
@@ -158,6 +159,26 @@ window.addWaxEndpoints = async () => {
   const waxEndpointsJson = JSON.parse(waxEndpointsJsonTxt);
   let html = '';
   checkEndpointsFns.length = 0;
+
+  if (LOAD_ALL_ENDPOINTS) {
+    const endpointsUrl = 'https://validate.eosnation.io/wax/reports/endpoints.json';
+    const res = await fetch(endpointsUrl, {
+      method: 'get',
+      headers: {'Content-Type': 'application/json'},
+    });
+    const text = await res.text();
+    const json = JSON.parse(text);
+    const report = json.report;
+    const api_https2 = report.api_https2;
+    api_https2.forEach((api_https2_elt) => {
+      const waxEndpoint = api_https2_elt[1];
+      if (waxEndpointsJson.indexOf(waxEndpoint) == -1) {
+        console.log('api_https2', 'waxEndpoint', waxEndpoint);
+        waxEndpointsJson.push(waxEndpoint);
+      }
+    });
+  }
+
   waxEndpointsJson.forEach((waxEndpoint, waxEndpointIx) => {
     const href = `${waxEndpoint}/v2/history/get_actions?act.name=requestrand&account=${owner}&limit=1`;
     const id = `waxEndpoint_${waxEndpointIx}`;
