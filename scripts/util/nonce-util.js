@@ -29,9 +29,9 @@ const init = (_config, _loggingUtil) => {
   config = _config;
   loggingUtil = _loggingUtil;
 
-  const toJson = async (res) => {
+  const toJson = async (url, res) => {
     if (res.status !== 200) {
-      throw Error(`status ${res.status}:${res.statusText}`);
+      throw Error(`url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`);
     }
     const text = await res.text();
     // console.log('text',text)
@@ -46,7 +46,7 @@ const init = (_config, _loggingUtil) => {
           body: body,
           headers: {'Content-Type': 'application/json'},
         });
-        const json = await toJson(res);
+        const json = await toJson(url, res);
         resolve(json);
       } catch (err) {
         reject(err);
@@ -93,12 +93,13 @@ const init = (_config, _loggingUtil) => {
         const req = `{"account_name": "${t}", "pos": "${e}", "offset": "${r}"}`;
         // console.log('history_get_actions', 'req', req);
         try {
-          const res = await fetch(`'${urlBase}/v1/history/get_actions'`, {
+          const url = `'${urlBase}/v1/history/get_actions'`;
+          const res = await fetch(url, {
             method: 'post',
             body: req,
             headers: {'Content-Type': 'application/json'},
           });
-          const json = await toJson(res);
+          const json = await toJson(url, res);
           resolve(json);
         } catch (err) {
           reject(err);
@@ -121,7 +122,7 @@ const init = (_config, _loggingUtil) => {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
           });
-          const json = await toJson(res);
+          const json = await toJson(urlStr, res);
           resolve(json);
         } catch (err) {
           reject(err);

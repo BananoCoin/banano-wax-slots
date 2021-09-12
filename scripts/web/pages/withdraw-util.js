@@ -140,7 +140,7 @@ const postWithoutCatch = async (context, req, res) => {
     }
     // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
     res.send(resp);
-    loggingUtil.log(dateUtil.getDate(), 'SUCCESS withdraw', message);
+    loggingUtil.log(dateUtil.getDate(), 'SUCCESS withdraw', 'owner', owner, 'account', account, 'amount', amount, message);
   } catch (error) {
     const resp = {};
     resp.message = `error '${error.message}'`;
