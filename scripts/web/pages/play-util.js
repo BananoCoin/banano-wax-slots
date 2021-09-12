@@ -52,7 +52,7 @@ const post = async (context, req, res) => {
   try {
     return await postWithoutCatch(context, req, res);
   } catch (error) {
-    console.log('playUtil error', error.message);
+    console.log(dateUtil.getDate(), 'playUtil error', error.message);
     // console.trace(error);
     const resp = {};
     resp.intermittentError = true;

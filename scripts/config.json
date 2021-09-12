@@ -38,18 +38,15 @@
     "https://api.wax.greeneosio.com",
     "https://api.wax.liquidstudios.io",
     "https://api.waxsweden.org",
-    "https://chain.wax.io",
     "https://wax-bp.wizardsguild.one",
     "https://wax.blokcrafters.io",
     "https://wax.cryptolions.io",
-    "https://wax.dapplica.io",
     "https://wax.eoseoul.io",
     "https://wax.eosn.io",
     "https://wax.eosphere.io",
     "https://wax.eosrio.io",
     "https://wax.eu.eosamsterdam.net",
-    "https://wax.greymass.com",
-    "https://wax.pink.gg"
+    "https://wax.greymass.com"
   ],
   "web": {
     "port": "8686"
