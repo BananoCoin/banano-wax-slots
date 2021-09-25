@@ -3,6 +3,8 @@
   "accountSeedLinkEnabled": false,
   "underMaintenance": false,
   "overrideNonce": false,
+  "excludedTemplates": ["289324"],
+  "logsDataDir": "data/logs",
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",
   "burnAccount": "",

@@ -23,6 +23,7 @@ let ready = false;
 /* eslint-enable no-unused-vars */
 
 const ownerAssetCacheMap = new Map();
+const excludedTemplateSet = new Set();
 
 // functions
 const init = (_config, _loggingUtil) => {
@@ -66,6 +67,11 @@ const setWaxApiAndAddTemplates = async () => {
 
 const addAllTemplates = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
+
+  config.excludedTemplates.forEach((templateId) => {
+    excludedTemplateSet.add(templateId);
+  });
+
   let page = 1;
   const max = config.maxTemplatesPerPage;
 
@@ -87,7 +93,9 @@ const addAllTemplates = async () => {
         pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply, 10);
         pageTemplateData.max_supply = parseInt(pageTemplate.max_supply, 10);
 
-        templates.push(pageTemplateData);
+        if (!excludedTemplateSet.has(pageTemplateData.template_id)) {
+          templates.push(pageTemplateData);
+        }
       }
 
       if (lessThanMax) {
@@ -109,9 +117,8 @@ const addAllTemplates = async () => {
 
 const cacheAllCardImages = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED cacheAllCardImages');
-
   const getFile = async (ipfs) => {
-    const url = `https://ipfs.globalupload.io/${ipfs}`;
+    const url = `https://ipfs.io/ipfs/${ipfs}`;
     const tempFileName = `static-html/ipfs/${ipfs}-temp.webp`;
     const fileName = `static-html/ipfs/${ipfs}.webp`;
     if (!fs.existsSync(fileName)) {
@@ -124,8 +131,8 @@ const cacheAllCardImages = async () => {
                 if (err != null) {
                   loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'err', err);
                 }
-                loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'info', info);
-                fs.unlinkSync(tempFileName);
+                // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'info', info);
+                // fs.unlinkSync(tempFileName);
                 resolve();
               });
         };
@@ -181,7 +188,10 @@ const getOwnedCardsToCache = async (owner) => {
     // console.log('owner', owner, 'page', page, allAssets.length);
     const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
     pageAssets.forEach((asset) => {
-      allAssets.push(asset);
+      const templateId = asset.template.template_id.toString();
+      if (!excludedTemplateSet.has(templateId)) {
+        allAssets.push(asset);
+      }
     });
     if (pageAssets.length < assetsPerPage) {
       moreAssets = false;

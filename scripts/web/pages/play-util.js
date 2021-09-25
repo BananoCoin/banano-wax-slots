@@ -1,5 +1,7 @@
 'use strict';
 // libraries
+const fs = require('fs');
+const path = require('path');
 
 // modules
 const randomUtil = require('../../util/random-util.js');
@@ -39,6 +41,11 @@ const init = async (_config, _loggingUtil) => {
   bananojsCacheUtil.setBananodeApiUrl(config.bananodeApiUrl);
   setTimeout(centralAccountReceivePending, 0);
   setInterval(centralAccountReceivePending, config.centralWalletReceivePendingIntervalMs);
+
+
+  if (!fs.existsSync(config.logsDataDir)) {
+    fs.mkdirSync(config.logsDataDir, {recursive: true});
+  }
 };
 
 const deactivate = async () => {
@@ -376,6 +383,9 @@ const postWithoutCatch = async (context, req, res) => {
 
       loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'uniqueCardCount', resp.cardCount, 'totalCardCount', resp.ownedAssets.length, 'unfrozenCardCount', resp.unfrozenCardCount);
       await payout();
+      if (won) {
+        logWin(owner, account, bet, winPayment);
+      }
     }
   }
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
@@ -391,6 +401,16 @@ const postWithoutCatch = async (context, req, res) => {
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 
   res.send(resp);
+};
+
+const logWin = (owner, account, bet, winPayment) => {
+  const winLogFileNm = path.join(config.logsDataDir, 'wins.txt');
+  if (!fs.existsSync(winLogFileNm)) {
+    const header = '"owner","account","bet","winPayment"\r\n';
+    fs.appendFileSync(winLogFileNm, header);
+  }
+  const msg = `"${owner}","${account}","${bet}","${winPayment}"\r\n`;
+  fs.appendFileSync(winLogFileNm, msg);
 };
 
 // exports
