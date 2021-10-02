@@ -54,6 +54,18 @@ const toJson = async (url, res) => {
   if (res.status !== 200) {
     throw Error(`url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`);
   }
+  const headerNm = 'access-control-allow-origin';
+  if (res.headers.has(headerNm)) {
+    const originControl = res.headers.get(headerNm);
+    if (originControl.length !== 1) {
+      throw Error(`url:'${url}' cors:'${JSON.stringify(originControl)}'`);
+    }
+    if (originControl[0] !== '*') {
+      throw Error(`url:'${url}' cors:'${JSON.stringify(originControl)}'`);
+    }
+    // console.log(`cors`, originControl);
+  }
+  // console.log(`res.headers`, res.headers);
   const text = await res.text();
   // console.log('text',text)
   return JSON.parse(text);
@@ -102,7 +114,7 @@ const refreshWaxEndpointList = async () => {
       });
     }
 
-    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length);
+    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length, 'distinct', distinct(config.waxEndpointsV2).length);
   } catch (error) {
     console.trace(error);
     console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);

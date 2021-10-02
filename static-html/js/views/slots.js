@@ -5,7 +5,7 @@ import {getDate} from '../../js-lib/date-util.js';
 
 const blurSize = '0.5vmin';
 const CHAIN_NOT_LOADED = 'Not Loaded';
-const LOAD_ALL_ENDPOINTS = true;
+const LOAD_ALL_ENDPOINTS = false;
 
 let tryNumber = 0;
 const maxTryNumber = 2;
@@ -193,8 +193,18 @@ window.addWaxEndpoints = async () => {
           method: 'get',
           headers: {'Content-Type': 'application/json'},
         });
-        const text = await res.text();
-        fetchElt.innerText = text;
+        if (res.status !== 200) {
+          fetchElt.innerText = `url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`;
+        } else {
+          const text = await res.text();
+          // console.log('text',text)
+          const json = JSON.parse(text);
+          if (json.actions !== undefined) {
+            fetchElt.innerText= 'number of actions ' + json.actions.length;
+          } else {
+            fetchElt.innerText= 'actions is undefined';
+          }
+        }
       } catch (error) {
         fetchElt.innerText = error.message;
       }
