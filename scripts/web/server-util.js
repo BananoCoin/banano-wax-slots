@@ -5,6 +5,7 @@ const request = require('request');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
+const fetch = require('node-fetch');
 
 // modules
 const dateUtil = require('../util/date-util.js');
@@ -45,6 +46,68 @@ const init = async (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   await initWebServer();
+
+  refreshWaxEndpointList();
+};
+
+const toJson = async (url, res) => {
+  if (res.status !== 200) {
+    throw Error(`url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`);
+  }
+  const text = await res.text();
+  // console.log('text',text)
+  return JSON.parse(text);
+};
+
+const refreshWaxEndpointList = async () => {
+  console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'STARTING', 'count', config.waxEndpointsV2.length);
+  try {
+    const url = config.waxEndpointV2ListUrl;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+    });
+    const json = await toJson(url, res);
+    const newEndpoints = [];
+    for (let ix = 0; ix < json.length; ix++) {
+      const elt = json[ix];
+      const eltWeight = parseInt(elt.weight, 10);
+      if (eltWeight > 0) {
+        const href = `${elt.node_url}/v2/history/get_actions?act.name=requestrand&account=${config.burnAccount}&limit=1`;
+        const res = await fetch(href, {
+          method: 'get',
+          headers: {'Content-Type': 'application/json'},
+        });
+
+        try {
+          const getActionsResp = await toJson(elt.node_url, res);
+          if (getActionsResp.actions !== undefined) {
+            if (getActionsResp.actions.length > 0) {
+              for (let ix = 0; ix < eltWeight; ix++) {
+                newEndpoints.push(elt.node_url);
+              }
+            }
+          }
+          console.log(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success');
+        } catch (error) {
+          console.log(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'error', error.message);
+        }
+      }
+    }
+    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
+    if (newEndpoints.length > 0) {
+      config.waxEndpointsV2.length = 0;
+      newEndpoints.forEach((url) => {
+        config.waxEndpointsV2.push(url);
+      });
+    }
+
+    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length);
+  } catch (error) {
+    console.trace(error);
+    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);
+  }
+  setTimeout(refreshWaxEndpointList, config.waxEndpointV2ListUrlRefreshMs);
 };
 
 const deactivate = async () => {
@@ -96,11 +159,11 @@ const initWebServer = async () => {
 
     if (config.waxEndpointVersion == 'v2proxy') {
       data.waxEndpoint = '';
-      data.waxEndpoints = JSON.stringify(config.waxEndpointsV2);
+      data.waxEndpoints = JSON.stringify(distinct(config.waxEndpointsV2));
     }
     if (config.waxEndpointVersion == 'v2') {
       data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV2);
-      data.waxEndpoints = JSON.stringify(config.waxEndpointsV2);
+      data.waxEndpoints = JSON.stringify(distinct(config.waxEndpointsV2));
     }
     if (config.waxEndpointVersion == 'v1') {
       data.waxEndpoint = randomUtil.getRandomArrayElt(config.waxEndpointsV1);
@@ -464,6 +527,10 @@ const verifyOwnerAndNonce = async (req) => {
     resp.ready = false;
     return resp;
   }
+};
+
+const distinct = (array) => {
+  return [...new Set(array)];
 };
 
 // exports

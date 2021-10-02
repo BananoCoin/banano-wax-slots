@@ -7,7 +7,7 @@
   "logsDataDir": "data/logs",
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",
-  "burnAccount": "",
+  "burnAccount": "bananobanano",
   "centralWalletReceivePendingIntervalMs": 10000,
   "centralWalletReceivePendingLoggingOn": false,
   "centralWalletSeed": "",
@@ -50,6 +50,8 @@
     "https://wax.eu.eosamsterdam.net",
     "https://wax.greymass.com"
   ],
+  "waxEndpointV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json",
+  "waxEndpointV2ListUrlRefreshMs": 600000,
   "web": {
     "port": "8686"
   },
