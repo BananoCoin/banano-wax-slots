@@ -194,7 +194,7 @@ window.addWaxEndpoints = async () => {
           headers: {'Content-Type': 'application/json'},
         });
         if (res.status !== 200) {
-          fetchElt.innerText = `url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`;
+          fetchElt.innerText = `url:'${waxEndpoint}' status:'${res.status}' statusText:'${res.statusText}'`;
         } else {
           const text = await res.text();
           // console.log('text',text)
@@ -206,6 +206,7 @@ window.addWaxEndpoints = async () => {
           }
         }
       } catch (error) {
+        console.trace(error);
         fetchElt.innerText = error.message;
       }
     };
