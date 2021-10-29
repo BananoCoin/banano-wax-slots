@@ -196,9 +196,12 @@ const getOwnedCardsToCache = async (owner) => {
     // console.log('owner', owner, 'page', page, allAssets.length);
     const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
     pageAssets.forEach((asset) => {
+      // console.log('owner', owner, 'page', page, asset);
       const templateId = asset.template.template_id.toString();
       if (!excludedTemplateSet.has(templateId)) {
-        allAssets.push(asset);
+        if (includedSchemaSet.has(asset.schema.schema_name)) {
+          allAssets.push(asset);
+        }
       }
     });
     if (pageAssets.length < assetsPerPage) {
