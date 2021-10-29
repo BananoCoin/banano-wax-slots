@@ -4,6 +4,7 @@
   "underMaintenance": false,
   "overrideNonce": false,
   "excludedTemplates": ["289324"],
+  "includedSchemas": ["crptomonkeys"],
   "logsDataDir": "data/logs",
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",

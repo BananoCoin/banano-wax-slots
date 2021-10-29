@@ -24,6 +24,7 @@ let ready = false;
 
 const ownerAssetCacheMap = new Map();
 const excludedTemplateSet = new Set();
+const includedSchemaSet = new Set();
 
 // functions
 const init = (_config, _loggingUtil) => {
@@ -64,12 +65,15 @@ const setWaxApiAndAddTemplates = async () => {
   setTimeout(addAllTemplates, 0);
 };
 
-
 const addAllTemplates = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
 
   config.excludedTemplates.forEach((templateId) => {
     excludedTemplateSet.add(templateId);
+  });
+
+  config.includedSchemas.forEach((schemaId) => {
+    includedSchemaSet.add(schemaId);
   });
 
   let page = 1;
@@ -87,6 +91,7 @@ const addAllTemplates = async () => {
         // loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates pageTemplate', pageTemplate);
         const pageTemplateData = {};
         pageTemplateData.template_id = pageTemplate.template_id;
+        pageTemplateData.schema_name = pageTemplate.schema.schema_name;
         pageTemplateData.name = pageTemplate.immutable_data.name;
         pageTemplateData.img = pageTemplate.immutable_data.img;
         pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
@@ -94,7 +99,10 @@ const addAllTemplates = async () => {
         pageTemplateData.max_supply = parseInt(pageTemplate.max_supply, 10);
 
         if (!excludedTemplateSet.has(pageTemplateData.template_id)) {
-          templates.push(pageTemplateData);
+          if (includedSchemaSet.has(pageTemplateData.schema_name)) {
+            // loggingUtil.log(dateUtil.getDate(), 'SUCCESS addTemplates pageTemplateData', pageTemplateData);
+            templates.push(pageTemplateData);
+          }
         }
       }
 
