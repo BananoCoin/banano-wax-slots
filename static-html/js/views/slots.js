@@ -24,6 +24,9 @@ const checkEndpointsFns = [];
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
 
 const startSound = (id) => {
+  if (window.localStorage.soundOn !== 'true') {
+    return;
+  }
   document.getElementById(id).play();
 };
 
@@ -458,6 +461,31 @@ window.reload = () => {
   location.reload();
 };
 
+const synchSound = () => {
+  console.log('synchSound old', window.localStorage.soundOn);
+  const soundElt = document.querySelector('#sound');
+  if (window.localStorage.soundOn == 'true') {
+    soundElt.innerText = 'Sound On';
+  } else if (window.localStorage.soundOn == 'false') {
+    soundElt.innerText = 'Sound Off';
+  } else {
+    window.localStorage.soundOn = 'true';
+    soundElt.innerText = 'Sound On';
+  }
+  console.log('synchSound new', window.localStorage.soundOn);
+}
+
+window.toggleSound = () => {
+  console.log('toggleSound old', window.localStorage.soundOn);
+  if (window.localStorage.soundOn == 'true') {
+    window.localStorage.soundOn = 'false';
+  } else {
+    window.localStorage.soundOn = 'true';
+  }
+  console.log('toggleSound new', window.localStorage.soundOn);
+  synchSound();
+};
+
 window.debug = () => {
   const scoreText = [];
   scoreText.push(`owner:${window.localStorage.owner}`);
@@ -532,6 +560,7 @@ window.onLoad = async () => {
     window.location.href = window.location.pathname;
     return;
   }
+  synchSound();
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   let waxEndpointUrl = waxEndpointElt.innerText;
