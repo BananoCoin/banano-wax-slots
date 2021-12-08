@@ -20,6 +20,7 @@
   "maxTemplatesPerPage": 100,
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
+  "referredByBonusPercent": 0.05,
   "betBonus": 0.1,
   "minBet": 0.0,
   "maxBet": 1.0,

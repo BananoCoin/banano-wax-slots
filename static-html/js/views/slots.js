@@ -73,6 +73,9 @@ const play = async (bet) => {
   const parms = {};
   parms.owner = window.localStorage.owner;
   parms.nonce = window.localStorage.nonce;
+  if (window.localStorage.referredBy !== undefined) {
+    parms.referred_by = window.localStorage.referredBy;
+  }
   // console.log('play', parms);
 
   if (bet) {
@@ -473,7 +476,7 @@ const synchSound = () => {
     soundElt.innerText = 'Sound On';
   }
   console.log('synchSound new', window.localStorage.soundOn);
-}
+};
 
 window.toggleSound = () => {
   console.log('toggleSound old', window.localStorage.soundOn);
@@ -545,6 +548,15 @@ window.onLoad = async () => {
       console.log('searchParams.owner', searchParamsOwner);
       window.localStorage.owner = searchParamsOwner;
     }
+    if (searchParams.has('referredBy')) {
+      const searchParamsReferredBy = searchParams.get('referredBy');
+      console.log('searchParams.referredBy', searchParamsReferredBy);
+      if(searchParamsReferredBy == '') {
+        delete window.localStorage.referredBy;
+      } else {
+        window.localStorage.referredBy = searchParamsReferredBy;
+      }
+    }
     if (searchParams.has('nonce')) {
       const searchParamsNonce = searchParams.get('nonce');
       console.log('searchParams.nonce', searchParamsNonce);
@@ -583,12 +595,18 @@ window.onLoad = async () => {
   // const collection = await api.getCollection("crptomonkeys", false);
   // console.log(collection);
   const ownerElt = document.querySelector('#owner');
+  const referredByElt = document.querySelector('#referredBy');
   const cardElt = document.querySelector('#cards');
   const nonceElt = document.querySelector('#nonce');
   const nonceHashElt = document.querySelector('#nonceHash');
   const lastNonceElt = document.querySelector('#lastNonceHash');
   lastNonceElt.innerHTML = '';
 
+  if (window.localStorage.referredBy !== undefined) {
+    referredByElt.innerText = window.localStorage.referredBy;
+  } else {
+    referredByElt.innerText = '';
+  }
   if (window.localStorage.nonce === undefined) {
     const nonceBytes = new Uint8Array(16);
     window.crypto.getRandomValues(nonceBytes);
@@ -859,6 +877,8 @@ const addCards = async () => {
     accountSeedLinkElt.href =
     `?nonce=${window.localStorage.nonce}&owner=${window.localStorage.owner}`;
   }
+  const referralLinkElt = document.querySelector('#referralLink');
+  referralLinkElt.href = `?referredBy=${window.localStorage.owner}`;
 
   const card1Elt = getSvgSlotMachineElementById('card1');
   const card2Elt = getSvgSlotMachineElementById('card2');

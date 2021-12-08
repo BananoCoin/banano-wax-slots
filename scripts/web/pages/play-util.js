@@ -364,12 +364,30 @@ const postWithoutCatch = async (context, req, res) => {
           }
         }
       }
+
+      const referredBy = req.body.referred_by;
+      let payReferral = false;
+      let referredByAccount;
+      let referredByPayment;
+      if (referredBy !== undefined) {
+        if (referredBy !== owner) {
+          payReferral = true;
+          const referredBySeed = seedUtil.getSeedFromOwner(referredBy);
+          referredByAccount = await bananojsCacheUtil.getBananoAccountFromSeed(referredBySeed, config.walletSeedIx);
+          referredByPayment = (winPayment * config.referredByBonusPercent).toFixed(4);
+        }
+      }
+
       // loggingUtil.log(dateUtil.getDate(), 'SUCCESS checkCards');
       const payout = async () => {
         try {
           if (won) {
             totalWinsSinceRestart++;
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
+
+            if (payReferral) {
+              await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, referredByPayment);
+            }
           } else {
             totalLossesSinceRestart++;
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(seed, config.walletSeedIx, houseAccount, bet);
@@ -381,7 +399,7 @@ const postWithoutCatch = async (context, req, res) => {
         }
       };
 
-      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'uniqueCardCount', resp.cardCount, 'totalCardCount', resp.ownedAssets.length, 'unfrozenCardCount', resp.unfrozenCardCount);
+      loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'uniqueCardCount', resp.cardCount, 'totalCardCount', resp.ownedAssets.length, 'unfrozenCardCount', resp.unfrozenCardCount, 'payReferral', payReferral, 'referredBy', referredBy, 'referredByAccount', referredByAccount, 'referredByPayment', referredByPayment);
       await payout();
       if (won) {
         logWin(owner, account, bet, winPayment);

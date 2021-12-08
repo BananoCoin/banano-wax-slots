@@ -13,9 +13,19 @@
             <button id="faqButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" onclick="showFAQ();return false;">FAQ</button>
           </ul>
           <b class="col-md-3 color_black text-end" style="margin-right:3%">
-            Account: <span class="selectable" id="owner"></span>
-            <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button>
-            <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>
+            <table>
+              <tr>
+                <td>
+                  Account: <span class="selectable" id="owner"></span>
+                  <br>
+                  Referred By: <span class="selectable" id="referredBy"></span>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button>
+                  <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>
+                </td>
+              </tr>
+            </table>
           </b>
         </div>
       </td>
@@ -121,6 +131,11 @@
                       <div class="card-body">
                         <h5 class="card-text">
                           <span class="selectable" id="accountCacheBalance"></span>
+                        </h5>
+                      </div>
+                      <div class="card-body">
+                        <h5 class="card-text">
+                          <a class="text-small" target="_blank" id="referralLink">Referral Link</a>
                         </h5>
                       </div>
                       {{#if accountSeedLinkEnabled}}
