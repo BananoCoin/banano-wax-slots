@@ -72,7 +72,7 @@ const toJson = async (url, res) => {
 };
 
 const refreshWaxEndpointList = async () => {
-  console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'STARTING', 'count', config.waxEndpointsV2.length);
+  loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'STARTING', 'count', config.waxEndpointsV2.length);
   try {
     const url = config.waxEndpointV2ListUrl;
     const res = await fetch(url, {
@@ -100,13 +100,13 @@ const refreshWaxEndpointList = async () => {
               }
             }
           }
-          console.log(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success');
+          loggingUtil.debug(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success');
         } catch (error) {
-          console.log(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'error', error.message);
+          loggingUtil.debug(dateUtil.getDate(), 'refreshWaxEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'error', error.message);
         }
       }
     }
-    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
+    loggingUtil.debug(dateUtil.getDate(), 'refreshWaxEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
     if (newEndpoints.length > 0) {
       config.waxEndpointsV2.length = 0;
       newEndpoints.forEach((url) => {
@@ -114,10 +114,10 @@ const refreshWaxEndpointList = async () => {
       });
     }
 
-    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length, 'distinct', distinct(config.waxEndpointsV2).length);
+    loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length, 'distinct', distinct(config.waxEndpointsV2).length);
   } catch (error) {
-    console.trace(error);
-    console.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);
+    loggingUtil.trace(error);
+    loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);
   }
   setTimeout(refreshWaxEndpointList, config.waxEndpointV2ListUrlRefreshMs);
 };
@@ -168,6 +168,8 @@ const initWebServer = async () => {
     data.version = version;
     data.overrideNonce = config.overrideNonce;
     data.waxEndpointVersion = config.waxEndpointVersion;
+    data.authUrl = config.cryptomonkeysConnect.auth_url;
+    data.clientId = config.cryptomonkeysConnect.client_id;
 
     if (config.waxEndpointVersion == 'v2proxy') {
       data.waxEndpoint = '';
@@ -326,7 +328,7 @@ const initWebServer = async () => {
 
     const ip = getIp(req);
     const response = await getCaptchaResponse(config, req, ip);
-    console.log(dateUtil.getDate(), 'hcaptcha', response);
+    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', response);
     const responseJson = JSON.parse(response);
     if (!responseJson.success) {
       const resp = {};
@@ -418,6 +420,67 @@ const initWebServer = async () => {
       const resp = await nonceUtil.getWaxRpc().chain_push_transaction(bodyStr);
       res.send(resp);
     });
+  });
+
+  app.get('/cmc_nonce_hash', async (req, res) => {
+    loggingUtil.debug(dateUtil.getDate(), 'cmc_nonce_hash', req.method, req.url, req.query, req.body);
+    const owner = req.query.owner;
+    const nonceHash = nonceUtil.getCmcLastNonceHashByOwner(owner);
+    res.type('text/plain;charset=UTF-8');
+    res.send(nonceHash);
+  });
+
+  app.get('/oauth/monkeyconnect/callback', async (req, res) => {
+    loggingUtil.debug(dateUtil.getDate(), 'callback', req.method, req.url, req.query, req.body);
+    const code = req.query.code;
+    const state = req.query.state;
+    loggingUtil.debug(dateUtil.getDate(), 'callback', 'code', code);
+    loggingUtil.debug(dateUtil.getDate(), 'callback', 'state', state);
+
+    const tokenUrl = config.cryptomonkeysConnect.token_url;
+    // const tokenBodyJson = {};
+    // tokenBodyJson.client_id = config.cryptomonkeysConnect.client_id;
+    // tokenBodyJson.client_secret = config.cryptomonkeysConnect.client_secret;
+    // tokenBodyJson.grant_type = 'authorization_code';
+    // tokenBodyJson.code = code;
+    // const tokenBody = JSON.stringify(tokenBodyJson);
+    let tokenBodyForm = '';
+    tokenBodyForm += 'client_id=' + config.cryptomonkeysConnect.client_id;
+    tokenBodyForm += '&client_secret=' + config.cryptomonkeysConnect.client_secret;
+    tokenBodyForm += '&grant_type=authorization_code';
+    tokenBodyForm += '&code=' + code;
+    loggingUtil.debug('tokenUrl', tokenUrl);
+    loggingUtil.debug('tokenBodyForm', tokenBodyForm);
+    const tokenRes = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+      // 'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      // body: tokenBody,
+      body: tokenBodyForm,
+    });
+    const tokenRespJson = await toJson(tokenUrl, tokenRes);
+
+    const usernameUrl = config.cryptomonkeysConnect.username_api_url;
+    const usernameRes = await fetch(usernameUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + tokenRespJson.access_token,
+      },
+    });
+    const usernameRespJson = await toJson(usernameUrl, usernameRes);
+
+    let redirectUrl = '/';
+    if (usernameRespJson.success) {
+      const owner = usernameRespJson.user;
+      const noncehash = nonceUtil.getNonceHash(state);
+      nonceUtil.setCmcLastNonceHashByOwner(owner, noncehash);
+      redirectUrl = '/?owner=' + owner;
+    }
+    // loggingUtil.log(dateUtil.getDate(), 'callback', 'nonce', nonce);
+    res.redirect(302, redirectUrl);
   });
 
   app.get('/favicon.ico', async (req, res) => {
@@ -530,9 +593,16 @@ const verifyOwnerAndNonce = async (req) => {
     resp.success = false;
     return resp;
   }
+  if (req.body.nonce_kind === undefined) {
+    const resp = {};
+    resp.message = 'no nonce_kind';
+    resp.success = false;
+    return resp;
+  }
   const nonce = req.body.nonce;
   const owner = req.body.owner;
-  const badNonce = await nonceUtil.isBadNonce(owner, nonce);
+  const nonceKind = req.body.nonce_kind;
+  const badNonce = await nonceUtil.isBadNonce(owner, nonce, nonceKind);
   if (badNonce) {
     const resp = {};
     resp.errorMessage = `Nonce mismatch, log in again.`;

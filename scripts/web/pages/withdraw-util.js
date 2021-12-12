@@ -69,7 +69,9 @@ const postWithoutCatch = async (context, req, res) => {
   // loggingUtil.log(dateUtil.getDate(), 'nonce');// , nonce);
   const owner = req.body.owner;
   // loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
-  const badNonce = await nonceUtil.isBadNonce(owner, nonce);
+  const nonceKind = req.body.nonce_kind;
+  // loggingUtil.log(dateUtil.getDate(), 'nonce_kind');// , nonceKind);
+  const badNonce = await nonceUtil.isBadNonce(owner, nonce, nonceKind);
   if (badNonce) {
     const resp = {};
     resp.message = `Need to log in again, server side nonce hash has does not match blockchain nonce hash.`;

@@ -7,7 +7,11 @@ const fetch = require('node-fetch');
 const randomUtil = require('./random-util.js');
 
 // constants
-const lastNonceByOwnerMap = new Map();
+/** wax network, for both anchor and wax cloud wallet nonces. */
+const waxLastNonceHashByOwnerMap = new Map();
+
+/** cryptomonkeysConnect network, for connect.cryptomonkeys.cc nonces. */
+const cmcLastNonceHashByOwnerMap = new Map();
 
 // variables
 /* eslint-disable no-unused-vars */
@@ -159,7 +163,7 @@ const getInt64StrFromUint8Array = (ba) => {
   return (bi%max).toString();
 };
 
-const isBadNonce = async (owner, nonce) => {
+const isBadNonce = async (owner, nonce, nonceKind) => {
   if (config.overrideNonce) {
     return false;
   }
@@ -169,14 +173,28 @@ const isBadNonce = async (owner, nonce) => {
   if (nonce == undefined) {
     throw Error('nonce is a required field');
   }
+  if (nonceKind == undefined) {
+    throw Error('nonceKind is a required field');
+  }
   const nonceHash = getNonceHash(nonce);
-  if (lastNonceByOwnerMap.has(owner)) {
-    const lastNonceHash = lastNonceByOwnerMap.get(owner);
+  let lastNonceHashByOwnerMap;
+  switch (nonceKind) {
+    case 'wax':
+      lastNonceHashByOwnerMap = waxLastNonceHashByOwnerMap;
+      break;
+    case 'cmc':
+      lastNonceHashByOwnerMap = cmcLastNonceHashByOwnerMap;
+      break;
+    default:
+      throw Error(`unknown nonceKind '${nonceKind}'`);
+  }
+  if (lastNonceHashByOwnerMap.has(owner)) {
+    const lastNonceHash = lastNonceHashByOwnerMap.get(owner);
     // console.log('isBadNonce', 'cache', 'lastNonceHash', lastNonceHash, nonceHash);
     if (lastNonceHash == nonceHash) {
       return false;
     }
-    lastNonceByOwnerMap.delete(owner);
+    lastNonceHashByOwnerMap.delete(owner);
   }
   // console.log('isBadNonce', 'owner', owner);
   // console.log('isBadNonce', 'nonce', nonce);
@@ -207,7 +225,7 @@ const isBadNonce = async (owner, nonce) => {
 
         if (lastNonceHash == nonceHash) {
           allNoncesBad = false;
-          lastNonceByOwnerMap.set(owner, lastNonceHash);
+          lastNonceHashByOwnerMap.set(owner, lastNonceHash);
         }
       }
     });
@@ -224,7 +242,18 @@ const getWaxRpc = () => {
 };
 
 const getCachedNonceCount = () => {
-  return lastNonceByOwnerMap.size;
+  return waxLastNonceHashByOwnerMap.size + cmcLastNonceHashByOwnerMap.size;
+};
+
+const setCmcLastNonceHashByOwner = (owner, nonceHash) => {
+  cmcLastNonceHashByOwnerMap.set(owner, nonceHash);
+};
+
+const getCmcLastNonceHashByOwner = (owner) => {
+  if (cmcLastNonceHashByOwnerMap.has(owner)) {
+    return cmcLastNonceHashByOwnerMap.get(owner);
+  }
+  return '';
 };
 
 module.exports.init = init;
@@ -232,3 +261,6 @@ module.exports.deactivate = deactivate;
 module.exports.isBadNonce = isBadNonce;
 module.exports.getWaxRpc = getWaxRpc;
 module.exports.getCachedNonceCount = getCachedNonceCount;
+module.exports.setCmcLastNonceHashByOwner = setCmcLastNonceHashByOwner;
+module.exports.getCmcLastNonceHashByOwner = getCmcLastNonceHashByOwner;
+module.exports.getNonceHash = getNonceHash;

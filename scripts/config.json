@@ -73,5 +73,13 @@
     "sitekey": "",
     "secret": "",
     "bananos": 0.05
+  },
+  "cryptomonkeysConnect": {
+    "username_api_url": "",
+    "token_url": "",
+    "auth_url": "",
+    "enabled": true,
+    "client_id": "",
+    "client_secret": ""
   }
 }

@@ -45,6 +45,7 @@ window.waxjsWallet = async () => {
       return;
     }
   }
+  window.localStorage.nonce_kind = 'wax';
   walletKind = 'waxjs';
   resetNonceAndOwner();
 };
@@ -56,8 +57,33 @@ window.anchorWallet = async () => {
       return;
     }
   }
+  window.localStorage.nonce_kind = 'wax';
   walletKind = 'anchor';
   resetNonceAndOwner();
+};
+
+window.cryptomonkeyConnectWallet = async () => {
+  window.localStorage.nonce = getRandomHex32();
+  window.localStorage.nonce_kind = 'cmc';
+  const authUrl = document.querySelector('#authUrl').innerText;
+  const clientId = document.querySelector('#clientId').innerText;
+  const redirectUrl = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/oauth/monkeyconnect/callback';
+  const url = `${authUrl}?response_type=code&client_id=${clientId}&scope=name&state=${window.localStorage.nonce}&redirect_uri=${redirectUrl}`;
+  console.log('url', url);
+  document.location = url;
+};
+
+const getRandomHex32 = () => {
+  const array = new Uint32Array(32);
+  window.crypto.getRandomValues(array);
+  const hex = getByteArrayAsHexString(array);
+  return hex;
+};
+
+const getByteArrayAsHexString = (byteArray) => {
+  return Array.prototype.map.call(byteArray, (byte) => {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
 };
 
 window.resetNonceAndOwner = async () => {
@@ -73,6 +99,7 @@ const play = async (bet) => {
   const parms = {};
   parms.owner = window.localStorage.owner;
   parms.nonce = window.localStorage.nonce;
+  parms.nonce_kind = window.localStorage.nonce_kind;
   if (window.localStorage.referredBy !== undefined) {
     parms.referred_by = window.localStorage.referredBy;
   }
@@ -231,92 +258,102 @@ window.getLastNonce = async () => {
     return;
   }
 
-  const waxEndpointVersionElt = document.querySelector('#waxEndpointVersion');
-  const waxEndpointVersion = waxEndpointVersionElt.innerText;
-  if (waxEndpointVersion == 'v1') {
-    const ownerActions = await waxEndpoint.rpc.history_get_actions(owner, -1, -2);
-    const ownerAction = ownerActions.actions[0];
-    const lastNonce = ownerAction.action_trace.act.data.assoc_id;
-    // console.log(ownerAction);
-    lastNonceElt.innerText = lastNonce;
-  }
-  if (waxEndpointVersion == 'v2' || waxEndpointVersion == 'v2proxy') {
-    const waxEndpointElt = document.querySelector('#waxEndpoint');
-    let urlBase = waxEndpointElt.innerText;
-    if (urlBase.length == 0) {
-      urlBase = window.location.href;
-      if (urlBase.endsWith('/')) {
-        urlBase = urlBase.substring(0, urlBase.length-1);
-      }
-    }
-    const urlStr = '/v2/history/get_actions';
-    console.log('history_get_actions', 'urlBase', urlBase);
-    // console.log('history_get_actions', 'urlStr', urlStr);
-    const url = new URL(urlStr, urlBase);
-    url.searchParams.append('act.name', 'requestrand');
-    // url.searchParams.append('act.data.assoc_id', nonceHashElt.innerText);
-    url.searchParams.append('account', owner);
-    url.searchParams.append('skip', 0);
-    url.searchParams.append('limit', 10);
-    url.searchParams.append('simple', false);
-    // console.log('history_get_actions', 'url', url);
-    fetch(url, {
+  if (window.localStorage.nonce_kind == 'cmc') {
+    const res = await fetch('/cmc_nonce_hash?owner=' + owner, {
       method: 'get',
       headers: {'Content-Type': 'application/json'},
-    })
-        .catch((err) => {
-          console.log('history_get_actions', 'err', err);
-          setScore([err.message]);
-        })
-        .then((res) => res.json())
-        .catch((err) => {
-          console.log('history_get_actions', 'err', err);
-          setScore([err.message]);
-        })
-        .then((json) => {
-          if (json == undefined) {
-            const score = [];
-            score.push('json == undefined');
-            setScore(score);
-            return;
-          }
-          if (json.error) {
-            const score = [];
-            score.push(json.error);
-            if (json.message) {
-              score.push(json.message);
+    });
+    const text = await res.text();
+    lastNonceElt.innerText = text;
+  }
+  if (window.localStorage.nonce_kind == 'wax') {
+    const waxEndpointVersionElt = document.querySelector('#waxEndpointVersion');
+    const waxEndpointVersion = waxEndpointVersionElt.innerText;
+    if (waxEndpointVersion == 'v1') {
+      const ownerActions = await waxEndpoint.rpc.history_get_actions(owner, -1, -2);
+      const ownerAction = ownerActions.actions[0];
+      const lastNonce = ownerAction.action_trace.act.data.assoc_id;
+      // console.log(ownerAction);
+      lastNonceElt.innerText = lastNonce;
+    }
+    if (waxEndpointVersion == 'v2' || waxEndpointVersion == 'v2proxy') {
+      const waxEndpointElt = document.querySelector('#waxEndpoint');
+      let urlBase = waxEndpointElt.innerText;
+      if (urlBase.length == 0) {
+        urlBase = window.location.href;
+        if (urlBase.endsWith('/')) {
+          urlBase = urlBase.substring(0, urlBase.length-1);
+        }
+      }
+      const urlStr = '/v2/history/get_actions';
+      console.log('history_get_actions', 'urlBase', urlBase);
+      // console.log('history_get_actions', 'urlStr', urlStr);
+      const url = new URL(urlStr, urlBase);
+      url.searchParams.append('act.name', 'requestrand');
+      // url.searchParams.append('act.data.assoc_id', nonceHashElt.innerText);
+      url.searchParams.append('account', owner);
+      url.searchParams.append('skip', 0);
+      url.searchParams.append('limit', 10);
+      url.searchParams.append('simple', false);
+      // console.log('history_get_actions', 'url', url);
+      fetch(url, {
+        method: 'get',
+        headers: {'Content-Type': 'application/json'},
+      })
+          .catch((err) => {
+            console.log('history_get_actions', 'err', err);
+            setScore([err.message]);
+          })
+          .then((res) => res.json())
+          .catch((err) => {
+            console.log('history_get_actions', 'err', err);
+            setScore([err.message]);
+          })
+          .then((json) => {
+            if (json == undefined) {
+              const score = [];
+              score.push('json == undefined');
+              setScore(score);
+              return;
             }
-            setScore(score);
-            return;
-          }
-          chainTimestamp = '';
-          console.log('history_get_actions', 'json', json);
-          if (json.actions !== undefined) {
-            let lastNonce;
-            // console.log('history_get_actions', 'json', json);
-            if (json.actions.length > 0) {
-              if (json.actions[0].act !== undefined) {
-                chainTimestamp = json.actions[0].timestamp;
-                lastNonce = json.actions[0].act.data.assoc_id;
+            if (json.error) {
+              const score = [];
+              score.push(json.error);
+              if (json.message) {
+                score.push(json.message);
               }
-            } else {
-              chainTimestamp = 'Unknown';
+              setScore(score);
+              return;
             }
-            json.actions.forEach((action) => {
-              if (action.act.data.assoc_id == nonceHashElt.innerText) {
-                chainTimestamp = action.timestamp;
-                lastNonce = action.act.data.assoc_id;
+            chainTimestamp = '';
+            console.log('history_get_actions', 'json', json);
+            if (json.actions !== undefined) {
+              let lastNonce;
+              // console.log('history_get_actions', 'json', json);
+              if (json.actions.length > 0) {
+                if (json.actions[0].act !== undefined) {
+                  chainTimestamp = json.actions[0].timestamp;
+                  lastNonce = json.actions[0].act.data.assoc_id;
+                }
+              } else {
+                chainTimestamp = 'Unknown';
               }
-            });
-            const tIx = chainTimestamp.indexOf('T');
-            if (tIx != -1) {
-              chainTimestamp = chainTimestamp.substring(0, tIx);
+              json.actions.forEach((action) => {
+                if (action.act.data.assoc_id == nonceHashElt.innerText) {
+                  chainTimestamp = action.timestamp;
+                  lastNonce = action.act.data.assoc_id;
+                }
+              });
+              const tIx = chainTimestamp.indexOf('T');
+              if (tIx != -1) {
+                chainTimestamp = chainTimestamp.substring(0, tIx);
+              }
+              // console.log('history_get_actions', 'lastNonce', lastNonce);
+              // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
+              lastNonceElt.innerText = lastNonce;
             }
-            // console.log('history_get_actions', 'lastNonce', lastNonce);
-            // console.log('history_get_actions', 'nonceHashElt.innerText', nonceHashElt.innerText);
-            lastNonceElt.innerText = lastNonce;
-          }
-        });
+          });
+    }
   }
 };
 
@@ -551,7 +588,7 @@ window.onLoad = async () => {
     if (searchParams.has('referredBy')) {
       const searchParamsReferredBy = searchParams.get('referredBy');
       console.log('searchParams.referredBy', searchParamsReferredBy);
-      if(searchParamsReferredBy == '') {
+      if (searchParamsReferredBy == '') {
         delete window.localStorage.referredBy;
       } else {
         window.localStorage.referredBy = searchParamsReferredBy;
@@ -568,6 +605,11 @@ window.onLoad = async () => {
         nonceTimestamp = nonceTimestamp.substring(0, tIx);
       }
       window.localStorage.nonceTimestamp = nonceTimestamp;
+    }
+    if (searchParams.has('nonce_kind')) {
+      const searchParamsNonceKind = searchParams.get('nonce_kind');
+      console.log('searchParams.nonce_kind', searchParamsNonceKind);
+      window.localStorage.nonce_kind = searchParamsNonceKind;
     }
     window.location.href = window.location.pathname;
     return;
@@ -596,6 +638,7 @@ window.onLoad = async () => {
   // console.log(collection);
   const ownerElt = document.querySelector('#owner');
   const referredByElt = document.querySelector('#referredBy');
+  const nonceKindElt = document.querySelector('#nonceKind');
   const cardElt = document.querySelector('#cards');
   const nonceElt = document.querySelector('#nonce');
   const nonceHashElt = document.querySelector('#nonceHash');
@@ -606,6 +649,12 @@ window.onLoad = async () => {
     referredByElt.innerText = window.localStorage.referredBy;
   } else {
     referredByElt.innerText = '';
+  }
+
+  if (window.localStorage.nonce_kind !== undefined) {
+    nonceKindElt.innerText = window.localStorage.nonce_kind;
+  } else {
+    nonceKindElt.innerText = '';
   }
   if (window.localStorage.nonce === undefined) {
     const nonceBytes = new Uint8Array(16);
@@ -875,7 +924,7 @@ const addCards = async () => {
   const accountSeedLinkElt = document.querySelector('#accountSeedLink');
   if (accountSeedLinkElt !== null) {
     accountSeedLinkElt.href =
-    `?nonce=${window.localStorage.nonce}&owner=${window.localStorage.owner}`;
+    `?nonce=${window.localStorage.nonce}&owner=${window.localStorage.owner}&nonce_kind=${window.localStorage.nonce_kind}`;
   }
   const referralLinkElt = document.querySelector('#referralLink');
   referralLinkElt.href = `?referredBy=${window.localStorage.owner}`;

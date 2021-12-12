@@ -153,6 +153,16 @@ const postWithoutCatch = async (context, req, res) => {
     res.send(resp);
     return;
   }
+  // loggingUtil.log(dateUtil.getDate(), 'STARTED play', req.body);
+  const nonceKind = req.body.nonce_kind;
+  if (nonceKind == undefined) {
+    loggingUtil.log(dateUtil.getDate(), 'play', 'no nonce_kind');
+    const resp = {};
+    resp.errorMessage = 'no nonce_kind';
+    resp.ready = false;
+    res.send(resp);
+    return;
+  }
   // loggingUtil.log(dateUtil.getDate(), 'nonce');// , owner);
 
   const houseAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.houseWalletSeed, config.walletSeedIx);
@@ -168,7 +178,7 @@ const postWithoutCatch = async (context, req, res) => {
   }
   // loggingUtil.log(dateUtil.getDate(), 'owner');// , owner);
 
-  const badNonce = await nonceUtil.isBadNonce(owner, nonce);
+  const badNonce = await nonceUtil.isBadNonce(owner, nonce, nonceKind);
   if (badNonce) {
     const resp = {};
     resp.errorMessage = `Nonce mismatch, log in again.`;
