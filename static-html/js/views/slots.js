@@ -1210,6 +1210,17 @@ const getOwnedAssetHtml = (ownedAsset) => {
   return ownedAssetsHtml;
 };
 
+const asOrderedList = (list) => {
+  let html = '<ol>';
+  for (let ix = 0; ix < list.length; ix++) {
+    html += '<li>';
+    html += list[ix];
+    html += '</li>';
+  }
+  html += '</ol>';
+  return html;
+};
+
 const resetScoreText = async () => {
   const scoreText = [];
   if (cardData === undefined) {
@@ -1287,6 +1298,8 @@ const resetScoreText = async () => {
   document.querySelector('#cacheStats').innerHTML = cacheStats;
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
+
+  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList);
 
   document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;
 

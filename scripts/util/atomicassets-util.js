@@ -295,6 +295,10 @@ const getTemplates = () => {
   return templates;
 };
 
+const getActiveAccountList = () => {
+  return [...ownerAssetCacheMap.keys()];
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getTemplateCount = getTemplateCount;
@@ -304,3 +308,4 @@ module.exports.getPayoutInformation = getPayoutInformation;
 module.exports.isReady = isReady;
 module.exports.getTemplates = getTemplates;
 module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
+module.exports.getActiveAccountList = getActiveAccountList;

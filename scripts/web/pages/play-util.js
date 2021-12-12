@@ -416,6 +416,7 @@ const postWithoutCatch = async (context, req, res) => {
       }
     }
   }
+  resp.activeWaxUserList = atomicassetsUtil.getActiveAccountList();
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();

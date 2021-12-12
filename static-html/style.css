@@ -329,9 +329,12 @@ table.centered {
   font-family: monospace;
 }
 
-
 .bordered {
   border-radius: 0.4vmin;
   border: solid;
   border-width: 0.1vmin;
+}
+
+.text_align_center {
+  text-align: center;
 }
