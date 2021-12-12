@@ -434,8 +434,8 @@ const initWebServer = async () => {
     loggingUtil.debug(dateUtil.getDate(), 'callback', req.method, req.url, req.query, req.body);
     const code = req.query.code;
     const state = req.query.state;
-    loggingUtil.log(dateUtil.getDate(), 'callback', 'code', code);
-    loggingUtil.log(dateUtil.getDate(), 'callback', 'state', state);
+    loggingUtil.debug(dateUtil.getDate(), 'callback', 'code', code);
+    loggingUtil.debug(dateUtil.getDate(), 'callback', 'state', state);
 
     const tokenUrl = config.cryptomonkeysConnect.token_url;
     let tokenBodyForm = '';
@@ -443,8 +443,8 @@ const initWebServer = async () => {
     tokenBodyForm += '&client_secret=' + config.cryptomonkeysConnect.client_secret;
     tokenBodyForm += '&grant_type=authorization_code';
     tokenBodyForm += '&code=' + code;
-    loggingUtil.log('tokenUrl', tokenUrl);
-    loggingUtil.log('tokenBodyForm', tokenBodyForm);
+    loggingUtil.debug('tokenUrl', tokenUrl);
+    loggingUtil.debug('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
@@ -455,6 +455,10 @@ const initWebServer = async () => {
 
     if (tokenRes.status !== 200) {
       const tokenResponseText = await tokenRes.text();
+      loggingUtil.log(dateUtil.getDate(), 'callback', 'code', code);
+      loggingUtil.log(dateUtil.getDate(), 'callback', 'state', state);
+      loggingUtil.log('tokenUrl', tokenUrl);
+      loggingUtil.log('tokenBodyForm', tokenBodyForm);
       loggingUtil.log('token', 'FAILED');
       loggingUtil.log('tokenStatus', tokenRes.status);
       loggingUtil.log('tokenStatusText', tokenRes.statusText);
