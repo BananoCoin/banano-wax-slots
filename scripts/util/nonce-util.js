@@ -34,7 +34,7 @@ const init = (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   const toJson = async (url, res) => {
-    if (res.status !== 200) {
+    if ((res.status !== 200)&&(res.status !== 202)) {
       throw Error(`url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`);
     }
     const text = await res.text();
