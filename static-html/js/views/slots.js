@@ -1513,6 +1513,7 @@ const withdraw = () => {
   const parms = {};
   parms.owner = window.localStorage.owner;
   parms.nonce = window.localStorage.nonce;
+  parms.nonce_kind = window.localStorage.nonce_kind;
   parms.account = accountElt.value;
   parms.amount = amountElt.value;
 
