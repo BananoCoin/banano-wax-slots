@@ -460,6 +460,14 @@ const initWebServer = async () => {
       // body: tokenBody,
       body: tokenBodyForm,
     });
+
+    if (tokenRes.status !== 200) {
+      loggingUtil.log('token', 'FAILED');
+      loggingUtil.log('tokenUrl', tokenUrl);
+      loggingUtil.log('tokenBodyForm', tokenBodyForm);
+      res.redirect(302, '/');
+      return;
+    }
     const tokenRespJson = await toJson(tokenUrl, tokenRes);
 
     const usernameUrl = config.cryptomonkeysConnect.username_api_url;
