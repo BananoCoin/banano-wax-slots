@@ -75,9 +75,9 @@
     "bananos": 0.05
   },
   "cryptomonkeysConnect": {
-    "username_api_url": "",
-    "token_url": "",
-    "auth_url": "",
+    "username_api_url": "https://connect.cryptomonkeys.cc/accounts/api/v1/username/",
+    "token_url": "https://connect.cryptomonkeys.cc/o/token/",
+    "auth_url": "https://connect.cryptomonkeys.cc/o/authorize",
     "enabled": true,
     "client_id": "",
     "client_secret": ""

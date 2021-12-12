@@ -434,35 +434,30 @@ const initWebServer = async () => {
     loggingUtil.debug(dateUtil.getDate(), 'callback', req.method, req.url, req.query, req.body);
     const code = req.query.code;
     const state = req.query.state;
-    loggingUtil.debug(dateUtil.getDate(), 'callback', 'code', code);
-    loggingUtil.debug(dateUtil.getDate(), 'callback', 'state', state);
+    loggingUtil.log(dateUtil.getDate(), 'callback', 'code', code);
+    loggingUtil.log(dateUtil.getDate(), 'callback', 'state', state);
 
     const tokenUrl = config.cryptomonkeysConnect.token_url;
-    // const tokenBodyJson = {};
-    // tokenBodyJson.client_id = config.cryptomonkeysConnect.client_id;
-    // tokenBodyJson.client_secret = config.cryptomonkeysConnect.client_secret;
-    // tokenBodyJson.grant_type = 'authorization_code';
-    // tokenBodyJson.code = code;
-    // const tokenBody = JSON.stringify(tokenBodyJson);
     let tokenBodyForm = '';
     tokenBodyForm += 'client_id=' + config.cryptomonkeysConnect.client_id;
     tokenBodyForm += '&client_secret=' + config.cryptomonkeysConnect.client_secret;
     tokenBodyForm += '&grant_type=authorization_code';
     tokenBodyForm += '&code=' + code;
-    loggingUtil.debug('tokenUrl', tokenUrl);
-    loggingUtil.debug('tokenBodyForm', tokenBodyForm);
+    loggingUtil.log('tokenUrl', tokenUrl);
+    loggingUtil.log('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
-      // 'Content-Type': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      // body: tokenBody,
       body: tokenBodyForm,
     });
 
     if (tokenRes.status !== 200) {
       loggingUtil.log('token', 'FAILED');
+      loggingUtil.log('tokenStatus', tokenRes.status);
+      loggingUtil.log('tokenStatusText', tokenRes.statusText);
+      loggingUtil.log('tokenRes', tokenRes);
       loggingUtil.log('tokenUrl', tokenUrl);
       loggingUtil.log('tokenBodyForm', tokenBodyForm);
       res.redirect(302, '/');
