@@ -454,16 +454,19 @@ const initWebServer = async () => {
     });
 
     if (tokenRes.status !== 200) {
+      const tokenResponseText = await tokenRes.text();
       loggingUtil.log('token', 'FAILED');
       loggingUtil.log('tokenStatus', tokenRes.status);
       loggingUtil.log('tokenStatusText', tokenRes.statusText);
       loggingUtil.log('tokenRes', tokenRes);
       loggingUtil.log('tokenUrl', tokenUrl);
       loggingUtil.log('tokenBodyForm', tokenBodyForm);
+      loggingUtil.log('tokenResponseText', tokenResponseText);
       res.redirect(302, '/');
       return;
     }
     const tokenRespJson = await toJson(tokenUrl, tokenRes);
+    loggingUtil.log('tokenRespJson', tokenRespJson);
 
     const usernameUrl = config.cryptomonkeysConnect.username_api_url;
     const usernameRes = await fetch(usernameUrl, {
