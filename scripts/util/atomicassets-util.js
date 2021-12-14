@@ -84,7 +84,8 @@ const addAllTemplates = async () => {
     let lessThanMax = false;
     try {
       const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys'}, page, max);
-      lessThanMax = templates.length < max;
+      lessThanMax = pageTemplates.length < max;
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, pageTemplates.length, max);
 
       for (let pageTemplateIx = 0; pageTemplateIx < pageTemplates.length; pageTemplateIx++) {
         const pageTemplate = pageTemplates[pageTemplateIx];
@@ -110,12 +111,12 @@ const addAllTemplates = async () => {
         loggingUtil.log(dateUtil.getDate(), 'SUCCESS addAllTemplates');
         setTimeout(cacheAllCardImages, 0);
       } else {
-        loggingUtil.log(dateUtil.getDate(), 'SUCCESS addTemplates page' + page);
+        loggingUtil.log(dateUtil.getDate(), 'SUCCESS addTemplates page', page);
         page++;
         setTimeout(addTemplates, 1000);
       }
     } catch (error) {
-      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page' + page, error.message);
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, error.message);
       setTimeout(addTemplates, 1000);
     }
   };
