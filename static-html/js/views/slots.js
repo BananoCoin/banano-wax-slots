@@ -187,21 +187,25 @@ const play = async (bet) => {
 const autoplay = () => {
   if (window.localStorage.autoplayOn == 'true') {
     console.log('autoplay STARTED');
-    synchBetButtons('50ban');
-    if (!goodOdds) {
-      synchBetButtons('10ban');
-    }
-    if (!goodOdds) {
-      synchBetButtons('5ban');
-    }
-    if (!goodOdds) {
-      synchBetButtons('1ban');
-    }
-    if (goodOdds) {
-      window.play();
+    if (cardData.cacheHouseBalanceDecimal > 0) {
+      synchBetButtons('50ban');
+      if (!goodOdds) {
+        synchBetButtons('10ban');
+      }
+      if (!goodOdds) {
+        synchBetButtons('5ban');
+      }
+      if (!goodOdds) {
+        synchBetButtons('1ban');
+      }
+      if (goodOdds) {
+        window.play();
+      } else {
+        window.localStorage.autoplayOn == 'false';
+        // synchAutoplay();
+      }
     } else {
       window.localStorage.autoplayOn == 'false';
-      // synchAutoplay();
     }
     console.log('autoplay SUCCESS');
   }
