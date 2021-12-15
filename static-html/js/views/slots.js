@@ -19,6 +19,7 @@ let spinMonkeysIx = 0;
 let waxEndpoint;
 let stopWinConfetti = true;
 let chainTimestamp = CHAIN_NOT_LOADED;
+let goodOdds = false;
 const checkEndpointsFns = [];
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
@@ -178,6 +179,32 @@ const play = async (bet) => {
   xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xmlhttp.send(JSON.stringify(parms));
   document.querySelector('#play').disabled = true;
+  if (window.localStorage.autoplayOn == 'true') {
+    setTimeout(autoplay, 1000);
+  }
+};
+
+const autoplay = () => {
+  if (window.localStorage.autoplayOn == 'true') {
+    console.log('autoplay STARTED');
+    synchBetButtons('50ban');
+    if (!goodOdds) {
+      synchBetButtons('10ban');
+    }
+    if (!goodOdds) {
+      synchBetButtons('5ban');
+    }
+    if (!goodOdds) {
+      synchBetButtons('1ban');
+    }
+    if (goodOdds) {
+      window.play();
+    } else {
+      window.localStorage.autoplayOn == 'false';
+      // synchAutoplay();
+    }
+    console.log('autoplay SUCCESS');
+  }
 };
 
 window.play = () => {
@@ -505,6 +532,24 @@ window.reload = () => {
   location.reload();
 };
 
+const synchAutoplay = () => {
+  console.log('synchAutoplay old', window.localStorage.autoplayOn);
+  const autoplayElt = document.querySelector('#autoplay');
+  if (window.localStorage.autoplayOn == 'true') {
+    autoplayElt.innerText = 'Autoplay On';
+  } else if (window.localStorage.autoplayOn == 'false') {
+    autoplayElt.innerText = 'Autoplay Off';
+  } else {
+    window.localStorage.autoplayOn = 'true';
+    autoplayElt.innerText = 'Autoplay On';
+  }
+  console.log('synchAutoplay new', window.localStorage.autoplayOn);
+
+  if (window.localStorage.autoplayOn == 'true') {
+    autoplay();
+  }
+};
+
 const synchSound = () => {
   console.log('synchSound old', window.localStorage.soundOn);
   const soundElt = document.querySelector('#sound');
@@ -529,6 +574,18 @@ window.toggleSound = () => {
   console.log('toggleSound new', window.localStorage.soundOn);
   synchSound();
 };
+
+window.toggleAutoplay = () => {
+  console.log('autoplayOn old', window.localStorage.autoplayOn);
+  if (window.localStorage.autoplayOn == 'true') {
+    window.localStorage.autoplayOn = 'false';
+  } else {
+    window.localStorage.autoplayOn = 'true';
+  }
+  console.log('autoplayOn new', window.localStorage.autoplayOn);
+  synchAutoplay();
+};
+
 
 window.debug = () => {
   const scoreText = [];
@@ -619,6 +676,7 @@ window.onLoad = async () => {
     return;
   }
   synchSound();
+  synchAutoplay();
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   let waxEndpointUrl = waxEndpointElt.innerText;
@@ -1312,7 +1370,7 @@ const resetScoreText = async () => {
 
   // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;
-  let goodOdds = false;
+  goodOdds = false;
   if (idAmounts !== undefined) {
     const bet = idAmounts[betFromSvgId];
 
