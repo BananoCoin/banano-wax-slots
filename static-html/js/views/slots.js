@@ -189,8 +189,10 @@ const autoplay = () => {
     if (cardData === undefined) {
       console.log('autoplay SKIPPED');
     } else {
-      console.log('autoplay STARTED', cardData.cacheHouseBalanceDecimal);
-      if (cardData.cacheHouseBalanceDecimal > 0) {
+      console.log('autoplay STARTED', 'cardData.scoreError', cardData.scoreError);
+      if (cardData.scoreError) {
+        window.localStorage.autoplayOn == 'false';
+      } else {
         synchBetButtons('50ban');
         if (!goodOdds) {
           synchBetButtons('10ban');
@@ -207,8 +209,6 @@ const autoplay = () => {
           window.localStorage.autoplayOn == 'false';
         // synchAutoplay();
         }
-      } else {
-        window.localStorage.autoplayOn == 'false';
       }
       console.log('autoplay SUCCESS');
     }
