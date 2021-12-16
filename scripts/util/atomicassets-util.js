@@ -10,6 +10,7 @@ const sharp = require('sharp');
 const assetUtil = require('./asset-util.js');
 const dateUtil = require('./date-util.js');
 const timedCacheUtil = require('./timed-cache-util.js');
+const walletsForOwner = new Map();
 
 // constants
 
@@ -170,9 +171,16 @@ const getAssetOptions = (owner) => {
 };
 
 const hasOwnedCards = async (owner) => {
-  const assetOptions = getAssetOptions(owner);
-  const pageAssets = await waxApi.getAssets(assetOptions, 1, 1);
-  return pageAssets.length > 0;
+  const wallets = walletsForOwner.get(owner);
+  for (let ix = 0; ix < wallets.length; ix++) {
+    const wallet = wallets[ix];
+    const assetOptions = getAssetOptions(wallet);
+    const pageAssets = await waxApi.getAssets(assetOptions, 1, 1);
+    if (pageAssets.length > 0) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const getTotalActiveCardCount = () => {
@@ -188,27 +196,31 @@ const getOwnedCards = async (owner) => {
 };
 
 const getOwnedCardsToCache = async (owner) => {
-  const assetOptions = getAssetOptions(owner);
-  let page = 1;
-  const assetsPerPage = config.maxAssetsPerPage;
-  let moreAssets = true;
   const allAssets = [];
-  while (moreAssets) {
-    // console.log('owner', owner, 'page', page, allAssets.length);
-    const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
-    pageAssets.forEach((asset) => {
-      // console.log('owner', owner, 'page', page, asset);
-      const templateId = asset.template.template_id.toString();
-      if (!excludedTemplateSet.has(templateId)) {
-        if (includedSchemaSet.has(asset.schema.schema_name)) {
-          allAssets.push(asset);
+  const wallets = walletsForOwner.get(owner);
+  for (let ix = 0; ix < wallets.length; ix++) {
+    const wallet = wallets[ix];
+    const assetOptions = getAssetOptions(wallet);
+    let page = 1;
+    const assetsPerPage = config.maxAssetsPerPage;
+    let moreAssets = true;
+    while (moreAssets) {
+      // console.log('owner', owner, 'page', page, allAssets.length);
+      const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
+      pageAssets.forEach((asset) => {
+        // console.log('owner', owner, 'page', page, asset);
+        const templateId = asset.template.template_id.toString();
+        if (!excludedTemplateSet.has(templateId)) {
+          if (includedSchemaSet.has(asset.schema.schema_name)) {
+            allAssets.push(asset);
+          }
         }
+      });
+      if (pageAssets.length < assetsPerPage) {
+        moreAssets = false;
       }
-    });
-    if (pageAssets.length < assetsPerPage) {
-      moreAssets = false;
+      page++;
     }
-    page++;
   }
   return allAssets;
 };
@@ -300,6 +312,10 @@ const getActiveAccountList = () => {
   return [...ownerAssetCacheMap.keys()];
 };
 
+const setWalletsForOwner = (owner, wallets) => {
+  walletsForOwner.set(owner, wallets);
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getTemplateCount = getTemplateCount;
@@ -310,3 +326,4 @@ module.exports.isReady = isReady;
 module.exports.getTemplates = getTemplates;
 module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
 module.exports.getActiveAccountList = getActiveAccountList;
+module.exports.setWalletsForOwner = setWalletsForOwner;

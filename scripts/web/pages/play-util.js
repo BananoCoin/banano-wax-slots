@@ -396,7 +396,7 @@ const postWithoutCatch = async (context, req, res) => {
             await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, winPayment);
 
             if (payReferral) {
-              await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, referredByPayment);
+              await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, referredByAccount, referredByPayment);
             }
           } else {
             totalLossesSinceRestart++;

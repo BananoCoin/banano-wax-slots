@@ -443,6 +443,9 @@ const initWebServer = async () => {
     tokenBodyForm += '&client_secret=' + config.cryptomonkeysConnect.client_secret;
     tokenBodyForm += '&grant_type=authorization_code';
     tokenBodyForm += '&code=' + code;
+    if (config.cryptomonkeysConnect.redirect_uri !== '') {
+      tokenBodyForm += '&redirect_uri=' + config.cryptomonkeysConnect.redirect_uri;
+    }
     loggingUtil.debug('tokenUrl', tokenUrl);
     loggingUtil.debug('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
@@ -462,7 +465,7 @@ const initWebServer = async () => {
       loggingUtil.log('token', 'FAILED');
       loggingUtil.log('tokenStatus', tokenRes.status);
       loggingUtil.log('tokenStatusText', tokenRes.statusText);
-      loggingUtil.log('tokenRes', tokenRes);
+      // loggingUtil.log('tokenRes', tokenRes);
       loggingUtil.log('tokenUrl', tokenUrl);
       loggingUtil.log('tokenBodyForm', tokenBodyForm);
       loggingUtil.log('tokenResponseText', tokenResponseText);
@@ -481,6 +484,9 @@ const initWebServer = async () => {
       },
     });
     const usernameRespJson = await toJson(usernameUrl, usernameRes);
+    loggingUtil.log(dateUtil.getDate(), 'callback', 'usernameRespJson', usernameRespJson);
+
+    atomicassetsUtil.setWalletsForOwner(usernameRespJson.user, usernameRespJson.wallets);
 
     let redirectUrl = '/';
     if (usernameRespJson.success) {
