@@ -171,7 +171,7 @@ const getAssetOptions = (owner) => {
 };
 
 const hasOwnedCards = async (owner) => {
-  const wallets = walletsForOwner.get(owner);
+  const wallets = getWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
@@ -197,7 +197,7 @@ const getOwnedCards = async (owner) => {
 
 const getOwnedCardsToCache = async (owner) => {
   const allAssets = [];
-  const wallets = walletsForOwner.get(owner);
+  const wallets = getWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
@@ -310,6 +310,14 @@ const getTemplates = () => {
 
 const getActiveAccountList = () => {
   return [...ownerAssetCacheMap.keys()];
+};
+
+const getWalletsForOwner = (owner) => {
+  if (walletsForOwner.has(owner)) {
+    return walletsForOwner.get(owner);
+  } else {
+    return [owner];
+  }
 };
 
 const setWalletsForOwner = (owner, wallets) => {
