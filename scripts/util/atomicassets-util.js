@@ -239,10 +239,21 @@ const getPayoutInformation = async (owner) => {
   resp.frozenAssetByTemplateMap = frozenAssetByTemplateMap;
   resp.unfrozenAssetByTemplateMap = unfrozenAssetByTemplateMap;
 
+  let frozenCount = 0;
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
-    assetUtil.thawAssetIfItIsTime(assetId);
+    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    if (isAssetFrozenFlag) {
+      frozenCount++;
+    }
+  }
+
+  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
+    const ownedCard = ownedCards[ownedCardIx];
+    const assetId = ownedCard.asset_id;
+    const rarity = ownedCard.data.rarity.toLowerCase();
+    assetUtil.thawAssetIfItIsTime(assetId, rarity, frozenCount);
     const templateId = ownedCard.template.template_id.toString();
     const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
@@ -264,7 +275,7 @@ const getPayoutInformation = async (owner) => {
     ownedAsset.assetId = assetId;
     ownedAsset.templateId = templateId;
     ownedAsset.frozen = isAssetFrozenFlag;
-    ownedAsset.thawTimeMs = assetUtil.getThawTimeMs(assetId);
+    ownedAsset.thawTimeMs = assetUtil.getThawTimeMs(assetId, rarity, frozenCount);
     ownedAssets.push(ownedAsset);
   }
   // loggingUtil.log(dateUtil.getDate(), 'ownedCards', ownedCards);

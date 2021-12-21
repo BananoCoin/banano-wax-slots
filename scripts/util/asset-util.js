@@ -65,11 +65,23 @@ const isAssetFrozen = (assetId) => {
   return fs.existsSync(assetFileNm);
 };
 
-const getThawTimeMs = (assetId) => {
+const getThawTimeMs = (assetId, rarity, cardCount) => {
+  /* istanbul ignore if */
+  if (assetId === undefined) {
+    throw new Error('assetId is required.');
+  };
+  /* istanbul ignore if */
+  if (rarity === undefined) {
+    throw new Error('rarity is required.');
+  };
+  /* istanbul ignore if */
+  if (cardCount === undefined) {
+    throw new Error('cardCount is required.');
+  };
   const assetFileNm = getAssetFileNm(assetId);
   if (fs.existsSync(assetFileNm)) {
     const {birthtimeMs} = fs.statSync(assetFileNm);
-    const thawTimeMs = birthtimeMs + config.thawTimeMs;
+    const thawTimeMs = birthtimeMs + getThawTimeByRarityMs(rarity, cardCount);
     const nowTimeMs = Date.now();
     const diffMs = thawTimeMs - nowTimeMs;
     // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
@@ -77,11 +89,46 @@ const getThawTimeMs = (assetId) => {
   }
 };
 
-const thawAssetIfItIsTime = (assetId) => {
+const getThawTimeByRarityMs = (rarity, cardCount) => {
+  /* istanbul ignore if */
+  if (rarity === undefined) {
+    throw new Error('rarity is required.');
+  };
+  /* istanbul ignore if */
+  if (cardCount === undefined) {
+    throw new Error('cardCount is required.');
+  };
+  const thawTimeByRarityMs = parseInt(config.thawTimeByRarityMs[rarity], 0);
+  let thawTime;
+  let fromRarity;
+  if (thawTimeByRarityMs <= 0) {
+    thawTime = config.thawTimeMs;
+    fromRarity = false;
+  } else {
+    thawTime = thawTimeByRarityMs;
+    fromRarity = true;
+  }
+
+  thawTime += cardCount * parseInt(config.thawTimeBonusPerCard, 10);
+
+  loggingUtil.log(dateUtil.getDate(), 'getThawTimeByRarityMs', 'rarity', rarity,
+      'fromRarity', fromRarity, 'thawTime', thawTime);
+  return thawTime;
+};
+
+const thawAssetIfItIsTime = (assetId, rarity, cardCount) => {
+  /* istanbul ignore if */
+  if (assetId === undefined) {
+    throw new Error('assetId is required.');
+  };
+  /* istanbul ignore if */
+  if (rarity === undefined) {
+    throw new Error('rarity is required.');
+  };
   const assetFileNm = getAssetFileNm(assetId);
   if (fs.existsSync(assetFileNm)) {
     const {birthtimeMs} = fs.statSync(assetFileNm);
-    const thawTimeMs = birthtimeMs + config.thawTimeMs;
+    const thawTimeMs = birthtimeMs + getThawTimeByRarityMs(rarity, cardCount);
     const nowTimeMs = Date.now();
     // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
     if (thawTimeMs < nowTimeMs) {

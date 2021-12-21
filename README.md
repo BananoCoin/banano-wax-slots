@@ -6,6 +6,4 @@
 
 ### todo
 
-1. add per-rarity cooldown.
-2. add per-cooldown-card cooldown.
-3. add rule: if number of active cards is less than house balance, scale back payments
+1. add rule: if number of active cards is less than house balance, scale back payments

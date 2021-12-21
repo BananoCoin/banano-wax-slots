@@ -473,7 +473,7 @@ const initWebServer = async () => {
       return;
     }
     const tokenRespJson = await toJson(tokenUrl, tokenRes);
-    loggingUtil.log('tokenRespJson', tokenRespJson);
+    loggingUtil.debug('tokenRespJson', tokenRespJson);
 
     const usernameUrl = config.cryptomonkeysConnect.username_api_url;
     const usernameRes = await fetch(usernameUrl, {
@@ -484,7 +484,7 @@ const initWebServer = async () => {
       },
     });
     const usernameRespJson = await toJson(usernameUrl, usernameRes);
-    loggingUtil.log(dateUtil.getDate(), 'callback', 'usernameRespJson', usernameRespJson);
+    loggingUtil.debug(dateUtil.getDate(), 'callback', 'usernameRespJson', usernameRespJson);
 
     atomicassetsUtil.setWalletsForOwner(usernameRespJson.user, usernameRespJson.wallets);
 
