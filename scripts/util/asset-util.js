@@ -111,7 +111,7 @@ const getThawTimeByRarityMs = (rarity, cardCount) => {
 
   thawTime += cardCount * parseInt(config.thawTimeBonusPerCard, 10);
 
-  loggingUtil.log(dateUtil.getDate(), 'getThawTimeByRarityMs', 'rarity', rarity,
+  loggingUtil.debug(dateUtil.getDate(), 'getThawTimeByRarityMs', 'rarity', rarity,
       'fromRarity', fromRarity, 'thawTime', thawTime);
   return thawTime;
 };

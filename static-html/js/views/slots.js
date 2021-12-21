@@ -417,7 +417,7 @@ const synchBetButtons = (selectedId) => {
         getSvgSlotMachineElementById(id).setAttribute('fill', 'yellow');
         getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
         const textElt = getSvgSlotMachineElementById(id+'-text');
-        const text = parseFloat(idAmounts[id]).toFixed(2);
+        const text = parseFloat(idAmounts[id]).toFixed(4);
         // console.log('synchBetButtons', textElt, text);
         textElt.textContent = text;
       });
@@ -1382,6 +1382,10 @@ const resetScoreText = async () => {
   if (idAmounts !== undefined) {
     const bet = idAmounts[betFromSvgId];
 
+    // console.log('bet', bet);
+    // console.log('cardData.payoutMultiplier', cardData.payoutMultiplier);
+    // console.log('cardData.betBonus', cardData.betBonus);
+
     const betLoss = bet;
     const betWin = (bet * cardData.payoutMultiplier) + cardData.betBonus;
     const chanceWin = cardData.cardCount / cardData.templateCount;
@@ -1389,15 +1393,15 @@ const resetScoreText = async () => {
     const expectedPctWin = 1 - expectedPctLoss;
     const expectedChanceToProfitPct = (betWin*expectedPctWin)/((betWin*expectedPctWin) + (betLoss*expectedPctLoss));
     const expectedValue = (betWin*expectedPctWin) - (betLoss*expectedPctLoss);
-    // console.log('betLoss', betLoss, 'expectedPctLoss', expectedPctLoss.toFixed(2));
-    // console.log('betWin', betWin, 'expectedPctWin', expectedPctWin.toFixed(2));
+    // console.log('betLoss', betLoss, 'expectedPctLoss', expectedPctLoss.toFixed(4));
+    // console.log('betWin', betWin, 'expectedPctWin', expectedPctWin.toFixed(4));
     // console.log('expectedChanceToProfitPct', expectedChanceToProfitPct);
     // console.log('expectedValue', expectedValue);
     const expectedPctWinStr = expectedPctWin * 100;
     const expectedChanceToProfitPctStr = expectedChanceToProfitPct * 100;
-    scoreText.push(`Multiplier:${cardData.payoutMultiplier} Bonus:${cardData.betBonus}  Payout:${betWin.toFixed(2)} `);
-    scoreText.push(`Chance To Win: ${expectedPctWinStr.toFixed(0)}% Exp Val:${expectedValue.toFixed(2)}`);
-    scoreText.push(`Expected Profit Chance:${expectedChanceToProfitPctStr.toFixed(2)}`);
+    scoreText.push(`Multiplier:${cardData.payoutMultiplier} Bonus:${cardData.betBonus.toFixed(4)}  Payout:${betWin.toFixed(4)} `);
+    scoreText.push(`Chance To Win: ${expectedPctWinStr.toFixed(0)}% Exp Val:${expectedValue.toFixed(4)}`);
+    scoreText.push(`Expected Profit Chance:${expectedChanceToProfitPctStr.toFixed(4)}`);
     if (expectedChanceToProfitPct > 0.5) {
       scoreText.push(`Good Odds:Yes`);
       goodOdds = true;
@@ -1544,7 +1548,7 @@ const setScore = (scoreText, fill, stroke) => {
   clear(scoreElt);
 
   if ((fill != undefined) && (stroke != undefined)) {
-    addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 285, 'height': 90, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
+    addChildSvgElement(scoreElt, 'rect', {'x': 107, 'y': 732, 'width': 330, 'height': 90, 'stroke': stroke, 'fill': fill, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '10'});
   }
 
   let y = 750;

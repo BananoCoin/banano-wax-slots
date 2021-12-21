@@ -21,14 +21,14 @@
   "maxPendingBananos": 10,
   "payoutMultiplier": 1.0,
   "referredByBonusPercent": 0.05,
-  "betBonus": 0.1,
+  "cappedHouseBalance": 10000,
+  "betBonusPct": 0.00001,
   "minBet": 0.0,
-  "maxBet": 1.0,
-  "bets": {
+  "betsPct": {
     "1ban": 0.0,
-    "5ban": 0.1,
-    "10ban": 0.5,
-    "50ban": 1.0
+    "5ban": 0.00001,
+    "10ban": 0.00005,
+    "50ban": 0.0001
   },
   "thawTimeByRarityMs": {
     "common": -1,

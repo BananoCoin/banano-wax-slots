@@ -207,6 +207,7 @@ const getActiveAccountCount = () => {
 
 module.exports.init = init;
 module.exports.deactivate = deactivate;
+module.exports.getBananoDecimalAmountAsRaw = bananojs.getBananoDecimalAmountAsRaw;
 module.exports.getRawStrFromBananoStr = bananojs.getRawStrFromBananoStr;
 module.exports.setBananodeApiUrl = bananojs.setBananodeApiUrl;
 module.exports.getBananoPartsFromRaw = bananojs.getBananoPartsFromRaw;

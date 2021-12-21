@@ -14,6 +14,7 @@ const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 const timedCacheUtil = require('../../util/timed-cache-util.js');
 
 // constants
+const PCT_SCALE = 100000;
 
 // variables
 
@@ -204,6 +205,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.scoreError = false;
   resp.templateCount = atomicassetsUtil.getTemplateCount();
   let won = false;
+  let maxBet = 0;
 
   const updateBalances = async () => {
     const houseAccountInfo = await bananojsCacheUtil.getAccountInfo(houseAccount, true);
@@ -219,6 +221,11 @@ const postWithoutCatch = async (context, req, res) => {
       resp.houseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.balance);
       resp.houseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.houseBalanceParts);
       resp.houseBalanceDecimal = await bananojsCacheUtil.getBananoPartsAsDecimal(resp.houseBalanceParts);
+      resp.betBonus = await getBetBonus(houseAccountInfo.cacheBalance);
+      resp.betBonus = parseFloat(resp.betBonus);
+
+      resp.bets = await getBets(houseAccountInfo.cacheBalance);
+      maxBet = await getMaxBet(houseAccountInfo.cacheBalance);
     }
     resp.cacheHouseBalanceParts = await bananojsCacheUtil.getBananoPartsFromRaw(houseAccountInfo.cacheBalance);
     resp.cacheHouseBalanceDescription = await bananojsCacheUtil.getBananoPartsDescription(resp.cacheHouseBalanceParts);
@@ -236,12 +243,13 @@ const postWithoutCatch = async (context, req, res) => {
 
   const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
   resp.payoutAmount = payoutInformation.payoutAmount;
+  resp.payoutAmount = parseFloat(resp.payoutAmount);
+
   resp.cardCount = payoutInformation.cardCount;
   resp.ownedAssets = payoutInformation.ownedAssets;
-  resp.payoutMultiplier = config.payoutMultiplier;
-  resp.betBonus = config.betBonus;
-  resp.bets = config.bets;
 
+  resp.payoutMultiplier = config.payoutMultiplier;
+  resp.payoutMultiplier = parseFloat(resp.payoutMultiplier);
 
   resp.unfrozenCardCount = 0;
   resp.ownedAssets.forEach((ownedAsset) => {
@@ -259,7 +267,7 @@ const postWithoutCatch = async (context, req, res) => {
   const minBet = parseFloat(config.minBet);
   if (resp.cacheBalanceDecimal < minBet) {
     play = false;
-    resp.score = [`Account balance too low.`, `Min balance:${minBet.toFixed(2)}`];
+    resp.score = [`Account balance too low.`, `Min balance:${minBet.toFixed(4)}`];
     resp.scoreError = true;
   }
   if (resp.houseAccountInfo.error) {
@@ -268,22 +276,25 @@ const postWithoutCatch = async (context, req, res) => {
     resp.scoreError = true;
   }
 
+  // loggingUtil.log(dateUtil.getDate(), 'resp.payoutAmount', resp.payoutAmount, 'resp.payoutMultiplier', resp.payoutMultiplier, 'resp.betBonus', resp.betBonus);
+
   if (play) {
     const houseBanano = parseInt(resp.cacheHouseBalanceParts[resp.cacheHouseBalanceParts.majorName], 10);
     const bet = parseFloat(req.body.bet);
-    const maxBet = parseFloat(config.maxBet);
-    const winPayment = ((resp.payoutAmount * bet * resp.payoutMultiplier) + resp.betBonus).toFixed(2);
+
+    const winPayment = ((resp.payoutAmount * bet * resp.payoutMultiplier) + resp.betBonus).toFixed(4);
+
     if (!Number.isFinite(bet)) {
       resp.score = [`Bad Bet '${req.body.bet}'`];
       resp.scoreError = true;
     } else if (bet > banano) {
-      resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano.toFixed(2)}'`];
+      resp.score = [`Low Balance. Bet '${bet}' greater than balance '${banano.toFixed(4)}'`];
       resp.scoreError = true;
     } else if (bet < minBet) {
-      resp.score = [`Min Bet ${minBet.toFixed(2)} Ban`];
+      resp.score = [`Min Bet ${minBet.toFixed(4)} Ban`];
       resp.scoreError = true;
     } else if (bet > maxBet) {
-      resp.score = [`Max Bet ${maxBet.toFixed(2)} Ban`];
+      resp.score = [`Max Bet ${maxBet.toFixed(4)} Ban`];
       resp.scoreError = true;
     } else if (winPayment > houseBanano) {
       resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];
@@ -430,6 +441,71 @@ const postWithoutCatch = async (context, req, res) => {
   // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
 
   res.send(resp);
+};
+
+const getPercentOfHouseBalanceAsDecimal = async (houseBalanceRaw, pct) => {
+  /* istanbul ignore if */
+  if (houseBalanceRaw === undefined) {
+    throw new Error('houseBalanceRaw is required.');
+  };
+  /* istanbul ignore if */
+  if (pct === undefined) {
+    throw new Error('pct is required.');
+  };
+
+  houseBalanceRaw = BigInt(houseBalanceRaw);
+
+  const cappedHouseBalanceRaw = BigInt(await bananojsCacheUtil.getBananoDecimalAmountAsRaw(parseFloat(config.cappedHouseBalance)));
+
+  // console.log('houseBalanceRaw1     ', houseBalanceRaw);
+  // console.log('cappedHouseBalanceRaw', cappedHouseBalanceRaw);
+  if (houseBalanceRaw > cappedHouseBalanceRaw) {
+    houseBalanceRaw = cappedHouseBalanceRaw;
+  }
+  // console.log('houseBalanceRaw2     ', houseBalanceRaw);
+
+  const scaleBi = BigInt(PCT_SCALE);
+  const per = BigInt(parseInt(parseFloat(pct) * PCT_SCALE, 10));
+  const raw = (houseBalanceRaw * BigInt(per)) / scaleBi;
+  const parts = await bananojsCacheUtil.getBananoPartsFromRaw(raw);
+
+  const rawBi = BigInt(parts.raw);
+  const stripPart = rawBi % BigInt(100);
+  const truncRaw = rawBi - stripPart;
+  parts.raw = truncRaw.toString();
+
+  // delete parts.raw;
+  const decimal = await bananojsCacheUtil.getBananoPartsAsDecimal(parts);
+  return decimal;
+};
+
+const getMaxBet = async (houseBalanceRaw) => {
+  const bets = await getBets(houseBalanceRaw);
+  const keys = [...Object.keys(bets)];
+  let maxBet = bets[keys[0]];
+  for (let ix = 1; ix < keys.length; ix++) {
+    const key = keys[ix];
+    const bet = bets[key];
+    maxBet = Math.max(maxBet, bet);
+  }
+  return (parseFloat(maxBet) * 1.01);
+};
+
+const getBets = async (houseBalanceRaw) => {
+  const bets = {};
+  const keys = [...Object.keys(config.betsPct)];
+  for (let ix = 0; ix < keys.length; ix++) {
+    const key = keys[ix];
+    const pct = config.betsPct[key];
+    const value = await getPercentOfHouseBalanceAsDecimal(houseBalanceRaw, pct);
+    bets[key] = value;
+  }
+  return bets;
+};
+
+const getBetBonus = async (houseBalanceRaw) => {
+  const betBonusDecimal = await getPercentOfHouseBalanceAsDecimal(houseBalanceRaw, config.betBonusPct);
+  return betBonusDecimal;
 };
 
 const logWin = (owner, account, bet, winPayment) => {

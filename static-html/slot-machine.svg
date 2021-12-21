@@ -30,21 +30,21 @@
       <text x="300" y="297" font-family="impact" font-size="16" stroke="cyan" fill="black" pointer-events="none" text-anchor="middle">Balance</text>
       <text x="300" y="323" font-family="impact" font-size="20" stroke="none" fill="cyan" pointer-events="none" id="accountCacheBalance" text-anchor="middle"></text>
     </g>
-    <g id="score_group" transform="translate(190,30)">
-      <rect x="109" y="733" width="280" height="90" fill="none" stroke="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="10.9"/>
+    <g id="score_group" transform="translate(170,30)">
+      <rect x="109" y="733" width="330" height="90" fill="cyan" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
       <g id="score"></g>
     </g>
 
-    <g transform="translate(300,183)" stroke="#5b5b5b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
-      <rect x="230" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" id="50ban"/>
-      <rect x="160" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" id="10ban"/>
-      <rect x="90" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" id="5ban"/>
-      <rect x="20" y="411.07" width="40" height="29.497" ry="1.0093" fill="#7b7b7b" id="1ban"/>
+    <g transform="translate(290,183)" stroke="#5b5b5b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+      <rect x="230" y="411.07" width="60" height="29.497" ry="1.0093" fill="#7b7b7b" id="50ban"/>
+      <rect x="160" y="411.07" width="60" height="29.497" ry="1.0093" fill="#7b7b7b" id="10ban"/>
+      <rect x="90" y="411.07" width="60" height="29.497" ry="1.0093" fill="#7b7b7b" id="5ban"/>
+      <rect x="20" y="411.07" width="60" height="29.497" ry="1.0093" fill="#7b7b7b" id="1ban"/>
       <g stroke-width="1">
-        <text x="250" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="50ban-text" text-anchor="middle">?</text>
-        <text x="180" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="10ban-text" text-anchor="middle">?</text>
-        <text x="110" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="5ban-text" text-anchor="middle">?</text>
-        <text x="40" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="1ban-text" text-anchor="middle">?</text>
+        <text x="260" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="50ban-text" text-anchor="middle">?</text>
+        <text x="190" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="10ban-text" text-anchor="middle">?</text>
+        <text x="120" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="5ban-text" text-anchor="middle">?</text>
+        <text x="50" y="432" font-family="monospace" font-size="14" font-weight="bold" stroke="black" fill="black" pointer-events="none" id="1ban-text" text-anchor="middle">?</text>
       </g>
     </g>
     <g id="playArm">
