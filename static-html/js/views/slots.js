@@ -999,6 +999,11 @@ const addCards = async () => {
   const referralLinkElt = document.querySelector('#referralLink');
   referralLinkElt.href = `?referredBy=${window.localStorage.owner}`;
 
+  if (cardData.withdrawAccount !== undefined) {
+    const withdrawAccountElt = document.querySelector('#withdrawAccount');
+    withdrawAccountElt.value = cardData.withdrawAccount;
+  }
+
   const card1Elt = getSvgSlotMachineElementById('card1');
   const card2Elt = getSvgSlotMachineElementById('card2');
   const card3Elt = getSvgSlotMachineElementById('card3');
@@ -1276,11 +1281,17 @@ const getOwnedAssetHtml = (ownedAsset) => {
   return ownedAssetsHtml;
 };
 
-const asOrderedList = (list) => {
+const asOrderedList = (list, checkList) => {
   let html = '<ol>';
   for (let ix = 0; ix < list.length; ix++) {
+    const elt = list[ix];
     html += '<li>';
-    html += list[ix];
+    html += elt;
+    if (checkList.includes(elt)) {
+      html += '(withdrew)';
+    } else {
+      html += '(dormant)';
+    }
     html += '</li>';
   }
   html += '</ol>';
@@ -1365,7 +1376,7 @@ const resetScoreText = async () => {
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
-  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList);
+  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList, cardData.ownersWithAccountsList);
 
   document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;
 

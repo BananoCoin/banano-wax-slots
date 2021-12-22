@@ -8,6 +8,7 @@
   "logsDataDir": "data/logs",
   "assetDataDir": "data/frozenAssets",
   "bananojsCacheDataDir": "data/bananojsCache",
+  "bananoWalletDataDir": "data/bananoWallet",
   "burnAccount": "bananobanano",
   "centralWalletReceivePendingIntervalMs": 10000,
   "centralWalletReceivePendingLoggingOn": false,

@@ -12,6 +12,7 @@ const assetUtil = require('../../util/asset-util.js');
 const atomicassetsUtil = require('../../util/atomicassets-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 const timedCacheUtil = require('../../util/timed-cache-util.js');
+const ownerAccountUtil = require('../../util/owner-account-util.js');
 
 // constants
 const PCT_SCALE = 100000;
@@ -44,8 +45,8 @@ const init = async (_config, _loggingUtil) => {
   setInterval(centralAccountReceivePending, config.centralWalletReceivePendingIntervalMs);
 
 
-  if (!fs.existsSync(config.logsDataDir)) {
-    fs.mkdirSync(config.logsDataDir, {recursive: true});
+  if (!fs.existsSync(config.bananoWalletDataDir)) {
+    fs.mkdirSync(config.bananoWalletDataDir, {recursive: true});
   }
 };
 
@@ -188,6 +189,7 @@ const postWithoutCatch = async (context, req, res) => {
     return;
   }
 
+
   const seed = seedUtil.getSeedFromOwner(owner);
   // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
@@ -204,6 +206,12 @@ const postWithoutCatch = async (context, req, res) => {
   resp.score = ['No Current Bet.', 'Press the \'Play\' button to continue.'];
   resp.scoreError = false;
   resp.templateCount = atomicassetsUtil.getTemplateCount();
+
+  const withdrawAccount = await ownerAccountUtil.loadOwnerAccount(owner);
+  if (withdrawAccount !== undefined) {
+    resp.withdrawAccount = withdrawAccount;
+  }
+
   let won = false;
   let maxBet = 0;
 
@@ -427,6 +435,7 @@ const postWithoutCatch = async (context, req, res) => {
       }
     }
   }
+  resp.ownersWithAccountsList = await ownerAccountUtil.getOwnersWithAccountsList();
   resp.activeWaxUserList = atomicassetsUtil.getActiveAccountList();
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();

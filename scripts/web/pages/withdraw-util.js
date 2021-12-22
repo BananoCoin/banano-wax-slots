@@ -1,12 +1,14 @@
 'use strict';
+
 // libraries
+const bananojs = require('@bananocoin/bananojs');
 
 // modules
 const dateUtil = require('../../util/date-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 const seedUtil = require('../../util/seed-util.js');
 const nonceUtil = require('../../util/nonce-util.js');
-const bananojs = require('@bananocoin/bananojs');
+const ownerAccountUtil = require('../../util/owner-account-util.js');
 
 // constants
 
@@ -54,7 +56,7 @@ const post = async (context, req, res) => {
 };
 
 const postWithoutCatch = async (context, req, res) => {
-  loggingUtil.log(dateUtil.getDate(), 'STARTED withdraw');
+  console.log(dateUtil.getDate(), 'STARTED withdraw', config.disableWithdraw);
 
   if (config.disableWithdraw) {
     const resp = {};
@@ -141,8 +143,12 @@ const postWithoutCatch = async (context, req, res) => {
       resp.success = false;
     }
     // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
-    res.send(resp);
+
+    await ownerAccountUtil.saveOwnerAccount(owner, account);
+
     loggingUtil.log(dateUtil.getDate(), 'SUCCESS withdraw', 'owner', owner, 'account', account, 'amount', amount, message);
+
+    res.send(resp);
   } catch (error) {
     const resp = {};
     resp.message = `error '${error.message}'`;
