@@ -436,6 +436,17 @@ const postWithoutCatch = async (context, req, res) => {
     }
   }
   resp.ownersWithAccountsList = await ownerAccountUtil.getOwnersWithAccountsList();
+
+  resp.ownersEligibleForGiveawayList = [];
+  for (let ix = 0; ix < resp.ownersWithAccountsList.length; ix++) {
+    const ownerWithAccount = resp.ownersWithAccountsList[ix];
+    const isOwnerEligibleForGiveawayFlag = await atomicassetsUtil.isOwnerEligibleForGiveaway(ownerWithAccount);
+    if (isOwnerEligibleForGiveawayFlag) {
+      resp.ownersEligibleForGiveawayList.push(ownerWithAccount);
+    }
+  }
+
+
   resp.activeWaxUserList = atomicassetsUtil.getActiveAccountList();
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();

@@ -999,9 +999,11 @@ const addCards = async () => {
   const referralLinkElt = document.querySelector('#referralLink');
   referralLinkElt.href = `?referredBy=${window.localStorage.owner}`;
 
-  if (cardData.withdrawAccount !== undefined) {
-    const withdrawAccountElt = document.querySelector('#withdrawAccount');
-    withdrawAccountElt.value = cardData.withdrawAccount;
+  if (cardData !== undefined) {
+    if (cardData.withdrawAccount !== undefined) {
+      const withdrawAccountElt = document.querySelector('#withdrawAccount');
+      withdrawAccountElt.value = cardData.withdrawAccount;
+    }
   }
 
   const card1Elt = getSvgSlotMachineElementById('card1');
@@ -1281,20 +1283,29 @@ const getOwnedAssetHtml = (ownedAsset) => {
   return ownedAssetsHtml;
 };
 
-const asOrderedList = (list, checkList) => {
-  let html = '<ol>';
+const asOrderedList = (list, activeCheckList, giveawayCheckList) => {
+  let eligibleHtml = '<h4>Elgible for Giveaway</h4><ol>';
+  let ineligibleHtml = '<h4>Inelgible for Giveaway</h4><ol>';
   for (let ix = 0; ix < list.length; ix++) {
     const elt = list[ix];
+    let html = '';
     html += '<li>';
     html += elt;
-    if (checkList.includes(elt)) {
+    if (activeCheckList.includes(elt)) {
       html += '(withdrew)';
     } else {
       html += '(dormant)';
     }
     html += '</li>';
+    if (activeCheckList.includes(elt) && giveawayCheckList.includes(elt)) {
+      eligibleHtml += html;
+    } else {
+      ineligibleHtml += html;
+    }
   }
-  html += '</ol>';
+  eligibleHtml += '</ol>';
+  ineligibleHtml += '</ol>';
+  const html = eligibleHtml + ineligibleHtml;
   return html;
 };
 
@@ -1376,7 +1387,7 @@ const resetScoreText = async () => {
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
-  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList, cardData.ownersWithAccountsList);
+  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList, cardData.ownersWithAccountsList, cardData.ownersEligibleForGiveawayList);
 
   document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;
 

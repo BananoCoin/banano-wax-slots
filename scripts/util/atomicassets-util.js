@@ -183,6 +183,25 @@ const hasOwnedCards = async (owner) => {
   return false;
 };
 
+const isOwnerEligibleForGiveaway = async (owner) => {
+  // is owner frozen card count over the config.minGiveawayBetCount
+  // isOwnerFrozenCardCountOverMinGiveawayBetCount
+  const ownedCards = await getOwnedCards(owner);
+  let frozenCount = 0;
+  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
+    const ownedCard = ownedCards[ownedCardIx];
+    const assetId = ownedCard.asset_id;
+    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    if (isAssetFrozenFlag) {
+      frozenCount++;
+    }
+    if (frozenCount >= config.minGiveawayBetCount) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const getTotalActiveCardCount = () => {
   return timedCacheUtil.getCacheSize(ownerAssetCacheMap);
 };
@@ -346,3 +365,4 @@ module.exports.getTemplates = getTemplates;
 module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
 module.exports.getActiveAccountList = getActiveAccountList;
 module.exports.setWalletsForOwner = setWalletsForOwner;
+module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
