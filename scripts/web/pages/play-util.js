@@ -14,9 +14,6 @@ const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 const timedCacheUtil = require('../../util/timed-cache-util.js');
 const ownerAccountUtil = require('../../util/owner-account-util.js');
 
-// constants
-const PCT_SCALE = 100000;
-
 // variables
 
 /* eslint-disable no-unused-vars */
@@ -488,18 +485,22 @@ const getPercentOfHouseBalanceAsDecimal = async (houseBalanceRaw, pct) => {
   }
   // console.log('houseBalanceRaw2     ', houseBalanceRaw);
 
-  const scaleBi = BigInt(PCT_SCALE);
-  const per = BigInt(parseInt(parseFloat(pct) * PCT_SCALE, 10));
+  pct = parseFloat(pct);
+
+  const pctLength = pct.toString().length;
+  const pctScale = '1' + ('0'.repeat(pctLength));
+
+  const scaleBi = BigInt(pctScale);
+  const per = BigInt(parseInt(parseFloat(pct) * parseInt(pctScale, 10), 10));
   const raw = (houseBalanceRaw * BigInt(per)) / scaleBi;
   const parts = await bananojsCacheUtil.getBananoPartsFromRaw(raw);
 
-  const rawBi = BigInt(parts.raw);
-  const stripPart = rawBi % BigInt(100);
-  const truncRaw = rawBi - stripPart;
-  parts.raw = truncRaw.toString();
-
   // delete parts.raw;
   const decimal = await bananojsCacheUtil.getBananoPartsAsDecimal(parts);
+  // console.log('houseBalanceRaw ', houseBalanceRaw);
+  // console.log('pct             ', pct);
+  // console.log('pctScale        ', pctScale);
+  // console.log('decimal         ', decimal);
   return decimal;
 };
 
