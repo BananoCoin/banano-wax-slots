@@ -40,6 +40,7 @@ const deactivate = async () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
+  mutex = undefined;
   /* eslint-enable no-unused-vars */
 };
 

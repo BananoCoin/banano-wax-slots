@@ -1177,7 +1177,9 @@ const getFrozenHistogramHtml = (ownedAssets) => {
   for (let ix = 0; ix < ownedAssets.length; ix++) {
     const ownedAsset = ownedAssets[ix];
     if (ownedAsset.thawTimeMs !== undefined) {
-      const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000));
+      const thawTimeDiff = ownedAsset.thawTimeMs -  Date.now();
+      // console.log('getFrozenHistogramHtml', ownedAsset, thawTimeDiff);
+      const thawTimeHours = (thawTimeDiff / (60*60*1000));
       if (thawTimeHours > maxThawTimeHours) {
         maxThawTimeHours = thawTimeHours;
       }
@@ -1274,7 +1276,8 @@ const getOwnedAssetHtml = (ownedAsset) => {
 
   if (ownedAsset.thawTimeMs !== undefined) {
     if (ownedAsset.thawTimeMs > 0) {
-      const thawTimeHours = (ownedAsset.thawTimeMs / (60*60*1000)).toFixed(3);
+      const thawTimeDiff = ownedAsset.thawTimeMs -  Date.now();
+      const thawTimeHours = (thawTimeDiff / (60*60*1000)).toFixed(3);
       ownedAssetsHtml += ` Thaw Time:${thawTimeHours} Hours`;
     }
   }

@@ -56,6 +56,7 @@ const deactivate = () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
+  mutex = undefined;
   /* eslint-enable no-unused-vars */
   waxApi = undefined;
   templates.length = 0;
@@ -98,18 +99,18 @@ const addAllTemplates = async () => {
 
       for (let pageTemplateIx = 0; pageTemplateIx < pageTemplates.length; pageTemplateIx++) {
         const pageTemplate = pageTemplates[pageTemplateIx];
-        // loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates pageTemplate', pageTemplate);
-        const pageTemplateData = {};
-        pageTemplateData.template_id = pageTemplate.template_id;
-        pageTemplateData.schema_name = pageTemplate.schema.schema_name;
-        pageTemplateData.name = pageTemplate.immutable_data.name;
-        pageTemplateData.img = pageTemplate.immutable_data.img;
-        pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
-        pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply, 10);
-        pageTemplateData.max_supply = parseInt(pageTemplate.max_supply, 10);
-
-        if (!excludedTemplateSet.has(pageTemplateData.template_id)) {
-          if (includedSchemaSet.has(pageTemplateData.schema_name)) {
+        if (!excludedTemplateSet.has(pageTemplate.template_id)) {
+          if (includedSchemaSet.has(pageTemplate.schema.schema_name)) {
+            // loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates pageTemplate', pageTemplate);
+            const pageTemplateData = {};
+            pageTemplateData.template_id = pageTemplate.template_id;
+            pageTemplateData.schema_name = pageTemplate.schema.schema_name;
+            pageTemplateData.name = pageTemplate.immutable_data.name;
+            pageTemplateData.img = pageTemplate.immutable_data.img;
+            pageTemplateData.backimg = pageTemplate.immutable_data.backimg;
+            pageTemplateData.issued_supply = parseInt(pageTemplate.issued_supply, 10);
+            pageTemplateData.max_supply = parseInt(pageTemplate.max_supply, 10);
+            pageTemplateData.rarity = pageTemplate.immutable_data.rarity.toLowerCase();
             // loggingUtil.log(dateUtil.getDate(), 'SUCCESS addTemplates pageTemplateData', pageTemplateData);
             templates.push(pageTemplateData);
           }
@@ -200,7 +201,7 @@ const isOwnerEligibleForGiveaway = async (owner) => {
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
-    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    const isAssetFrozenFlag = await assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
       frozenCount++;
     }
@@ -259,7 +260,7 @@ const getFrozenCount = async (ownedCards) => {
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
-    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    const isAssetFrozenFlag = await assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
       frozenCount++;
     }
@@ -271,8 +272,7 @@ const thawOwnerAssetsIfItIsTime = async (ownedCards, frozenCount) => {
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
-    const rarity = ownedCard.data.rarity.toLowerCase();
-    assetUtil.thawAssetIfItIsTime(assetId, rarity, frozenCount);
+    await assetUtil.thawAssetIfItIsTime(assetId);
   }
 };
 
@@ -296,9 +296,8 @@ const getPayoutInformation = async (owner) => {
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
-    const rarity = ownedCard.data.rarity.toLowerCase();
     const templateId = ownedCard.template.template_id.toString();
-    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    const isAssetFrozenFlag = await assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
       if (frozenAssetByTemplateMap[templateId] === undefined) {
         frozenAssetByTemplateMap[templateId] = [];
@@ -318,7 +317,7 @@ const getPayoutInformation = async (owner) => {
     ownedAsset.assetId = assetId;
     ownedAsset.templateId = templateId;
     ownedAsset.frozen = isAssetFrozenFlag;
-    ownedAsset.thawTimeMs = assetUtil.getThawTimeMs(assetId, rarity, frozenCount);
+    ownedAsset.thawTimeMs = await assetUtil.getThawTimeMs(assetId);
     ownedAssets.push(ownedAsset);
   }
   // loggingUtil.log(dateUtil.getDate(), 'ownedCards', ownedCards);

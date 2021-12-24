@@ -41,7 +41,7 @@
     "epic": 28800,
     "legendary": 2880
   },
-  "thawTimeBonusPerCard": 60000,
+  "thawTimeBonusPerCardMs": 60000,
   "thawTimeMs": 28800000,
   "activeTimeMs": 28800000,
   "walletSeedIx": 0,

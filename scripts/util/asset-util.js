@@ -2,6 +2,7 @@
 // libraries
 const fs = require('fs');
 const path = require('path');
+const awaitSemaphore = require('await-semaphore');
 
 // modules
 const dateUtil = require('./date-util.js');
@@ -13,6 +14,7 @@ const DEBUG = false;
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
+let mutex;
 /* eslint-enable no-unused-vars */
 
 // functions
@@ -27,6 +29,7 @@ const init = (_config, _loggingUtil, _seed, _entropyList) => {
   };
   config = _config;
   loggingUtil = _loggingUtil;
+  mutex = new awaitSemaphore.Mutex();
 
   if (!fs.existsSync(config.assetDataDir)) {
     fs.mkdirSync(config.assetDataDir, {recursive: true});
@@ -37,6 +40,7 @@ const deactivate = () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
+  mutex = undefined;
   /* eslint-enable no-unused-vars */
 };
 
@@ -49,43 +53,68 @@ const getAssetFileNm = (assetId) => {
   return assetFileNm;
 };
 
-const freezeAsset = (assetId) => {
-  const assetFileNm = getAssetFileNm(assetId);
-  if (!fs.existsSync(assetFileNm)) {
-    if (DEBUG) {
-      loggingUtil.log(dateUtil.getDate(), 'freezing asset', assetId);
-    }
-    const assetFile = fs.openSync(assetFileNm, 'w');
-    fs.closeSync(assetFile);
-  }
-};
-
-const isAssetFrozen = (assetId) => {
-  const assetFileNm = getAssetFileNm(assetId);
-  return fs.existsSync(assetFileNm);
-};
-
-const getThawTimeMs = (assetId, rarity, cardCount) => {
+const freezeAsset = async (assetId, thawTimeMs) => {
   /* istanbul ignore if */
   if (assetId === undefined) {
     throw new Error('assetId is required.');
   };
   /* istanbul ignore if */
-  if (rarity === undefined) {
-    throw new Error('rarity is required.');
+  if (thawTimeMs === undefined) {
+    throw new Error('thawTimeMs is required.');
   };
+  const mutexRelease = await mutex.acquire();
+  try {
+    const assetFileNm = getAssetFileNm(assetId);
+    if (!fs.existsSync(assetFileNm)) {
+      if (DEBUG) {
+        loggingUtil.log(dateUtil.getDate(), 'freezing asset', assetId);
+      }
+      const filePtr = fs.openSync(assetFileNm, 'w');
+      fs.writeSync(filePtr, JSON.stringify({thawTimeMs: thawTimeMs}));
+      fs.closeSync(filePtr);
+    }
+  } finally {
+    mutexRelease();
+  }
+};
+
+const isAssetFrozen = async (assetId) => {
+  const mutexRelease = await mutex.acquire();
+  try {
+    const assetFileNm = getAssetFileNm(assetId);
+    return fs.existsSync(assetFileNm);
+  } finally {
+    mutexRelease();
+  }
+};
+
+const getThawTimeMsInMutex = (assetId) => {
+  const file = getAssetFileNm(assetId);
+  if (fs.existsSync(file)) {
+    const {birthtimeMs} = fs.statSync(file);
+    const data = fs.readFileSync(file, 'UTF-8');
+    if (data.length == 0) {
+      return birthtimeMs;
+    }
+    const json = JSON.parse(data);
+    const thawTimeMs = birthtimeMs + json.thawTimeMs;
+
+    // loggingUtil.log(dateUtil.getDate(), 'getThawTimeMsInMutex', 'assetId', assetId,
+    // 'birthtimeMs', birthtimeMs, 'json.thawTimeMs', json.thawTimeMs, 'thawTimeMs', thawTimeMs);
+    return thawTimeMs;
+  }
+};
+
+const getThawTimeMs = async (assetId) => {
   /* istanbul ignore if */
-  if (cardCount === undefined) {
-    throw new Error('cardCount is required.');
+  if (assetId === undefined) {
+    throw new Error('assetId is required.');
   };
-  const assetFileNm = getAssetFileNm(assetId);
-  if (fs.existsSync(assetFileNm)) {
-    const {birthtimeMs} = fs.statSync(assetFileNm);
-    const thawTimeMs = birthtimeMs + getThawTimeByRarityMs(rarity, cardCount);
-    const nowTimeMs = Date.now();
-    const diffMs = thawTimeMs - nowTimeMs;
-    // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
-    return diffMs;
+  const mutexRelease = await mutex.acquire();
+  try {
+    return getThawTimeMsInMutex(assetId);
+  } finally {
+    mutexRelease();
   }
 };
 
@@ -109,42 +138,49 @@ const getThawTimeByRarityMs = (rarity, cardCount) => {
     fromRarity = true;
   }
 
-  thawTime += Math.ceil(Math.sqrt(cardCount)) * parseInt(config.thawTimeBonusPerCard, 10);
+  const fromCardCount = Math.ceil(Math.sqrt(cardCount)) * parseInt(config.thawTimeBonusPerCardMs, 10);
+  thawTime += fromCardCount;
 
   loggingUtil.debug(dateUtil.getDate(), 'getThawTimeByRarityMs', 'rarity', rarity,
-      'fromRarity', fromRarity, 'thawTime', thawTime);
+      'fromRarity', fromRarity, 'fromCardCount', fromCardCount, 'thawTime', thawTime);
   return thawTime;
 };
 
-const thawAssetIfItIsTime = (assetId, rarity, cardCount) => {
+const thawAssetIfItIsTime = async (assetId) => {
   /* istanbul ignore if */
   if (assetId === undefined) {
     throw new Error('assetId is required.');
   };
-  /* istanbul ignore if */
-  if (rarity === undefined) {
-    throw new Error('rarity is required.');
-  };
-  const assetFileNm = getAssetFileNm(assetId);
-  if (fs.existsSync(assetFileNm)) {
-    const {birthtimeMs} = fs.statSync(assetFileNm);
-    const thawTimeMs = birthtimeMs + getThawTimeByRarityMs(rarity, cardCount);
-    const nowTimeMs = Date.now();
-    // loggingUtil.log(dateUtil.getDate(), 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs);
-    if (thawTimeMs < nowTimeMs) {
-      if (DEBUG) {
-        loggingUtil.log(dateUtil.getDate(), 'thawing asset', assetId);
+  const mutexRelease = await mutex.acquire();
+  try {
+    const thawTimeMs = getThawTimeMsInMutex(assetId);
+    if (thawTimeMs !== undefined) {
+      const nowTimeMs = Date.now();
+      // const diffMs = nowTimeMs - thawTimeMs;
+      // loggingUtil.log(dateUtil.getDate(), 'thawAssetIfItIsTime', 'thawTimeMs', thawTimeMs, 'nowTimeMs', nowTimeMs, 'diffMs', diffMs);
+      if (thawTimeMs < nowTimeMs) {
+        if (DEBUG) {
+          loggingUtil.log(dateUtil.getDate(), 'thawing asset', assetId);
+        }
+        const file = getAssetFileNm(assetId);
+        fs.unlinkSync(file);
       }
-      fs.unlinkSync(assetFileNm);
     }
+  } finally {
+    mutexRelease();
   }
 };
 
-const getTotalFrozenAssetCount = () => {
-  if (fs.existsSync(config.assetDataDir)) {
-    return fs.readdirSync(config.assetDataDir).length;
-  } else {
-    return 0;
+const getTotalFrozenAssetCount = async () => {
+  const mutexRelease = await mutex.acquire();
+  try {
+    if (fs.existsSync(config.assetDataDir)) {
+      return fs.readdirSync(config.assetDataDir).length;
+    } else {
+      return 0;
+    }
+  } finally {
+    mutexRelease();
   }
 };
 
@@ -155,3 +191,4 @@ module.exports.freezeAsset = freezeAsset;
 module.exports.getThawTimeMs = getThawTimeMs;
 module.exports.thawAssetIfItIsTime = thawAssetIfItIsTime;
 module.exports.getTotalFrozenAssetCount = getTotalFrozenAssetCount;
+module.exports.getThawTimeByRarityMs = getThawTimeByRarityMs;

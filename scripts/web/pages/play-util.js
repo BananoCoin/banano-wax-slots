@@ -257,8 +257,11 @@ const postWithoutCatch = async (context, req, res) => {
   resp.payoutMultiplier = parseFloat(resp.payoutMultiplier);
 
   resp.unfrozenCardCount = 0;
+  resp.frozenCardCount = 0;
   resp.ownedAssets.forEach((ownedAsset) => {
-    if (!ownedAsset.frozen) {
+    if (ownedAsset.frozen) {
+      resp.frozenCardCount++;
+    } else {
       resp.unfrozenCardCount++;
     }
   });
@@ -377,7 +380,10 @@ const postWithoutCatch = async (context, req, res) => {
           const assets = payoutInformation.unfrozenAssetByTemplateMap[card.template_id];
           if (assets !== undefined) {
             const assetId = assets[0];
-            assetUtil.freezeAsset(assetId);
+            const rarity = card.rarity;
+            const cardCount = resp.frozenCardCount;
+            const thawTimeMs = await assetUtil.getThawTimeByRarityMs(rarity, cardCount);
+            await assetUtil.freezeAsset(assetId, thawTimeMs);
 
             resp.ownedAssets.forEach((ownedAsset) => {
               if (ownedAsset.assetId == assetId) {
@@ -452,7 +458,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
-  resp.totalFrozenCards = assetUtil.getTotalFrozenAssetCount();
+  resp.totalFrozenCards = await assetUtil.getTotalFrozenAssetCount();
   resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
   resp.totalWinsSinceRestart = totalWinsSinceRestart;
   resp.totalLossesSinceRestart = totalLossesSinceRestart;

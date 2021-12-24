@@ -41,6 +41,7 @@ const deactivate = () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
+  mutex = undefined;
   /* eslint-enable no-unused-vars */
   trackedSeedSet.clear();
   trackedAccountSet.clear();
