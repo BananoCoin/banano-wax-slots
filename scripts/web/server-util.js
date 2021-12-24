@@ -486,7 +486,7 @@ const initWebServer = async () => {
     const usernameRespJson = await toJson(usernameUrl, usernameRes);
     loggingUtil.debug(dateUtil.getDate(), 'callback', 'usernameRespJson', usernameRespJson);
 
-    atomicassetsUtil.setWalletsForOwner(usernameRespJson.user, usernameRespJson.wallets);
+    await atomicassetsUtil.saveWalletsForOwner(usernameRespJson.user, usernameRespJson.wallets);
 
     let redirectUrl = '/';
     if (usernameRespJson.success) {

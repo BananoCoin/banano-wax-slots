@@ -3,6 +3,8 @@
 const fetch = require('node-fetch');
 const {ExplorerApi} = require('atomicassets');
 const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 const request = require('request');
 const sharp = require('sharp');
 
@@ -10,7 +12,7 @@ const sharp = require('sharp');
 const assetUtil = require('./asset-util.js');
 const dateUtil = require('./date-util.js');
 const timedCacheUtil = require('./timed-cache-util.js');
-const walletsForOwner = new Map();
+const awaitSemaphore = require('await-semaphore');
 
 // constants
 
@@ -21,6 +23,7 @@ let loggingUtil;
 let waxApi;
 const templates = [];
 let ready = false;
+let mutex;
 /* eslint-enable no-unused-vars */
 
 const ownerAssetCacheMap = new Map();
@@ -41,6 +44,11 @@ const init = (_config, _loggingUtil) => {
   loggingUtil = _loggingUtil;
 
   ready = false;
+
+  mutex = new awaitSemaphore.Mutex();
+  if (!fs.existsSync(config.ownerWalletDataDir)) {
+    fs.mkdirSync(config.ownerWalletDataDir, {recursive: true});
+  }
   setTimeout(setWaxApiAndAddTemplates, 0);
 };
 
@@ -160,6 +168,7 @@ const cacheAllCardImages = async () => {
   }
   ready = true;
   loggingUtil.log(dateUtil.getDate(), 'SUCCESS cacheAllCardImages');
+  setTimeout(thawAllAssetsIfItIsTime, 0);
 };
 
 const getTemplateCount = () => {
@@ -171,7 +180,7 @@ const getAssetOptions = (owner) => {
 };
 
 const hasOwnedCards = async (owner) => {
-  const wallets = getWalletsForOwner(owner);
+  const wallets = await loadWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
@@ -196,6 +205,7 @@ const isOwnerEligibleForGiveaway = async (owner) => {
       frozenCount++;
     }
     if (frozenCount >= config.minGiveawayBetCount) {
+      // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveaway', true, frozenCount, '>=', config.minGiveawayBetCount);
       return true;
     }
   }
@@ -216,7 +226,7 @@ const getOwnedCards = async (owner) => {
 
 const getOwnedCardsToCache = async (owner) => {
   const allAssets = [];
-  const wallets = getWalletsForOwner(owner);
+  const wallets = await loadWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
@@ -244,6 +254,28 @@ const getOwnedCardsToCache = async (owner) => {
   return allAssets;
 };
 
+const getFrozenCount = async (ownedCards) => {
+  let frozenCount = 0;
+  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
+    const ownedCard = ownedCards[ownedCardIx];
+    const assetId = ownedCard.asset_id;
+    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
+    if (isAssetFrozenFlag) {
+      frozenCount++;
+    }
+  }
+  return frozenCount;
+};
+
+const thawOwnerAssetsIfItIsTime = async (ownedCards, frozenCount) => {
+  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
+    const ownedCard = ownedCards[ownedCardIx];
+    const assetId = ownedCard.asset_id;
+    const rarity = ownedCard.data.rarity.toLowerCase();
+    assetUtil.thawAssetIfItIsTime(assetId, rarity, frozenCount);
+  }
+};
+
 const getPayoutInformation = async (owner) => {
   const resp = {};
   resp.cardCount = 0;
@@ -258,21 +290,13 @@ const getPayoutInformation = async (owner) => {
   resp.frozenAssetByTemplateMap = frozenAssetByTemplateMap;
   resp.unfrozenAssetByTemplateMap = unfrozenAssetByTemplateMap;
 
-  let frozenCount = 0;
-  for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
-    const ownedCard = ownedCards[ownedCardIx];
-    const assetId = ownedCard.asset_id;
-    const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
-    if (isAssetFrozenFlag) {
-      frozenCount++;
-    }
-  }
+  const frozenCount = await getFrozenCount(ownedCards);
+  await thawOwnerAssetsIfItIsTime(ownedCards, frozenCount);
 
   for (let ownedCardIx = 0; ownedCardIx < ownedCards.length; ownedCardIx++) {
     const ownedCard = ownedCards[ownedCardIx];
     const assetId = ownedCard.asset_id;
     const rarity = ownedCard.data.rarity.toLowerCase();
-    assetUtil.thawAssetIfItIsTime(assetId, rarity, frozenCount);
     const templateId = ownedCard.template.template_id.toString();
     const isAssetFrozenFlag = assetUtil.isAssetFrozen(assetId);
     if (isAssetFrozenFlag) {
@@ -342,7 +366,32 @@ const getActiveAccountList = () => {
   return [...ownerAssetCacheMap.keys()];
 };
 
-const getWalletsForOwner = (owner) => {
+const getOwnerFile = (owner) => {
+  if (owner === undefined) {
+    throw new Error('account is required.');
+  };
+
+  const seedHash = crypto.createHash('sha256')
+      .update(`${owner}`)
+      .digest();
+  const fileNm = seedHash.toString('hex') + '.json';
+
+  return path.join(config.ownerWalletDataDir, fileNm);
+};
+
+const loadWalletsForOwner = async (owner) => {
+  const mutexRelease = await mutex.acquire();
+  try {
+    const file = getOwnerFile(owner);
+    if (!fs.existsSync(file)) {
+      saveWalletsForOwnerInsideMutex(owner, [owner]);
+    }
+    const data = fs.readFileSync(file, 'UTF-8');
+    const json = JSON.parse(data);
+    return json.wallets;
+  } finally {
+    mutexRelease();
+  }
   if (walletsForOwner.has(owner)) {
     return walletsForOwner.get(owner);
   } else {
@@ -350,8 +399,52 @@ const getWalletsForOwner = (owner) => {
   }
 };
 
-const setWalletsForOwner = (owner, wallets) => {
-  walletsForOwner.set(owner, wallets);
+const saveWalletsForOwnerInsideMutex = (owner, wallets) => {
+  const file = getOwnerFile(owner);
+  const filePtr = fs.openSync(file, 'w');
+  fs.writeSync(filePtr, JSON.stringify({owner: owner, wallets: wallets}));
+  fs.closeSync(filePtr);
+};
+
+const saveWalletsForOwner = async (owner, wallets) => {
+  const mutexRelease = await mutex.acquire();
+  try {
+    saveWalletsForOwnerInsideMutex(owner, wallets);
+  } finally {
+    mutexRelease();
+  }
+};
+
+const getOwnersWithWalletsList = async () => {
+  const mutexRelease = await mutex.acquire();
+  try {
+    const owners = [];
+    if (fs.existsSync(config.ownerWalletDataDir)) {
+      const list = fs.readdirSync(config.ownerWalletDataDir);
+      for (let ix = 0; ix < list.length; ix++) {
+        const nm = list[ix];
+        const file = path.join(config.ownerWalletDataDir, nm);
+        const data = fs.readFileSync(file, 'UTF-8');
+        const json = JSON.parse(data);
+        owners.push(json.owner);
+      }
+    }
+    return owners;
+  } finally {
+    mutexRelease();
+  }
+};
+
+const thawAllAssetsIfItIsTime = async () => {
+  loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
+  const owners = await getOwnersWithWalletsList();
+  for (let ownerIx = 0; ownerIx < owners.length; ownerIx++) {
+    const owner = owners[ownerIx];
+    const ownedCards = await getOwnedCards(owner);
+    const frozenCount = await getFrozenCount(ownedCards);
+    await thawOwnerAssetsIfItIsTime(ownedCards, frozenCount);
+  }
+  loggingUtil.log(dateUtil.getDate(), 'SUCCESS thawAllAssetsIfItIsTime');
 };
 
 module.exports.init = init;
@@ -364,5 +457,7 @@ module.exports.isReady = isReady;
 module.exports.getTemplates = getTemplates;
 module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
 module.exports.getActiveAccountList = getActiveAccountList;
-module.exports.setWalletsForOwner = setWalletsForOwner;
+module.exports.loadWalletsForOwner = loadWalletsForOwner;
+module.exports.saveWalletsForOwner = saveWalletsForOwner;
 module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
+module.exports.getOwnersWithWalletsList = getOwnersWithWalletsList;

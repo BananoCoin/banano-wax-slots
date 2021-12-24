@@ -436,18 +436,22 @@ const postWithoutCatch = async (context, req, res) => {
     }
   }
   resp.ownersWithAccountsList = await ownerAccountUtil.getOwnersWithAccountsList();
+  resp.activeWaxUserList = await atomicassetsUtil.getOwnersWithWalletsList();
 
   resp.ownersEligibleForGiveawayList = [];
-  for (let ix = 0; ix < resp.ownersWithAccountsList.length; ix++) {
-    const ownerWithAccount = resp.ownersWithAccountsList[ix];
-    const isOwnerEligibleForGiveawayFlag = await atomicassetsUtil.isOwnerEligibleForGiveaway(ownerWithAccount);
-    if (isOwnerEligibleForGiveawayFlag) {
-      resp.ownersEligibleForGiveawayList.push(ownerWithAccount);
+  for (let ix = 0; ix < resp.activeWaxUserList.length; ix++) {
+    const ownerWithAccount = resp.activeWaxUserList[ix];
+    if (resp.ownersWithAccountsList.includes(ownerWithAccount)) {
+      const isOwnerEligibleForGiveawayFlag = await atomicassetsUtil.isOwnerEligibleForGiveaway(ownerWithAccount);
+      // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', isOwnerEligibleForGiveawayFlag, ownerWithAccount);
+      if (isOwnerEligibleForGiveawayFlag) {
+        resp.ownersEligibleForGiveawayList.push(ownerWithAccount);
+      }
+    // } else {
+      // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', 'no account', ownerWithAccount);
     }
   }
 
-
-  resp.activeWaxUserList = atomicassetsUtil.getActiveAccountList();
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();

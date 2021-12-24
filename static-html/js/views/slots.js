@@ -1294,7 +1294,12 @@ const asOrderedList = (list, activeCheckList, giveawayCheckList) => {
     if (activeCheckList.includes(elt)) {
       html += '(withdrew)';
     } else {
-      html += '(dormant)';
+      html += '(no withdrawal yet)';
+    }
+    if (giveawayCheckList.includes(elt)) {
+      html += '(over min plays)';
+    } else {
+      html += '(under min plays)';
     }
     html += '</li>';
     if (activeCheckList.includes(elt) && giveawayCheckList.includes(elt)) {
