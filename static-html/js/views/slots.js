@@ -1177,7 +1177,7 @@ const getFrozenHistogramHtml = (ownedAssets) => {
   for (let ix = 0; ix < ownedAssets.length; ix++) {
     const ownedAsset = ownedAssets[ix];
     if (ownedAsset.thawTimeMs !== undefined) {
-      const thawTimeDiff = ownedAsset.thawTimeMs -  Date.now();
+      const thawTimeDiff = ownedAsset.thawTimeMs - Date.now();
       // console.log('getFrozenHistogramHtml', ownedAsset, thawTimeDiff);
       const thawTimeHours = (thawTimeDiff / (60*60*1000));
       if (thawTimeHours > maxThawTimeHours) {
@@ -1276,7 +1276,7 @@ const getOwnedAssetHtml = (ownedAsset) => {
 
   if (ownedAsset.thawTimeMs !== undefined) {
     if (ownedAsset.thawTimeMs > 0) {
-      const thawTimeDiff = ownedAsset.thawTimeMs -  Date.now();
+      const thawTimeDiff = ownedAsset.thawTimeMs - Date.now();
       const thawTimeHours = (thawTimeDiff / (60*60*1000)).toFixed(3);
       ownedAssetsHtml += ` Thaw Time:${thawTimeHours} Hours`;
     }
@@ -1839,41 +1839,50 @@ const winConfetti = () => {
   };
 
   function fire(particleRatio, opts) {
-    confetti(Object.assign({}, defaults, opts, {
-      particleCount: Math.floor(count * particleRatio),
-    }));
+    if (document.hasFocus()) {
+      confetti(Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio),
+      }));
+    }
   }
 
-  if (!stopWinConfetti) {
-    fire(0.25, {
-      spread: 26,
+  if (window.localStorage.autoplayOn == 'true') {
+    fire(0.01, {
+      spread: 1,
       startVelocity: 55,
     });
-  }
-  if (!stopWinConfetti) {
-    fire(0.2, {
-      spread: 60,
-    });
-  }
-  if (!stopWinConfetti) {
-    fire(0.35, {
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.8,
-    });
-  }
-  if (!stopWinConfetti) {
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 25,
-      decay: 0.92,
-      scalar: 1.2,
-    });
-  }
-  if (!stopWinConfetti) {
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 45,
-    });
+  } else {
+    if (!stopWinConfetti) {
+      fire(0.25, {
+        spread: 26,
+        startVelocity: 55,
+      });
+    }
+    if (!stopWinConfetti) {
+      fire(0.2, {
+        spread: 60,
+      });
+    }
+    if (!stopWinConfetti) {
+      fire(0.35, {
+        spread: 100,
+        decay: 0.91,
+        scalar: 0.8,
+      });
+    }
+    if (!stopWinConfetti) {
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 25,
+        decay: 0.92,
+        scalar: 1.2,
+      });
+    }
+    if (!stopWinConfetti) {
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 45,
+      });
+    }
   }
 };
