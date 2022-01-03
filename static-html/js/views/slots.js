@@ -148,7 +148,7 @@ const play = async (bet) => {
     if (this.readyState == 4) {
       if (this.status == 200) {
         cardData = JSON.parse(this.responseText);
-        console.log('cardData', cardData);
+        // console.log('cardData', cardData);
       } else {
         cardData = {
           ready: false,
@@ -194,9 +194,9 @@ const play = async (bet) => {
 const autoplay = () => {
   if (window.localStorage.autoplayOn == 'true') {
     if (cardData === undefined) {
-      console.log('autoplay SKIPPED');
+      // console.log('autoplay SKIPPED');
     } else {
-      console.log('autoplay STARTED', 'cardData.scoreError', cardData.scoreError);
+      // console.log('autoplay STARTED', 'cardData.scoreError', cardData.scoreError);
       if (cardData.scoreError) {
         window.localStorage.autoplayOn == 'false';
       } else {
@@ -204,14 +204,19 @@ const autoplay = () => {
           '50ban', '10ban', '5ban', '1ban',
         ];
         synchBetButtons(betButtons[0]);
+        // console.log('autoplay', 'expectedValue', 0, betButtons[0], betExpectedValue);
         let bestExpectedValue = betExpectedValue;
         let bestBetButton = betButtons[0];
         for (let betButtonIx = 1; betButtonIx < betButtons.length; betButtonIx++) {
           const betButton = betButtons[betButtonIx];
           synchBetButtons(betButton);
-          if (betExpectedValue > bestExpectedValue) {
-            bestExpectedValue = betExpectedValue;
-            bestBetButton = betButton;
+          // console.log('autoplay', 'expectedValue', betButtonIx, betButton, betExpectedValue);
+          if (betExpectedValue !== undefined) {
+            if ((betExpectedValue > bestExpectedValue) ||
+             (bestExpectedValue == undefined)) {
+              bestExpectedValue = betExpectedValue;
+              bestBetButton = betButton;
+            }
           }
         }
         synchBetButtons(bestBetButton);
@@ -222,7 +227,7 @@ const autoplay = () => {
         // synchAutoplay();
         }
       }
-      console.log('autoplay SUCCESS');
+      // console.log('autoplay SUCCESS');
     }
   }
 };
@@ -943,6 +948,9 @@ const setAllTopTo = (logInHtml, accountBalance, accountBalanceTooltip) => {
 };
 
 const truncate = (number) => {
+  if (number === undefined) {
+    return number;
+  }
   const ix = number.indexOf('.');
   if (ix < 0) {
     return number;
@@ -1421,6 +1429,7 @@ const resetScoreText = async () => {
   // console.log(53*(1-Math.cbrt(2/3)))
   const idAmounts = cardData.bets;
   goodOdds = false;
+  betExpectedValue = undefined;
   if (idAmounts !== undefined) {
     const bet = idAmounts[betFromSvgId];
 
