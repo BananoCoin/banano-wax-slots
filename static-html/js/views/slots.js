@@ -20,6 +20,8 @@ let waxEndpoint;
 let stopWinConfetti = true;
 let chainTimestamp = CHAIN_NOT_LOADED;
 let goodOdds = false;
+let betExpectedValue = undefined;
+let isSoundPlaying = false;
 const checkEndpointsFns = [];
 
 const sounds = ['start', 'wheel', 'winner', 'loser', 'money'];
@@ -28,14 +30,19 @@ const startSound = (id) => {
   if (window.localStorage.soundOn !== 'true') {
     return;
   }
-  document.getElementById(id).play();
+  isSoundPlaying = false;
+  document.getElementById(id).play().then(()=> {
+    isSoundPlaying = true;
+  });
 };
 
 const stopSounds = () => {
-  for (let ix = 0; ix < sounds.length; ix++) {
-    const id = sounds[ix];
-    document.getElementById(id).pause();
-    document.getElementById(id).currentTime = 0;
+  if (isSoundPlaying) {
+    for (let ix = 0; ix < sounds.length; ix++) {
+      const id = sounds[ix];
+      document.getElementById(id).pause();
+      document.getElementById(id).currentTime = 0;
+    }
   }
 };
 
@@ -193,16 +200,21 @@ const autoplay = () => {
       if (cardData.scoreError) {
         window.localStorage.autoplayOn == 'false';
       } else {
-        synchBetButtons('50ban');
-        if (!goodOdds) {
-          synchBetButtons('10ban');
+        const betButtons = [
+          '50ban', '10ban', '5ban', '1ban',
+        ];
+        synchBetButtons(betButtons[0]);
+        let bestExpectedValue = betExpectedValue;
+        let bestBetButton = betButtons[0];
+        for (let betButtonIx = 1; betButtonIx < betButtons.length; betButtonIx++) {
+          const betButton = betButtons[betButtonIx];
+          synchBetButtons(betButton);
+          if (betExpectedValue > bestExpectedValue) {
+            bestExpectedValue = betExpectedValue;
+            bestBetButton = betButton;
+          }
         }
-        if (!goodOdds) {
-          synchBetButtons('5ban');
-        }
-        if (!goodOdds) {
-          synchBetButtons('1ban');
-        }
+        synchBetButtons(bestBetButton);
         if (goodOdds) {
           window.play();
         } else {
@@ -1435,6 +1447,7 @@ const resetScoreText = async () => {
     if (expectedChanceToProfitPct > 0.5) {
       scoreText.push(`Good Odds:Yes`);
       goodOdds = true;
+      betExpectedValue = expectedValue;
     } else {
       scoreText.push(`Good Odds:No`);
     }
