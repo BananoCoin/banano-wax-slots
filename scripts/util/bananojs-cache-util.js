@@ -129,8 +129,13 @@ const receiveBananoDepositsForSeed = async (seed, seedIx, representative, hash) 
 const getAccountInfo = async (account, representativeFlag) => {
   const accountInfo = await bananojs.getAccountInfo(account, true);
   if (trackedAccountSet.has(account)) {
-    const accountData = getAccountData(account);
-    accountInfo.cacheBalance = accountData.balance;
+    const mutexRelease = await mutex.acquire();
+    try {
+      const accountData = getAccountData(account);
+      accountInfo.cacheBalance = accountData.balance;
+    } finally {
+      mutexRelease();
+    }
   }
   return accountInfo;
 };
