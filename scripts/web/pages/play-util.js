@@ -383,7 +383,7 @@ const postWithoutCatch = async (context, req, res) => {
             const rarity = card.rarity;
             const cardCount = resp.frozenCardCount;
             const thawTimeMs = await assetUtil.getThawTimeByRarityMs(rarity, cardCount);
-            await assetUtil.freezeAsset(assetId, thawTimeMs);
+            await assetUtil.freezeAsset(assetId, thawTimeMs, rarity);
 
             resp.ownedAssets.forEach((ownedAsset) => {
               if (ownedAsset.assetId == assetId) {
@@ -459,6 +459,7 @@ const postWithoutCatch = async (context, req, res) => {
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
   resp.totalFrozenCards = await assetUtil.getTotalFrozenAssetCount();
+  resp.frozenCardsByRarityMap = [...await assetUtil.getFrozenAssetCountByRarityMap()];
   resp.totalActiveCards = atomicassetsUtil.getTotalActiveCardCount();
   resp.totalWinsSinceRestart = totalWinsSinceRestart;
   resp.totalLossesSinceRestart = totalLossesSinceRestart;

@@ -53,7 +53,7 @@ const getAssetFileNm = (assetId) => {
   return assetFileNm;
 };
 
-const freezeAsset = async (assetId, thawTimeMs) => {
+const freezeAsset = async (assetId, thawTimeMs, rarity) => {
   /* istanbul ignore if */
   if (assetId === undefined) {
     throw new Error('assetId is required.');
@@ -61,6 +61,10 @@ const freezeAsset = async (assetId, thawTimeMs) => {
   /* istanbul ignore if */
   if (thawTimeMs === undefined) {
     throw new Error('thawTimeMs is required.');
+  };
+  /* istanbul ignore if */
+  if (rarity === undefined) {
+    throw new Error('rarity is required.');
   };
   const mutexRelease = await mutex.acquire();
   try {
@@ -70,7 +74,7 @@ const freezeAsset = async (assetId, thawTimeMs) => {
         loggingUtil.log(dateUtil.getDate(), 'freezing asset', assetId);
       }
       const filePtr = fs.openSync(assetFileNm, 'w');
-      fs.writeSync(filePtr, JSON.stringify({thawTimeMs: thawTimeMs}));
+      fs.writeSync(filePtr, JSON.stringify({thawTimeMs: thawTimeMs, rarity: rarity}));
       fs.closeSync(filePtr);
     }
   } finally {
@@ -138,7 +142,7 @@ const getThawTimeByRarityMs = (rarity, cardCount) => {
     fromRarity = true;
   }
 
-  const fromCardCount = Math.ceil(Math.sqrt(cardCount)) * parseInt(config.thawTimeBonusPerCardMs, 10);
+  const fromCardCount = cardCount * parseInt(config.thawTimeBonusPerCardMs, 10);
   thawTime += fromCardCount;
 
   loggingUtil.debug(dateUtil.getDate(), 'getThawTimeByRarityMs', 'rarity', rarity,
@@ -171,6 +175,32 @@ const thawAssetIfItIsTime = async (assetId) => {
   }
 };
 
+const getFrozenAssetCountByRarityMap = async () => {
+  const countByRarityMap = new Map();
+  const mutexRelease = await mutex.acquire();
+  try {
+    if (fs.existsSync(config.assetDataDir)) {
+      fs.readdirSync(config.assetDataDir).forEach((file) => {
+        const fileNm = path.join(config.assetDataDir, file);
+        const data = fs.readFileSync(fileNm, 'UTF-8');
+        if (data.length !== 0) {
+          const json = JSON.parse(data);
+          const rarity = json.rarity;
+          if (countByRarityMap.has(rarity)) {
+            const count = countByRarityMap.get(rarity);
+            countByRarityMap.set(rarity, count+1);
+          } else {
+            countByRarityMap.set(rarity, 1);
+          }
+        }
+      });
+    }
+  } finally {
+    mutexRelease();
+  }
+  return countByRarityMap;
+};
+
 const getTotalFrozenAssetCount = async () => {
   const mutexRelease = await mutex.acquire();
   try {
@@ -192,3 +222,4 @@ module.exports.getThawTimeMs = getThawTimeMs;
 module.exports.thawAssetIfItIsTime = thawAssetIfItIsTime;
 module.exports.getTotalFrozenAssetCount = getTotalFrozenAssetCount;
 module.exports.getThawTimeByRarityMs = getThawTimeByRarityMs;
+module.exports.getFrozenAssetCountByRarityMap = getFrozenAssetCountByRarityMap;

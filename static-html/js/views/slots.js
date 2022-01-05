@@ -1410,6 +1410,15 @@ const resetScoreText = async () => {
       cacheStats += `${elt[0]}:${elt[1]}`;
     });
   }
+  cacheStats += '<br>Frozen Rarity Count:';
+  if (cardData.frozenCardsByRarityMap !== undefined) {
+    cardData.frozenCardsByRarityMap.forEach((elt, eltIx) => {
+      if (eltIx > 0) {
+        cacheStats += ', ';
+      }
+      cacheStats += `${elt[0]}:${elt[1]}`;
+    });
+  }
 
   document.querySelector('#cacheStats').innerHTML = cacheStats;
 
