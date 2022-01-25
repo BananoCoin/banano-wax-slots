@@ -435,15 +435,20 @@ const getOwnersWithWalletsList = async () => {
 };
 
 const thawAllAssetsIfItIsTime = async () => {
-  loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
-  const owners = await getOwnersWithWalletsList();
-  for (let ownerIx = 0; ownerIx < owners.length; ownerIx++) {
-    const owner = owners[ownerIx];
-    const ownedCards = await getOwnedCards(owner);
-    const frozenCount = await getFrozenCount(ownedCards);
-    await thawOwnerAssetsIfItIsTime(ownedCards, frozenCount);
+  try {
+    loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
+    const owners = await getOwnersWithWalletsList();
+    for (let ownerIx = 0; ownerIx < owners.length; ownerIx++) {
+      const owner = owners[ownerIx];
+      const ownedCards = await getOwnedCards(owner);
+      const frozenCount = await getFrozenCount(ownedCards);
+      await thawOwnerAssetsIfItIsTime(ownedCards, frozenCount);
+    }
+    loggingUtil.log(dateUtil.getDate(), 'SUCCESS thawAllAssetsIfItIsTime');
+  } catch (error) {
+    loggingUtil.log(dateUtil.getDate(), 'FAILURE thawAllAssetsIfItIsTime');
+    loggingUtil.trace(error);
   }
-  loggingUtil.log(dateUtil.getDate(), 'SUCCESS thawAllAssetsIfItIsTime');
 };
 
 module.exports.init = init;
