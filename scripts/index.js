@@ -82,6 +82,8 @@ const init = async () => {
     await item.init(config, loggingUtil);
   }
 
+  await atomicassetsUtil.setWaxApiAndAddTemplates();
+
   webServerUtil.setCloseProgramFunction(closeProgram);
 
   process.on('SIGINT', closeProgram);

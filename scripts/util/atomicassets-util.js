@@ -13,6 +13,7 @@ const assetUtil = require('./asset-util.js');
 const dateUtil = require('./date-util.js');
 const timedCacheUtil = require('./timed-cache-util.js');
 const awaitSemaphore = require('await-semaphore');
+const randomUtil = require('./random-util.js');
 
 // constants
 
@@ -20,7 +21,6 @@ const awaitSemaphore = require('await-semaphore');
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
-let waxApi;
 const templates = [];
 let ready = false;
 let mutex;
@@ -49,7 +49,7 @@ const init = (_config, _loggingUtil) => {
   if (!fs.existsSync(config.ownerWalletDataDir)) {
     fs.mkdirSync(config.ownerWalletDataDir, {recursive: true});
   }
-  setTimeout(setWaxApiAndAddTemplates, 0);
+  // setTimeout(setWaxApiAndAddTemplates, 0);
 };
 
 const deactivate = () => {
@@ -58,24 +58,28 @@ const deactivate = () => {
   loggingUtil = undefined;
   mutex = undefined;
   /* eslint-enable no-unused-vars */
-  waxApi = undefined;
   templates.length = 0;
   ready = false;
 };
 
+const getWaxApi = () => {
+  const url = randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
+  const waxApi = new ExplorerApi(url, 'atomicassets', {fetch});
+  return waxApi;
+};
 
 const setWaxApiAndAddTemplates = async () => {
   try {
-    waxApi = new ExplorerApi('https://wax.api.atomicassets.io', 'atomicassets', {fetch});
+    const waxApi = getWaxApi();
+    await addAllTemplates(waxApi);
   } catch (error) {
-    console.log('INTERIM setWaxApiAndAddTemplates', error.message);
+    console.log('INTERIM setWaxApiAndAddTemplates', url, error.message);
     setTimeout(setWaxApiAndAddTemplates, 1000);
     return;
   }
-  setTimeout(addAllTemplates, 0);
 };
 
-const addAllTemplates = async () => {
+const addAllTemplates = async (waxApi) => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
 
   config.excludedTemplates.forEach((templateId) => {
@@ -183,6 +187,7 @@ const getAssetOptions = (owner) => {
 const hasOwnedCards = async (owner) => {
   const wallets = await loadWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
+    const waxApi = getWaxApi();
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
     const pageAssets = await waxApi.getAssets(assetOptions, 1, 1);
@@ -235,6 +240,7 @@ const getOwnedCardsToCache = async (owner) => {
     const assetsPerPage = config.maxAssetsPerPage;
     let moreAssets = true;
     while (moreAssets) {
+      const waxApi = getWaxApi();
       // console.log('owner', owner, 'page', page, allAssets.length);
       const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
       pageAssets.forEach((asset) => {
@@ -465,3 +471,4 @@ module.exports.loadWalletsForOwner = loadWalletsForOwner;
 module.exports.saveWalletsForOwner = saveWalletsForOwner;
 module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
 module.exports.getOwnersWithWalletsList = getOwnersWithWalletsList;
+module.exports.setWaxApiAndAddTemplates = setWaxApiAndAddTemplates;
