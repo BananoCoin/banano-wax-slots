@@ -83,13 +83,15 @@ const receivePending = async (representative, seed) => {
         noPending = true;
       } else {
         const pendingBlocks = pending.blocks[account];
-        const hashes = [...Object.keys(pendingBlocks)];
-        if (hashes.length !== 0) {
-          const hash = hashes[0];
-          const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
-          pendingList.push(response);
-        } else {
-          noPending = true;
+        if (pendingBlocks !== undefined) {
+          const hashes = [...Object.keys(pendingBlocks)];
+          if (hashes.length !== 0) {
+            const hash = hashes[0];
+            const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
+            pendingList.push(response);
+          } else {
+            noPending = true;
+          }
         }
       }
     }

@@ -64,8 +64,9 @@
     "https://wax.eu.eosamsterdam.net",
     "https://wax.greymass.com"
   ],
-  "waxEndpointV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json",
-  "waxEndpointV2ListUrlRefreshMs": 600000,
+  "waxEndpointV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json&type=hyperion",
+  "waxEndpointV2RefreshMs": 600000,
+  "waxEndpointV2MinWeight": 7,
   "web": {
     "port": "8686"
   },

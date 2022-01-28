@@ -84,7 +84,7 @@ const refreshWaxEndpointList = async () => {
     for (let ix = 0; ix < json.length; ix++) {
       const elt = json[ix];
       const eltWeight = parseInt(elt.weight, 10);
-      if (eltWeight > 0) {
+      if (eltWeight >= config.waxEndpointV2MinWeight) {
         const href = `${elt.node_url}/v2/history/get_actions?act.name=requestrand&account=${config.burnAccount}&limit=1`;
         const res = await fetch(href, {
           method: 'get',
@@ -119,7 +119,7 @@ const refreshWaxEndpointList = async () => {
     loggingUtil.trace(error);
     loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);
   }
-  setTimeout(refreshWaxEndpointList, config.waxEndpointV2ListUrlRefreshMs);
+  setTimeout(refreshWaxEndpointList, config.waxEndpointV2RefreshMs);
 };
 
 const deactivate = async () => {
@@ -132,7 +132,7 @@ const deactivate = async () => {
 const initWebServer = async () => {
   const app = express();
 
-  app.engine('.hbs', exphbs({extname: '.hbs',
+  app.engine('.hbs', exphbs.engine({extname: '.hbs',
     defaultLayout: 'main'}));
   app.set('view engine', '.hbs');
 
