@@ -65,7 +65,6 @@ const deactivate = () => {
 
 const fetchWrapper = async (url, options) => {
   // loggingUtil.log('fetchWrapper', 'url', url);
-  // loggingUtil.log('fetchWrapper', 'options', options);
   if (options == undefined) {
     options = {};
   }
@@ -73,20 +72,32 @@ const fetchWrapper = async (url, options) => {
     options.headers = {};
   }
   options.headers['Content-Type'] = 'application/json';
+  // options.headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
+  // options.headers['authority'] = url;
   const response = await fetch(url, options);
   const responseWrapper = {};
   responseWrapper.headers = response.headers;
   responseWrapper.status = response.status;
+  // loggingUtil.log('fetchWrapper', 'options', options);
   responseWrapper.json = async () => {
     const text = await response.text();
-    if (text.startsWith('<')) {
-      responseWrapper.status = 500;
-      return {message: text};
-    } else {
-      loggingUtil.log('fetchWrapper', 'status', response.status);
-      loggingUtil.log('fetchWrapper', 'headers', response.headers);
-      // loggingUtil.log('fetchWrapper', 'text', text);
+    // loggingUtil.log('fetchWrapper', 'status', response.status);
+    // loggingUtil.log('fetchWrapper', 'headers[x-ratelimit-limit]', response.headers.get('x-ratelimit-limit'));
+    // loggingUtil.log('fetchWrapper', 'headers[x-ratelimit-remaining]', response.headers.get('x-ratelimit-remaining'));
+    // loggingUtil.log('fetchWrapper', 'headers[x-ratelimit-reset]', response.headers.get('x-ratelimit-reset'));
+    // loggingUtil.log('fetchWrapper', 'text', text);
+    try {
       return JSON.parse(text);
+    } catch (error) {
+      if (url.endsWith('/v1/config')) {
+        responseWrapper.status = 200;
+        return {
+          success: true,
+          data: {fake: true},
+        };
+      }
+      responseWrapper.status = 500;
+      return {message: 'returned invalid json from ' + url};
     }
   };
   return responseWrapper;
@@ -97,8 +108,13 @@ const getWaxApiUrl = () => {
 };
 
 const getWaxApi = (url) => {
-  const waxApi = new ExplorerApi(url, 'atomicassets', {fetch: fetchWrapper});
-  return waxApi;
+  try {
+    const waxApi = new ExplorerApi(url, 'atomicassets', {fetch: fetchWrapper});
+    return waxApi;
+  } catch (error) {
+    loggingUtil.log('FAILURE getWaxApi', url, error.message);
+    return;
+  }
 };
 
 const setWaxApiAndAddTemplates = async () => {
@@ -517,3 +533,4 @@ module.exports.saveWalletsForOwner = saveWalletsForOwner;
 module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
 module.exports.getOwnersWithWalletsList = getOwnersWithWalletsList;
 module.exports.setWaxApiAndAddTemplates = setWaxApiAndAddTemplates;
+module.exports.getWaxApi = getWaxApi;

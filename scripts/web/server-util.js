@@ -86,10 +86,21 @@ const refreshAtomicAssetsEndpointList = async () => {
       const elt = json[ix];
       const eltWeight = parseInt(elt.weight, 10);
       if (eltWeight >= config.waxEndpointV2MinWeight) {
-        newEndpoints.push(elt.node_url);
+        try {
+          const api = atomicassetsUtil.getWaxApi(elt.node_url);
+          const res = await api.getConfig();
+          let success = false;
+          if (res.fake == undefined) {
+            newEndpoints.push(elt.node_url);
+            success = true;
+          }
+          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success', success);
+        } catch (error) {
+          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'elt.node_url', elt.node_url, 'error', error.message);
+        }
       }
     }
-    loggingUtil.debug(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
+    loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
     if (newEndpoints.length > 0) {
       config.atomicAssetsEndpointsV2.length = 0;
       newEndpoints.forEach((url) => {
