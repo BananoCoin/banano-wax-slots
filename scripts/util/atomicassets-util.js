@@ -476,7 +476,7 @@ const getOwnersWithWalletsList = async () => {
   }
 };
 
-const sleep(ms) {
+const sleep = async (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
