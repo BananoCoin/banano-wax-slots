@@ -86,25 +86,7 @@ const refreshAtomicAssetsEndpointList = async () => {
       const elt = json[ix];
       const eltWeight = parseInt(elt.weight, 10);
       if (eltWeight >= config.waxEndpointV2MinWeight) {
-        const href = `${elt.node_url}/v2/history/get_actions?act.name=requestrand&account=${config.burnAccount}&limit=1`;
-        const res = await fetch(href, {
-          method: 'get',
-          headers: {'Content-Type': 'application/json'},
-        });
-
-        try {
-          const getActionsResp = await toJson(elt.node_url, res);
-          if (getActionsResp.actions !== undefined) {
-            if (getActionsResp.actions.length > 0) {
-              for (let ix = 0; ix < eltWeight; ix++) {
-                newEndpoints.push(elt.node_url);
-              }
-            }
-          }
-          loggingUtil.debug(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success');
-        } catch (error) {
-          loggingUtil.debug(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'error', error.message);
-        }
+        newEndpoints.push(elt.node_url);
       }
     }
     loggingUtil.debug(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);

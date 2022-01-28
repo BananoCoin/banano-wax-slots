@@ -62,18 +62,51 @@ const deactivate = () => {
   ready = false;
 };
 
-const getWaxApi = () => {
-  const url = randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
-  const waxApi = new ExplorerApi(url, 'atomicassets', {fetch});
+
+const fetchWrapper = async (url, options) => {
+  // loggingUtil.log('fetchWrapper', 'url', url);
+  // loggingUtil.log('fetchWrapper', 'options', options);
+  if (options == undefined) {
+    options = {};
+  }
+  if (options.headers == undefined) {
+    options.headers = {};
+  }
+  options.headers['Content-Type'] = 'application/json';
+  const response = await fetch(url, options);
+  const responseWrapper = {};
+  responseWrapper.status = response.status;
+  responseWrapper.json = async () => {
+    const text = await response.text();
+    if (text.startsWith('<')) {
+      responseWrapper.status = 500;
+      return {message: text};
+    } else {
+      // loggingUtil.log('fetchWrapper', 'status', response.status);
+      // loggingUtil.log('fetchWrapper', 'text', text);
+      return JSON.parse(text);
+    }
+  };
+  return responseWrapper;
+};
+
+const getWaxApiUrl = () => {
+  return randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
+};
+
+const getWaxApi = (url) => {
+  const waxApi = new ExplorerApi(url, 'atomicassets', {fetch: fetchWrapper});
   return waxApi;
 };
 
 const setWaxApiAndAddTemplates = async () => {
+  const url = getWaxApiUrl();
   try {
-    const waxApi = getWaxApi();
+    const waxApi = getWaxApi(url);
     await addAllTemplates(waxApi);
   } catch (error) {
-    console.log('INTERIM setWaxApiAndAddTemplates', url, error.message);
+    // console.trace(error);
+    loggingUtil.log('INTERIM setWaxApiAndAddTemplates', url, error.message);
     setTimeout(setWaxApiAndAddTemplates, 1000);
     return;
   }
@@ -187,7 +220,8 @@ const getAssetOptions = (owner) => {
 const hasOwnedCards = async (owner) => {
   const wallets = await loadWalletsForOwner(owner);
   for (let ix = 0; ix < wallets.length; ix++) {
-    const waxApi = getWaxApi();
+    const url = getWaxApiUrl();
+    const waxApi = getWaxApi(url);
     const wallet = wallets[ix];
     const assetOptions = getAssetOptions(wallet);
     const pageAssets = await waxApi.getAssets(assetOptions, 1, 1);
@@ -240,7 +274,9 @@ const getOwnedCardsToCache = async (owner) => {
     const assetsPerPage = config.maxAssetsPerPage;
     let moreAssets = true;
     while (moreAssets) {
-      const waxApi = getWaxApi();
+      const url = getWaxApiUrl();
+      // loggingUtil.log('getOwnedCardsToCache', 'url', url);
+      const waxApi = getWaxApi(url);
       // console.log('owner', owner, 'page', page, allAssets.length);
       const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
       pageAssets.forEach((asset) => {
