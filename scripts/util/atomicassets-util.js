@@ -476,11 +476,18 @@ const getOwnersWithWalletsList = async () => {
   }
 };
 
+const sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const thawAllAssetsIfItIsTime = async () => {
   try {
     loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
     const owners = await getOwnersWithWalletsList();
     for (let ownerIx = 0; ownerIx < owners.length; ownerIx++) {
+      if(ownerIx > 0) {
+        await sleep(1000);
+      }
       const owner = owners[ownerIx];
       const ownedCards = await getOwnedCards(owner);
       const frozenCount = await getFrozenCount(ownedCards);
