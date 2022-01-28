@@ -75,6 +75,7 @@ const fetchWrapper = async (url, options) => {
   options.headers['Content-Type'] = 'application/json';
   const response = await fetch(url, options);
   const responseWrapper = {};
+  responseWrapper.headers = response.headers;
   responseWrapper.status = response.status;
   responseWrapper.json = async () => {
     const text = await response.text();
@@ -82,7 +83,8 @@ const fetchWrapper = async (url, options) => {
       responseWrapper.status = 500;
       return {message: text};
     } else {
-      // loggingUtil.log('fetchWrapper', 'status', response.status);
+      loggingUtil.log('fetchWrapper', 'status', response.status);
+      loggingUtil.log('fetchWrapper', 'headers', response.headers);
       // loggingUtil.log('fetchWrapper', 'text', text);
       return JSON.parse(text);
     }
