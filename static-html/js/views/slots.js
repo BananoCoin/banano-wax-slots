@@ -1309,26 +1309,28 @@ const getOwnedAssetHtml = (ownedAsset) => {
 const asOrderedList = (list, activeCheckList, giveawayCheckList) => {
   let eligibleHtml = '<h4>Elgible for Giveaway</h4><ol>';
   let ineligibleHtml = '<h4>Inelgible for Giveaway</h4><ol>';
-  for (let ix = 0; ix < list.length; ix++) {
-    const elt = list[ix];
-    let html = '';
-    html += '<li>';
-    html += elt;
-    if (activeCheckList.includes(elt)) {
-      html += '(withdrew)';
-    } else {
-      html += '(no withdrawal yet)';
-    }
-    if (giveawayCheckList.includes(elt)) {
-      html += '(over min plays)';
-    } else {
-      html += '(under min plays)';
-    }
-    html += '</li>';
-    if (activeCheckList.includes(elt) && giveawayCheckList.includes(elt)) {
-      eligibleHtml += html;
-    } else {
-      ineligibleHtml += html;
+  if (list != undefined) {
+    for (let ix = 0; ix < list.length; ix++) {
+      const elt = list[ix];
+      let html = '';
+      html += '<li>';
+      html += elt;
+      if (activeCheckList.includes(elt)) {
+        html += '(withdrew)';
+      } else {
+        html += '(no withdrawal yet)';
+      }
+      if (giveawayCheckList.includes(elt)) {
+        html += '(over min plays)';
+      } else {
+        html += '(under min plays)';
+      }
+      html += '</li>';
+      if (activeCheckList.includes(elt) && giveawayCheckList.includes(elt)) {
+        eligibleHtml += html;
+      } else {
+        ineligibleHtml += html;
+      }
     }
   }
   eligibleHtml += '</ol>';

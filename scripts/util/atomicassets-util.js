@@ -1,7 +1,6 @@
 'use strict';
 // libraries
 const fetch = require('node-fetch');
-const {ExplorerApi} = require('atomicassets');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -24,6 +23,7 @@ let loggingUtil;
 const templates = [];
 let ready = false;
 let mutex;
+let ExplorerApi;
 /* eslint-enable no-unused-vars */
 
 const ownerAssetCacheMap = new Map();
@@ -49,6 +49,64 @@ const init = (_config, _loggingUtil) => {
   if (!fs.existsSync(config.ownerWalletDataDir)) {
     fs.mkdirSync(config.ownerWalletDataDir, {recursive: true});
   }
+
+  ExplorerApi = class ExplorerApi {
+    /**
+     * constructor
+     * @param {string} endpoint the endpoint
+     * @param {string} namespace the namespace
+     * @param {string} args the args
+     * @return {undefined} returns nothing.
+     */
+    constructor(endpoint, namespace, args) {
+      this.endpoint = endpoint;
+      this.namespace = namespace;
+      this.fetch = args.fetch;
+    };
+    /**
+     * gets the config
+     * @return {Object} returns json.
+     */
+    async getConfig() {
+      const url = `${this.endpoint}/${this.namespace}/v1/config`;
+      const response = await this.fetch(url);
+      return await response.json();
+    }
+    /**
+     * gets the assets
+     * @param {string} options the options
+     * @param {string} page the page
+     * @param {string} limit the limit
+     * @return {Array} returns an array of data.
+     */
+    async getAssets(options = {}, page = 1, limit = 100) {
+      let url = `${this.endpoint}/${this.namespace}/v1/assets?page=${page}&limit=${limit}`;
+      Object.keys(options).forEach((key) => {
+        const value = options[key];
+        url += `&${key}=${value}`;
+      });
+      const response = await this.fetch(url);
+      const json = await response.json();
+      return json.data;
+    }
+    /**
+     * gets the templates
+     * @param {string} options the options
+     * @param {string} page the page
+     * @param {string} limit the limit
+     * @return {Array} returns an array of data.
+     */
+    async getTemplates(options = {}, page = 1, limit = 100) {
+      let url = `${this.endpoint}/${this.namespace}/v1/templates?page=${page}&limit=${limit}`;
+      Object.keys(options).forEach((key) => {
+        const value = options[key];
+        url += `&${key}=${value}`;
+      });
+      const response = await this.fetch(url);
+      const json = await response.json();
+      return json.data;
+    };
+  };
   // setTimeout(setWaxApiAndAddTemplates, 0);
 };
 
@@ -80,6 +138,9 @@ const fetchWrapper = async (url, options) => {
   responseWrapper.status = response.status;
   // loggingUtil.log('fetchWrapper', 'options', options);
   responseWrapper.json = async () => {
+    if (response.status != 200) {
+      throw Error(response.statusText);
+    }
     const text = await response.text();
     // loggingUtil.log('fetchWrapper', 'status', response.status);
     // loggingUtil.log('fetchWrapper', 'headers[x-ratelimit-limit]', response.headers.get('x-ratelimit-limit'));
@@ -89,13 +150,6 @@ const fetchWrapper = async (url, options) => {
     try {
       return JSON.parse(text);
     } catch (error) {
-      if (url.endsWith('/v1/config')) {
-        responseWrapper.status = 200;
-        return {
-          success: true,
-          data: {fake: true},
-        };
-      }
       responseWrapper.status = 500;
       return {message: 'returned invalid json from ' + url};
     }

@@ -90,7 +90,7 @@ const refreshAtomicAssetsEndpointList = async () => {
           const api = atomicassetsUtil.getWaxApi(elt.node_url);
           const res = await api.getConfig();
           let success = false;
-          if (res.fake == undefined) {
+          if (res.success) {
             newEndpoints.push(elt.node_url);
             success = true;
           }
