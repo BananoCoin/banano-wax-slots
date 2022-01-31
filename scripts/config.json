@@ -14,6 +14,7 @@
   "centralWalletReceivePendingIntervalMs": 10000,
   "centralWalletReceivePendingLoggingOn": false,
   "centralWalletSeed": "",
+  "fetchTimeout": 5000,
   "houseWalletSeed": "",
   "cookieSecret": "",
   "historyGetActionsTimeMs": 30000,
