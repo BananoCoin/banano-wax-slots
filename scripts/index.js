@@ -12,6 +12,7 @@ const timedCacheUtil = require('./util/timed-cache-util.js');
 const atomicassetsUtil = require('./util/atomicassets-util.js');
 const ownerAccountUtil = require('./util/owner-account-util.js');
 const blackMonkeyUtil = require('./util/black-monkey-util.js');
+const sanitizeBodyUtil = require('./util/sanitize-body-util.js');
 const webPagePlayUtil = require('./web/pages/play-util.js');
 const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
@@ -73,6 +74,7 @@ const init = async () => {
   modules.push(atomicassetsUtil);
   modules.push(ownerAccountUtil);
   modules.push(blackMonkeyUtil);
+  modules.push(sanitizeBodyUtil);
   modules.push(webPagePlayUtil);
   modules.push(webPageWithdrawUtil);
   modules.push(webServerUtil);

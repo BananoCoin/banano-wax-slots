@@ -1,7 +1,6 @@
 'use strict';
 // libraries
 const http = require('http');
-const request = require('request');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
@@ -10,18 +9,14 @@ const fetch = require('node-fetch');
 // modules
 const dateUtil = require('../util/date-util.js');
 const atomicassetsUtil = require('../util/atomicassets-util.js');
-const bananojsCacheUtil = require('../util/bananojs-cache-util.js');
 const nonceUtil = require('../util/nonce-util.js');
-const seedUtil = require('../util/seed-util.js');
-const blackMonkeyUtil = require('../util/black-monkey-util.js');
 const webPagePlayUtil = require('./pages/play-util.js');
 const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 const randomUtil = require('../util/random-util.js');
 const timedCacheUtil = require('../util/timed-cache-util.js');
+const sanitizeBodyUtil = require('../util/sanitize-body-util.js');
 
 // constants
-const blackMonkeyImagesByOwner = {};
-const blackMonkeyFrozenByOwner = {};
 const version = require('../../package.json').version;
 const historyGetActionsCacheMap = new Map();
 
@@ -94,10 +89,12 @@ const refreshAtomicAssetsEndpointList = async () => {
             newEndpoints.push(elt.node_url);
             success = true;
           }
-          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'success', success);
+          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, 'of', json.length, 'INTERIM', eltWeight, 'success', success);
         } catch (error) {
-          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, json.length, 'INTERIM ', eltWeight, 'elt.node_url', elt.node_url, 'error', error.message);
+          loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, 'of', json.length, 'INTERIM', eltWeight, 'elt.node_url', elt.node_url, 'error', error.message);
         }
+      } else {
+        loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', ix, 'of', json.length, 'SKIPPED', eltWeight);
       }
     }
     loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'INTERIM ', 'count', newEndpoints.length, 'distinct', distinct(newEndpoints).length);
@@ -234,163 +231,29 @@ const initWebServer = async () => {
   });
 
   app.post('/play', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.body);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
     const context = {};
     await webPagePlayUtil.post(context, req, res);
   });
 
   app.post('/withdraw', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.body);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
     const context = {};
     await webPageWithdrawUtil.post(context, req, res);
-  });
-
-  app.post('/black_monkey_images', async (req, res) => {
-    if (!config.blackMonkeyCaptcha.enabled) {
-      const resp = {};
-      resp.message = `black monkey disabled`;
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
-    if (verifyOwnerAndNonceResponse !== undefined) {
-      res.send(verifyOwnerAndNonceResponse);
-      return;
-    }
-    if (blackMonkeyFrozenByOwner[req.body.owner] !== undefined) {
-      const birthtimeMs = blackMonkeyFrozenByOwner[req.body.owner];
-      const thawTimeMs = birthtimeMs + config.blackMonkeyCaptcha.thawTimeMs;
-      const nowTimeMs = Date.now();
-      const diffMs = thawTimeMs - nowTimeMs;
-      if (diffMs > 0) {
-        const resp = {};
-        resp.images = [];
-        resp.message = `cooldown ${diffMs/1000} seconds`;
-        resp.success = false;
-        res.send(resp);
-        return;
-      } else {
-        delete blackMonkeyFrozenByOwner[req.body.owner];
-      }
-    }
-    if (blackMonkeyImagesByOwner[req.body.owner] === undefined) {
-      const images = await blackMonkeyUtil.getImages();
-      // console.log('black_monkey_images', images);
-      blackMonkeyImagesByOwner[req.body.owner] = images;
-    }
-    if (blackMonkeyFrozenByOwner[req.body.owner] === undefined) {
-      blackMonkeyFrozenByOwner[req.body.owner] = Date.now();
-    }
-    const images = blackMonkeyImagesByOwner[req.body.owner];
-    const resp = {};
-    resp.images = images.data;
-    resp.success = true;
-    res.send(resp);
-  });
-
-  app.post('/black_monkey', async (req, res) => {
-    if (!config.blackMonkeyCaptcha.enabled) {
-      const resp = {};
-      resp.message = `black monkey disabled`;
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-
-    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
-    if (verifyOwnerAndNonceResponse !== undefined) {
-      res.send(verifyOwnerAndNonceResponse);
-      return;
-    }
-    const owner = req.body.owner;
-
-    const hasCards = await atomicassetsUtil.hasOwnedCards(owner);
-    if (!hasCards) {
-      const resp = {};
-      resp.message = `black monkey failed. owner '${owner}' has no cards`;
-      loggingUtil.log(dateUtil.getDate(), 'black monkey', resp.message);
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-
-    const answer = blackMonkeyImagesByOwner[owner];
-    delete blackMonkeyImagesByOwner[owner];
-
-    if ((answer == undefined) || (req.body.answer == undefined) || (parseInt(answer.answer, 10) !== parseInt(req.body.answer, 10))) {
-      const resp = {};
-      resp.message = `black monkey failed expected:'${answer.answer}' actual:'${req.body.answer}'`;
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-
-    const seed = seedUtil.getSeedFromOwner(owner);
-    const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-    const accountInfo = await bananojsCacheUtil.getAccountInfo(account, true);
-    const bananosMax = config.blackMonkeyCaptcha.bananosMax;
-    const bananosMaxRaw = BigInt(bananojsCacheUtil.getRawStrFromBananoStr(bananosMax.toString()));
-    const balance = accountInfo.cacheBalance;
-    const balanceParts = bananojsCacheUtil.getBananoPartsFromRaw(balance);
-    delete balanceParts.raw;
-    const balanceDecimal = bananojsCacheUtil.getBananoPartsAsDecimal(balanceParts);
-    const balanceRaw = balance;
-
-    loggingUtil.log(dateUtil.getDate(), 'black monkey balanceRaw   ', balanceRaw);
-    loggingUtil.log(dateUtil.getDate(), 'black monkey bananosMaxRaw', bananosMaxRaw);
-
-    if (balanceRaw >= bananosMaxRaw) {
-      const resp = {};
-      resp.message = `black monkey failed. account balance '${balanceDecimal}' meets or exceeds max balance '${bananosMax}'`;
-      loggingUtil.log(dateUtil.getDate(), 'black monkey', resp.message);
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-
-    const captchaAmount = config.blackMonkeyCaptcha.bananos;
-    loggingUtil.log(dateUtil.getDate(), 'black monkey', account, captchaAmount);
-    await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
-    const resp = {};
-    resp.message = '';
-    resp.success = true;
-    res.send(resp);
-  });
-
-  app.post('/hcaptcha', async (req, res) => {
-    if (req.body['h-captcha-response'] === undefined) {
-      const resp = {};
-      resp.message = 'no h-captcha-response';
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-
-    const verifyOwnerAndNonceResponse = await verifyOwnerAndNonce(req);
-    if (verifyOwnerAndNonceResponse !== undefined) {
-      res.send(verifyOwnerAndNonceResponse);
-      return;
-    }
-
-    const ip = getIp(req);
-    const response = await getCaptchaResponse(config, req, ip);
-    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', response);
-    const responseJson = JSON.parse(response);
-    if (!responseJson.success) {
-      const resp = {};
-      resp.message = 'hcaptcha failed';
-      resp.success = false;
-      res.send(resp);
-      return;
-    }
-    const seed = seedUtil.getSeedFromOwner(owner);
-    const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-    const captchaAmount = config.hcaptcha.bananos;
-    loggingUtil.log(dateUtil.getDate(), 'hcaptcha', account, captchaAmount);
-    await bananojsCacheUtil.sendBananoWithdrawalFromSeed(config.houseWalletSeed, config.walletSeedIx, account, captchaAmount);
-    const resp = {};
-    resp.message = '';
-    resp.success = true;
-    res.send(resp);
   });
 
   app.get('/v2/history/get_actions', async (req, res) => {
@@ -468,6 +331,14 @@ const initWebServer = async () => {
   });
 
   app.get('/cmc_nonce_hash', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.body);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
     loggingUtil.debug(dateUtil.getDate(), 'cmc_nonce_hash', req.method, req.url, req.query, req.body);
     const owner = req.query.owner;
     const nonceHash = nonceUtil.getCmcLastNonceHashByOwner(owner);
@@ -476,6 +347,14 @@ const initWebServer = async () => {
   });
 
   app.get('/oauth/monkeyconnect/callback', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.query);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
     loggingUtil.debug(dateUtil.getDate(), 'callback', req.method, req.url, req.query, req.body);
     const code = req.query.code;
     const state = req.query.state;
@@ -581,96 +460,96 @@ const setCloseProgramFunction = (fn) => {
   closeProgramFn = fn;
 };
 
-const getIp = (req) => {
-  let ip;
-  if (req.headers['x-forwarded-for'] !== undefined) {
-    ip = req.headers['x-forwarded-for'];
-  } else if (req.connection.remoteAddress == '::ffff:127.0.0.1') {
-    ip = '::ffff:127.0.0.1';
-  } else if (req.connection.remoteAddress == '::1') {
-    ip = '::ffff:127.0.0.1';
-  } else {
-    ip = req.connection.remoteAddress;
-  }
-  // console.log('ip', ip);
-  return ip;
-};
+// const getIp = (req) => {
+//   let ip;
+//   if (req.headers['x-forwarded-for'] !== undefined) {
+//     ip = req.headers['x-forwarded-for'];
+//   } else if (req.connection.remoteAddress == '::ffff:127.0.0.1') {
+//     ip = '::ffff:127.0.0.1';
+//   } else if (req.connection.remoteAddress == '::1') {
+//     ip = '::ffff:127.0.0.1';
+//   } else {
+//     ip = req.connection.remoteAddress;
+//   }
+//   // console.log('ip', ip);
+//   return ip;
+// };
 
-const getCaptchaResponse = async (config, req, ip) => {
-  return new Promise((resolve) => {
-    // console.log('config', config);
-    /*
-      Send a http POST to  with the following parameters:
-    secret
-        Your verification key
-    token
-        The user's answer from the form field h-captcha-response
-    remoteip
-        The user's IP address
-      */
-    const token = req.body['h-captcha-response'];
-    // const body = `{ 'secret': ${config.secretKey}, 'response': ${token} }`;
+// const getCaptchaResponse = async (config, req, ip) => {
+//   return new Promise((resolve) => {
+//     // console.log('config', config);
+//     /*
+//       Send a http POST to  with the following parameters:
+//     secret
+//         Your verification key
+//     token
+//         The user's answer from the form field h-captcha-response
+//     remoteip
+//         The user's IP address
+//       */
+//     const token = req.body['h-captcha-response'];
+//     // const body = `{ 'secret': ${config.secretKey}, 'response': ${token} }`;
+//
+//     let body = '';
+//     body += `secret=${config.hcaptcha.secret}`;
+//     body += '&';
+//     body += `response=${token}`;
+//     body += '&';
+//     body += `remoteip=${ip}`;
+//
+//     // console.log('submitting', body);
+//
+//     request({
+//       headers: {
+//         'content-type': 'application/x-www-form-urlencoded',
+//         // 'content-type': 'application/json',
+//       },
+//       uri: ' https://hcaptcha.com/siteverify',
+//       body: body,
+//       method: 'POST',
+//       timeout: 30000,
+//     }, (err, httpResponse, response) => {
+//       // console.log('sendRequest body', body);
+//       // console.log('sendRequest err', err);
+//       // console.log('sendRequest httpResponse', httpResponse);
+//       // if (response.includes('credit')) {
+//       // console.log('sendRequest', ip, response);
+//       // }
+//       resolve(response);
+//     });
+//   });
+// };
 
-    let body = '';
-    body += `secret=${config.hcaptcha.secret}`;
-    body += '&';
-    body += `response=${token}`;
-    body += '&';
-    body += `remoteip=${ip}`;
-
-    // console.log('submitting', body);
-
-    request({
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        // 'content-type': 'application/json',
-      },
-      uri: ' https://hcaptcha.com/siteverify',
-      body: body,
-      method: 'POST',
-      timeout: 30000,
-    }, (err, httpResponse, response) => {
-      // console.log('sendRequest body', body);
-      // console.log('sendRequest err', err);
-      // console.log('sendRequest httpResponse', httpResponse);
-      // if (response.includes('credit')) {
-      // console.log('sendRequest', ip, response);
-      // }
-      resolve(response);
-    });
-  });
-};
-
-const verifyOwnerAndNonce = async (req) => {
-  if (req.body.nonce === undefined) {
-    const resp = {};
-    resp.message = 'no nonce';
-    resp.success = false;
-    return resp;
-  }
-  if (req.body.owner === undefined) {
-    const resp = {};
-    resp.message = 'no owner';
-    resp.success = false;
-    return resp;
-  }
-  if (req.body.nonce_kind === undefined) {
-    const resp = {};
-    resp.message = 'no nonce_kind';
-    resp.success = false;
-    return resp;
-  }
-  const nonce = req.body.nonce;
-  const owner = req.body.owner;
-  const nonceKind = req.body.nonce_kind;
-  const badNonce = await nonceUtil.isBadNonce(owner, nonce, nonceKind);
-  if (badNonce) {
-    const resp = {};
-    resp.errorMessage = `Nonce mismatch, log in again.`;
-    resp.ready = false;
-    return resp;
-  }
-};
+// const verifyOwnerAndNonce = async (req) => {
+//   if (req.body.nonce === undefined) {
+//     const resp = {};
+//     resp.message = 'no nonce';
+//     resp.success = false;
+//     return resp;
+//   }
+//   if (req.body.owner === undefined) {
+//     const resp = {};
+//     resp.message = 'no owner';
+//     resp.success = false;
+//     return resp;
+//   }
+//   if (req.body.nonce_kind === undefined) {
+//     const resp = {};
+//     resp.message = 'no nonce_kind';
+//     resp.success = false;
+//     return resp;
+//   }
+//   const nonce = req.body.nonce;
+//   const owner = req.body.owner;
+//   const nonceKind = req.body.nonce_kind;
+//   const badNonce = await nonceUtil.isBadNonce(owner, nonce, nonceKind);
+//   if (badNonce) {
+//     const resp = {};
+//     resp.errorMessage = `Nonce mismatch, log in again.`;
+//     resp.ready = false;
+//     return resp;
+//   }
+// };
 
 const distinct = (array) => {
   return [...new Set(array)];

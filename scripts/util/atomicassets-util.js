@@ -6,6 +6,7 @@ const path = require('path');
 const crypto = require('crypto');
 const request = require('request');
 const sharp = require('sharp');
+const AbortController = require('abort-controller');
 
 // modules
 const assetUtil = require('./asset-util.js');
