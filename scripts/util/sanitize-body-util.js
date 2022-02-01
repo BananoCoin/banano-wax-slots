@@ -60,6 +60,8 @@ const init = (_config, _loggingUtil) => {
   regexpMap.set('nonce', new RegExp('^[a-f0-9]+$'));
   regexpMap.set('state', new RegExp('^[a-f0-9]+$'));
   regexpMap.set('bet', new RegExp('^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$'));
+  regexpMap.set('amount', new RegExp('^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$'));
+  regexpMap.set('account', new RegExp('^ban_[13456789abcdefghijkmnopqrstuwxyz]{0,64}$'));
   regexpMap.set('nonce_kind', new RegExp('^wax|cmc$'));
   regexpMap.set('referred_by', new RegExp('^[a-zA-Z0-9_\\.]*$'));
 };
