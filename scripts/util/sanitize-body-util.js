@@ -59,6 +59,7 @@ const init = (_config, _loggingUtil) => {
   regexpMap.set('code', new RegExp('^[a-zA-Z0-9]+$'));
   regexpMap.set('nonce', new RegExp('^[a-f0-9]+$'));
   regexpMap.set('state', new RegExp('^[a-f0-9]+$'));
+  regexpMap.set('bet', new RegExp('^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$'));
   regexpMap.set('nonce_kind', new RegExp('^wax|cmc$'));
   regexpMap.set('referred_by', new RegExp('^[a-zA-Z0-9_\\.]*$'));
 };
