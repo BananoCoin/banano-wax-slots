@@ -200,6 +200,8 @@ const initWebServer = async () => {
 
   app.get('/', async (req, res) => {
     const data = {};
+
+    data.autoplayCycleTime = config.autoplayCycleTime;
     data.accountSeedLinkEnabled = config.accountSeedLinkEnabled;
     data.templateCount = atomicassetsUtil.getTemplateCount();
     data.burnAccount = config.burnAccount;

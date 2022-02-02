@@ -187,7 +187,10 @@ const play = async (bet) => {
   xmlhttp.send(JSON.stringify(parms));
   document.querySelector('#play').disabled = true;
   if (window.localStorage.autoplayOn == 'true') {
-    setTimeout(autoplay, 1000);
+    const autoplayCycleTime = parseInt(document.querySelector('#autoplayCycleTime').innerText);
+    if (autoplayCycleTime > 0) {
+      setTimeout(autoplay, autoplayCycleTime);
+    }
   }
 };
 

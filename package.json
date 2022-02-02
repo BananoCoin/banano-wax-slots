@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "1.5.21",
+  "version": "1.5.22",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -32,7 +32,7 @@
     "express-handlebars": "^6.0.2",
     "node-fetch": "^2.6.7",
     "request": "^2.88.2",
-    "sharp": "^0.29.3",
+    "sharp": "^0.30.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1"
   },

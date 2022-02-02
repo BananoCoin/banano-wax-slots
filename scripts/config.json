@@ -14,6 +14,7 @@
   "centralWalletReceivePendingIntervalMs": 10000,
   "centralWalletReceivePendingLoggingOn": false,
   "centralWalletSeed": "",
+  "autoplayCycleTime": 5000,
   "fetchTimeout": 5000,
   "houseWalletSeed": "",
   "cookieSecret": "",
@@ -65,8 +66,7 @@
     "https://wax.eu.eosamsterdam.net",
     "https://wax.greymass.com"
   ],
-  "atomicAssetsEndpointsV2": [
-  ],
+  "atomicAssetsEndpointsV2": [],
   "atomicAssetsEndpointsV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json&type=atomic",
   "waxEndpointV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json&type=hyperion",
   "waxEndpointV2RefreshMs": 600000,
