@@ -15,6 +15,7 @@ const webPageWithdrawUtil = require('./pages/withdraw-util.js');
 const randomUtil = require('../util/random-util.js');
 const timedCacheUtil = require('../util/timed-cache-util.js');
 const sanitizeBodyUtil = require('../util/sanitize-body-util.js');
+const ownerAccountUtil = require('../util/owner-account-util.js');
 
 // constants
 const version = require('../../package.json').version;
@@ -230,6 +231,35 @@ const initWebServer = async () => {
     // console.log('/', data);
 
     res.render('slots', data);
+  });
+
+  app.get('/nft', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.body);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
+    const resp = {};
+    resp.ownersWithAccountsList = await ownerAccountUtil.getOwnersWithAccountsList();
+    resp.activeWaxUserList = await atomicassetsUtil.getOwnersWithWalletsList();
+
+    resp.ownersEligibleForGiveawayList = [];
+    for (let ix = 0; ix < resp.activeWaxUserList.length; ix++) {
+      const ownerWithAccount = resp.activeWaxUserList[ix];
+      if (resp.ownersWithAccountsList.includes(ownerWithAccount)) {
+        const isOwnerEligibleForGiveawayFlag = await atomicassetsUtil.isOwnerEligibleForGiveaway(ownerWithAccount);
+        // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', isOwnerEligibleForGiveawayFlag, ownerWithAccount);
+        if (isOwnerEligibleForGiveawayFlag) {
+          resp.ownersEligibleForGiveawayList.push(ownerWithAccount);
+        }
+      // } else {
+        // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', 'no account', ownerWithAccount);
+      }
+    }
+    res.send(resp);
   });
 
   app.post('/play', async (req, res) => {

@@ -11,6 +11,7 @@ let tryNumber = 0;
 const maxTryNumber = 2;
 let owner;
 let cardData;
+let nftData;
 let walletKind;
 let betFromSvgId = '1ban';
 let betFromSvg = 0;
@@ -105,6 +106,16 @@ window.resetNonceAndOwner = async () => {
   owner = undefined;
   window.onLoad();
 };
+
+const getNftData = async() => {
+    const res = await fetch('/nft', {
+      method: 'get',
+      headers: {'Content-Type': 'application/json'},
+    });
+    const text = await res.text();
+    const json = JSON.parse(text);
+    nftData = json;
+}
 
 const play = async (bet) => {
   const xmlhttp = new XMLHttpRequest();
@@ -705,6 +716,7 @@ window.onLoad = async () => {
   }
   synchSound();
   synchAutoplay();
+  getNftData();
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   let waxEndpointUrl = waxEndpointElt.innerText;
@@ -1429,7 +1441,9 @@ const resetScoreText = async () => {
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
-  document.querySelector('#activeUsersList2').innerHTML = asOrderedList(cardData.activeWaxUserList, cardData.ownersWithAccountsList, cardData.ownersEligibleForGiveawayList);
+  if(nftData !== undefined) {
+    document.querySelector('#activeUsersList2').innerHTML = asOrderedList(nftData.activeWaxUserList, nftData.ownersWithAccountsList, nftData.ownersEligibleForGiveawayList);
+  }
 
   document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;
 

@@ -440,22 +440,6 @@ const postWithoutCatch = async (context, req, res) => {
       }
     }
   }
-  resp.ownersWithAccountsList = await ownerAccountUtil.getOwnersWithAccountsList();
-  resp.activeWaxUserList = await atomicassetsUtil.getOwnersWithWalletsList();
-
-  resp.ownersEligibleForGiveawayList = [];
-  for (let ix = 0; ix < resp.activeWaxUserList.length; ix++) {
-    const ownerWithAccount = resp.activeWaxUserList[ix];
-    if (resp.ownersWithAccountsList.includes(ownerWithAccount)) {
-      const isOwnerEligibleForGiveawayFlag = await atomicassetsUtil.isOwnerEligibleForGiveaway(ownerWithAccount);
-      // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', isOwnerEligibleForGiveawayFlag, ownerWithAccount);
-      if (isOwnerEligibleForGiveawayFlag) {
-        resp.ownersEligibleForGiveawayList.push(ownerWithAccount);
-      }
-    // } else {
-      // loggingUtil.log(dateUtil.getDate(), 'isOwnerEligibleForGiveawayFlag', 'no account', ownerWithAccount);
-    }
-  }
 
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
