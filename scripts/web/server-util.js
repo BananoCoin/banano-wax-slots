@@ -202,6 +202,7 @@ const initWebServer = async () => {
   app.get('/', async (req, res) => {
     const data = {};
 
+    data.giveawayResultsEndpoint = config.giveawayResultsEndpoint;
     data.autoplayCycleTime = config.autoplayCycleTime;
     data.accountSeedLinkEnabled = config.accountSeedLinkEnabled;
     data.templateCount = atomicassetsUtil.getTemplateCount();

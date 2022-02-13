@@ -12,6 +12,7 @@ const maxTryNumber = 2;
 let owner;
 let cardData;
 let nftData;
+let giveawayResults;
 let walletKind;
 let betFromSvgId = '1ban';
 let betFromSvg = 0;
@@ -107,15 +108,26 @@ window.resetNonceAndOwner = async () => {
   window.onLoad();
 };
 
-const getNftData = async() => {
-    const res = await fetch('/nft', {
-      method: 'get',
-      headers: {'Content-Type': 'application/json'},
-    });
-    const text = await res.text();
-    const json = JSON.parse(text);
-    nftData = json;
-}
+const getGiveawayWinnerData = async () => {
+  const giveawayResultsEndpoint = document.querySelector('#giveawayResultsEndpoint').innerText;
+  const res = await fetch(giveawayResultsEndpoint, {
+    method: 'get',
+    headers: {'Content-Type': 'application/json'},
+  });
+  const text = await res.text();
+  const json = JSON.parse(text);
+  giveawayResults = json;
+};
+
+const getNftData = async () => {
+  const res = await fetch('/nft', {
+    method: 'get',
+    headers: {'Content-Type': 'application/json'},
+  });
+  const text = await res.text();
+  const json = JSON.parse(text);
+  nftData = json;
+};
 
 const play = async (bet) => {
   const xmlhttp = new XMLHttpRequest();
@@ -258,7 +270,7 @@ window.checkEndpoints = () => {
 
 window.addWaxEndpoints = async () => {
   const waxEndpointsJsonElt = document.querySelector('#waxEndpointsJson');
-  const waxEndpointsJsonTxt = waxEndpointsJsonElt.innerText;
+  const waxEndpointsJsonTxt = waxEndpointsJsonElt.innerText; activeUsersList;
   const waxEndpointsJson = JSON.parse(waxEndpointsJsonTxt);
   let html = '';
   checkEndpointsFns.length = 0;
@@ -717,6 +729,7 @@ window.onLoad = async () => {
   synchSound();
   synchAutoplay();
   getNftData();
+  getGiveawayWinnerData();
 
   const waxEndpointElt = document.querySelector('#waxEndpoint');
   let waxEndpointUrl = waxEndpointElt.innerText;
@@ -1441,8 +1454,23 @@ const resetScoreText = async () => {
 
   document.querySelector('#activeUsers2').innerText = document.querySelector('#activeUsers').innerText;
 
-  if(nftData !== undefined) {
-    document.querySelector('#activeUsersList2').innerHTML = asOrderedList(nftData.activeWaxUserList, nftData.ownersWithAccountsList, nftData.ownersEligibleForGiveawayList);
+  if (nftData !== undefined) {
+    document.querySelector('#activeUsersList').innerHTML = asOrderedList(nftData.activeWaxUserList, nftData.ownersWithAccountsList, nftData.ownersEligibleForGiveawayList);
+  }
+  if (giveawayResults !== undefined) {
+    if (giveawayResults.data !== undefined) {
+      let html = '<h4>Giveaway Winners</h4><ol>';
+      for (let ix = 0; ix < giveawayResults.data.length; ix++) {
+        const elt = giveawayResults.data[ix];
+        html += '<li>';
+        html += elt.issue_time.split('T')[0];
+        html += ' ';
+        html += JSON.stringify(elt.winner);
+        html += '</li>';
+      }
+      html += '</ol>';
+      document.querySelector('#giveawayResults').innerHTML = html;
+    }
   }
 
   document.querySelector('#totalWinsAndLosses2').innerText = document.querySelector('#totalWinsAndLosses').innerText;

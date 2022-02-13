@@ -71,6 +71,7 @@
   "waxEndpointV2ListUrl": "http://waxmonitor.cmstats.net/api/endpoints?format=json&type=hyperion",
   "waxEndpointV2RefreshMs": 600000,
   "waxEndpointV2MinWeight": 7,
+  "giveawayResultsEndpoint": "https://mine.api.cmstats.net/drops?limit=1000&slots=true&order=desc",
   "web": {
     "port": "8686"
   },

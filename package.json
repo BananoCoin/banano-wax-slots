@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.5.1",
+    "@bananocoin/bananojs": "^2.5.2",
     "abort-controller": "^3.0.0",
     "await-semaphore": "^0.1.3",
     "blakejs": "^1.1.1",
@@ -32,7 +32,7 @@
     "express-handlebars": "^6.0.2",
     "node-fetch": "^2.6.7",
     "request": "^2.88.2",
-    "sharp": "^0.30.0",
+    "sharp": "^0.30.1",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1"
   },
