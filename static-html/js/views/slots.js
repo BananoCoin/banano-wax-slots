@@ -641,6 +641,7 @@ window.toggleAutoplay = () => {
 window.debug = () => {
   const scoreText = [];
   scoreText.push(`owner:${window.localStorage.owner}`);
+  scoreText.push(`wallets:${JSON.stringify(cardData.wallets)}`);
   scoreText.push(`nonce.length:${window.localStorage.nonce.length}`);
   scoreText.push(`endpoint:${waxEndpoint.rpc.endpoint}`);
   scoreText.push(`clientTimestamp:${window.localStorage.nonceTimestamp}`);

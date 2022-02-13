@@ -249,6 +249,7 @@ const postWithoutCatch = async (context, req, res) => {
   await updateBalances();
 
   const payoutInformation = await atomicassetsUtil.getPayoutInformation(owner);
+  resp.wallets = payoutInformation.wallets;
   resp.payoutAmount = payoutInformation.payoutAmount;
   resp.payoutAmount = parseFloat(resp.payoutAmount);
 

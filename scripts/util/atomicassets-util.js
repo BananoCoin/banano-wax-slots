@@ -433,6 +433,7 @@ const thawOwnerAssetsIfItIsTime = async (ownedCards, frozenCount) => {
 
 const getPayoutInformation = async (owner) => {
   const resp = {};
+  resp.wallets = await loadWalletsForOwner(owner);
   resp.cardCount = 0;
   resp.templateCount = templates.length;
   // loggingUtil.log(dateUtil.getDate(), 'STARTED countCards');
