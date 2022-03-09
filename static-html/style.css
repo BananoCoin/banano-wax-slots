@@ -25,7 +25,11 @@ li {
   vertical-align: middle;
 }
 
-span, form, ul, li, p {
+span,
+form,
+ul,
+li,
+p {
   color: black;
 }
 
@@ -241,25 +245,25 @@ table.centered {
   bottom: 0;
 }
 
-.bet input[type="radio"] {
+.bet input[type='radio'] {
   opacity: 0.01;
   z-index: 100;
 }
 
-.bet input[type="radio"]:checked+label,
-.Checked+label {
+.bet input[type='radio']:checked + label,
+.Checked + label {
   background: yellow;
 }
 
 .bet label {
   padding: 0.5vmin;
-  border: 0.1vmin solid #CCC;
+  border: 0.1vmin solid #ccc;
   cursor: pointer;
   z-index: 90;
 }
 
 .bet label:hover {
-  background: #DDD;
+  background: #ddd;
 }
 
 .exit_link {
@@ -273,11 +277,11 @@ table.centered {
 }
 
 .exit_link:active {
-  color: #AAA;
+  color: #aaa;
 }
 
 .exit_link:hover {
-  color: #AAA;
+  color: #aaa;
 }
 
 .mb-3 {
@@ -295,11 +299,11 @@ table.centered {
   color: #fff;
   background-color: var(--bs-dark);
   border-color: #fff;
-  box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .25);
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
 }
 
 .bi {
-  vertical-align: -.125em;
+  vertical-align: -0.125em;
   fill: currentColor;
 }
 

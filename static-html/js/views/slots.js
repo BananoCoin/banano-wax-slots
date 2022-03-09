@@ -1,6 +1,7 @@
+/* eslint-disable camelcase */
+/* eslint-disable require-jsdoc */
 import {waxjs} from '../../js-lib/waxjs-0.0.14.js';
 import {blake2bInit, blake2bUpdate, blake2bFinal} from '../../js-lib/blake2b.js';
-import {bananojs} from '../../js-lib/bananocoin-bananojs-2.2.2.js';
 import {getDate} from '../../js-lib/date-util.js';
 
 const blurSize = '0.5vmin';
@@ -482,7 +483,7 @@ const spinMonkey = (cardElt, ownedAsset) => {
   }
   const cardTitle = `${ownedAsset.name}`;
   const src = `/ipfs/${ownedAsset.img}.webp`;
-  const image = addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale) url(#blur)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
+  addChildSvgElement(cardElt, 'image', {'filter': 'url(#grayscale) url(#blur)', 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
   addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
 };
 
@@ -755,7 +756,7 @@ window.onLoad = async () => {
   const ownerElt = document.querySelector('#owner');
   const referredByElt = document.querySelector('#referredBy');
   const nonceKindElt = document.querySelector('#nonceKind');
-  const cardElt = document.querySelector('#cards');
+  // const cardElt = document.querySelector('#cards');
   const nonceElt = document.querySelector('#nonce');
   const nonceHashElt = document.querySelector('#nonceHash');
   const lastNonceElt = document.querySelector('#lastNonceHash');
@@ -1007,7 +1008,7 @@ const addCards = async () => {
   const lastNonceHashElt = document.querySelector('#lastNonceHash');
   const nonceHashElt = document.querySelector('#nonceHash');
 
-  const scoreElt = document.querySelector('#score');
+  // const scoreElt = document.querySelector('#score');
   setEverythingNotGray();
   if (lastNonceHashElt.innerText != nonceHashElt.innerText) {
     const scoreText = ['Need to log in again.', 'local nonce hash has does not match', 'blockchain nonce hash.'];
@@ -1059,7 +1060,7 @@ const addCards = async () => {
   const card2Elt = getSvgSlotMachineElementById('card2');
   const card3Elt = getSvgSlotMachineElementById('card3');
   const setCard = (cardElt, cardDataElt) => {
-    const innerHTML = '';
+    // const innerHTML = '';
     let border = '';
     if (cardDataElt.frozen) {
       border = 'border-width:0.2vh;border-color:blue;background-color:lightblue;';
@@ -1091,7 +1092,7 @@ const addCards = async () => {
     }
     const cardTitle = `${cardDataElt.name} (${cardDataElt.totalCardCount-cardDataElt.frozenCardCount}/${cardDataElt.totalCardCount})`;
     const anchorElt = addChildSvgElement(cardElt, 'a', {'href': href, 'target': '__blank'});
-    const image = addChildSvgElement(anchorElt, 'image', {'filter': filter, 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
+    addChildSvgElement(anchorElt, 'image', {'filter': filter, 'href': src, 'x': 0, 'y': 2, 'width': 84, 'height': 105});
     addText(addChildSvgElement(cardElt, 'text', {'x': 5, 'y': 120, 'width': 86, 'height': 20, 'font-family': 'monospace', 'font-size': '6', 'stroke': 'black', 'fill': 'white', 'pointer-events': 'none'}), cardTitle);
   };
   if ((cardData === undefined) || (!cardData.ready)) {
@@ -1621,18 +1622,18 @@ const getOrientation = () => {
   }
 };
 
-const addScoreDivInnerHeader = () => {
-  try {
-    const orientation = getOrientation();
-    const innerWidth = window.innerWidth;
-    const innerHeight = window.innerHeight;
-    const hide = getHideFlag(innerWidth, innerHeight, orientation);
-    const scoreDivInnerElt = document.querySelector('#scoreDivInner1');
-    scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight}h:hide:${hide} orientation:${orientation}<br>`;
-  } catch (error) {
-    alert(error.message);
-  }
-};
+// const addScoreDivInnerHeader = () => {
+//   try {
+//     const orientation = getOrientation();
+//     const innerWidth = window.innerWidth;
+//     const innerHeight = window.innerHeight;
+//     const hide = getHideFlag(innerWidth, innerHeight, orientation);
+//     const scoreDivInnerElt = document.querySelector('#scoreDivInner1');
+//     scoreDivInnerElt.innerHTML = `${window.innerWidth}w > ${window.innerHeight}h:hide:${hide} orientation:${orientation}<br>`;
+//   } catch (error) {
+//     alert(error.message);
+//   }
+// };
 
 window.onresize = () => {
   hideShowScoreDiv();
@@ -1698,7 +1699,6 @@ const setAccountCacheBalance = (balanceText, balanceTooltip) => {
 const withdraw = () => {
   const accountElt = document.querySelector('#withdrawAccount');
   const amountElt = document.querySelector('#withdrawAmount');
-  const withdrawButtonElt = document.querySelector('#withdrawButton');
   const withdrawResponseElt = document.querySelector('#withdrawResponse');
 
   const xmlhttp = new XMLHttpRequest();

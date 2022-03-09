@@ -14,8 +14,11 @@
     "sourceType": "module"
   },
   "rules": {
-    "max-len": ["error", {
-      "code": 450
-    }]
+    "max-len": [
+      "error",
+      {
+        "code": 450
+      }
+    ]
   }
 }
