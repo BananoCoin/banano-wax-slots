@@ -3,7 +3,7 @@
     <tr>
       <td colspan="3">
         <div class=" bg_color_darkgreen d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3" style="margin:0.1vmin">
-          <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+          <a href="/" class="d-flex align-items-center col-md-4 mb-2 mb-md-0 text-dark text-decoration-none">
             <img src="/logo.png" class="bi me-2" width="132" style="margin:0.1vmin" height="32vmin" role="img" aria-label="Bootstrap"></img>
             {{version}}
           </a>
@@ -12,7 +12,7 @@
             <button id="additionlDetailsButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" disabled onclick="showAdditionalDetails();return false;">Withdraw / Details / Cards</button>
             <button id="faqButton" type="button" class="btn btn-black me-2 bg_color_yellow color_black" onclick="showFAQ();return false;">FAQ</button>
           </ul>
-          <b class="col-md-3 color_black text-end" style="margin-right:3%">
+          <b class="col-md-4 color_black text-end" style="margin-right:3%">
             <table>
               <tr>
                 <td>
@@ -25,7 +25,10 @@
                 <td>
                   <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="waxjsWallet();return false;">WAX</button>
                   <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="anchorWallet();return false;">Anchor</button>
-                  <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="cryptomonkeyConnectWallet();return false;">🙈</button>
+                  <button type="button" class="btn btn-outline-black me-2 bg_color_yellow color_black" onclick="cryptomonkeyConnectWallet();return false;" title="Crypto Monkey Connect">
+                    Crypto Monkey Connect
+                    <img src="https://connect.cryptomonkeys.cc/static/images/image0.png" class="bi me-2" width="16vmin" style="margin:0.1vmin" height="16vmin" role="img" aria-label="Bootstrap"></img>
+                  </button>
                 </td>
               </tr>
             </table>
