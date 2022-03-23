@@ -90,6 +90,7 @@ body {
 
 .bg_color_darkgreen {
   background-color: rgb(0, 128, 0);
+  border-radius: 1rem;
 }
 
 .bg_color_yellow {
