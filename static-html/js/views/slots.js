@@ -540,7 +540,7 @@ const setArm = (id) => {
   smrestElt.setAttribute('visibility', 'hidden');
   smmouseElt.setAttribute('visibility', 'hidden');
   smclickElt.setAttribute('visibility', 'hidden');
-  if(id !== 'smrest') {
+  if (id !== 'smrest') {
     runnerElt.setAttribute('visibility', 'visible');
   } else {
     runnerElt.setAttribute('visibility', 'hidden');
