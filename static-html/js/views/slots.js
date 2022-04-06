@@ -535,10 +535,16 @@ const setArm = (id) => {
   const smrestElt = getSvgSlotMachineElementById('smrest');
   const smmouseElt = getSvgSlotMachineElementById('smmouse');
   const smclickElt = getSvgSlotMachineElementById('smclick');
+  const runnerElt = getSvgSlotMachineElementById('runner');
   const elt = getSvgSlotMachineElementById(id);
   smrestElt.setAttribute('visibility', 'hidden');
   smmouseElt.setAttribute('visibility', 'hidden');
   smclickElt.setAttribute('visibility', 'hidden');
+  if(id !== 'smrest') {
+    runnerElt.setAttribute('visibility', 'visible');
+  } else {
+    runnerElt.setAttribute('visibility', 'hidden');
+  }
   elt.setAttribute('visibility', 'visible');
 };
 

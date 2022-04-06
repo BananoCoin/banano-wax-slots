@@ -12,6 +12,7 @@
     <image id="smrest" href="slot-machine-rest.png" x="45" y="195" width="800" height="755" visibility="visible"/>
     <image id="smmouse" href="slot-machine-mouseover.png" x="45" y="195" width="800" height="755" visibility="hidden"/>
     <image id="smclick" href="slot-machine-click.png" x="45" y="195" width="800" height="755" visibility="hidden"/>
+    <image id="runner" href="runner.gif" x="425" y="660" width="40" height="40" visibility="hidden"/>
     <g id="card_group" transform="translate(283,420)">
       <g id="card1" transform="translate(0,0)">
         <rect x="0" y="0" width="86" height="127" fill="#FF0000"/>
