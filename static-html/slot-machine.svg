@@ -32,7 +32,7 @@
       <text x="300" y="323" font-family="impact" font-size="20" stroke="none" fill="cyan" pointer-events="none" id="accountCacheBalance" text-anchor="middle"></text>
     </g>
     <g id="score_group" transform="translate(170,30)">
-      <rect x="109" y="733" width="330" height="100" fill="cyan" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+      <rect x="109" y="733" width="330" height="90" fill="cyan" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
       <g id="score"></g>
     </g>
 
