@@ -53,7 +53,7 @@ tbody {
 body {
   padding: 0;
   margin: 0;
-  background: url(forest-background.png) no-repeat center center fixed;
+  background: url(forest-bg.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
