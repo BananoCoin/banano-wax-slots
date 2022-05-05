@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "1.7.9",
+  "version": "1.7.10",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.5.11",
+    "@bananocoin/bananojs": "^2.5.13",
     "abort-controller": "^3.0.0",
     "await-semaphore": "^0.1.3",
     "blakejs": "^1.2.1",
@@ -27,21 +27,21 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "eosjs": "^22.1.0",
-    "express": "^4.17.3",
+    "express": "^4.18.1",
     "express-handlebars": "^6.0.5",
     "node-fetch": "^2.6.7",
     "request": "^2.88.2",
     "sharp": "^0.30.4",
-    "socket.io": "^4.4.1",
-    "socket.io-client": "^4.4.1"
+    "socket.io": "^4.5.0",
+    "socket.io-client": "^4.5.0"
   },
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.6",
-    "eslint": "^8.13.0",
+    "eslint": "^8.14.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^9.2.2",
-    "npm-check-updates": "^12.5.9",
+    "npm-check-updates": "^12.5.11",
     "nyc": "^15.1.0",
     "prettier": "^2.6.2",
     "xml2json": "^0.12.0"
