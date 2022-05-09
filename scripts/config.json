@@ -61,7 +61,7 @@
     "port": "8686"
   },
   "disableWithdraw": false,
-  "minWithdrawalBananos": 15,
+  "minWithdrawalBananos": 1,
   "blackMonkeyCaptcha": {
     "thawTimeMs": 5000,
     "enabled": false,
