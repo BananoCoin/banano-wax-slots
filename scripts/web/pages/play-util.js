@@ -19,7 +19,7 @@ const ownerAccountUtil = require('../../util/owner-account-util.js');
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
-const checkPendingSeeds = new Set();
+// const checkPendingSeeds = new Set();
 let totalWinsSinceRestart = 0;
 let totalLossesSinceRestart = 0;
 /* eslint-enable no-unused-vars */
@@ -71,28 +71,18 @@ const post = async (context, req, res) => {
 const receivePending = async (representative, seed) => {
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
   const pendingList = [];
-  let noPending = false;
-  while (!noPending) {
-    const pending = await bananojsCacheUtil.getAccountsPending([account], config.maxPendingBananos, true);
-    if (config.centralWalletReceivePendingLoggingOn) {
-      loggingUtil.log(dateUtil.getDate(), 'account', account, 'pending', pending.blocks[account]);
-    }
-    if (pending!== undefined) {
-    // loggingUtil.log(dateUtil.getDate(), 'pending', pending);
-      if (pending.error) {
-        noPending = true;
-      } else {
-        const pendingBlocks = pending.blocks[account];
-        if (pendingBlocks !== undefined) {
-          const hashes = [...Object.keys(pendingBlocks)];
-          if (hashes.length !== 0) {
-            const hash = hashes[0];
-            const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
-            pendingList.push(response);
-          } else {
-            noPending = true;
-          }
-        }
+  const pending = await bananojsCacheUtil.getAccountsPending([account], config.maxPendingBananos, true);
+  if (config.centralWalletReceivePendingLoggingOn) {
+    loggingUtil.log(dateUtil.getDate(), 'account', account, 'pending', pending.blocks[account]);
+  }
+  if (pending !== undefined) {
+    const pendingBlocks = pending.blocks[account];
+    if (pendingBlocks !== undefined) {
+      const hashes = [...Object.keys(pendingBlocks)];
+      if (hashes.length !== 0) {
+        const hash = hashes[0];
+        const response = await bananojsCacheUtil.receiveBananoDepositsForSeed(seed, config.walletSeedIx, representative, hash);
+        pendingList.push(response);
       }
     }
   }
@@ -106,7 +96,8 @@ const centralAccountReceivePending = async () => {
     }
     const centralAccount = await bananojsCacheUtil.getBananoAccountFromSeed(config.centralWalletSeed, config.walletSeedIx);
     const centralPendingList = await receivePending(centralAccount, config.centralWalletSeed);
-    const seeds = [...checkPendingSeeds];
+    // const seeds = [...checkPendingSeeds];
+    const seeds = [];
     seeds.push(config.houseWalletSeed);
     for (let seedIx = 0; seedIx < seeds.length; seedIx++) {
       const seed = seeds[seedIx];
@@ -114,7 +105,7 @@ const centralAccountReceivePending = async () => {
       if (config.centralWalletReceivePendingLoggingOn) {
         loggingUtil.log(dateUtil.getDate(), 'pendingList', pendingList);
       }
-      checkPendingSeeds.delete(seed);
+      // checkPendingSeeds.delete(seed);
     }
     if (config.centralWalletReceivePendingLoggingOn) {
       loggingUtil.log(dateUtil.getDate(), 'SUCCESS centralAccountReceivePending', centralPendingList);
@@ -192,10 +183,10 @@ const postWithoutCatch = async (context, req, res) => {
   const seed = seedUtil.getSeedFromOwner(owner);
   // loggingUtil.log(dateUtil.getDate(), 'seed');// , seed);
   const account = await bananojsCacheUtil.getBananoAccountFromSeed(seed, config.walletSeedIx);
-  if (config.centralWalletReceivePendingLoggingOn) {
-    loggingUtil.log(dateUtil.getDate(), 'checkPendingSeeds.add', account);
-  }
-  checkPendingSeeds.add(seed);
+  // if (config.centralWalletReceivePendingLoggingOn) {
+  // loggingUtil.log(dateUtil.getDate(), 'checkPendingSeeds.add', account);
+  // }
+  // checkPendingSeeds.add(seed);
 
   const resp = {};
   resp.ready = true;
