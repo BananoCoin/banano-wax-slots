@@ -1,12 +1,10 @@
 'use strict';
 // libraries
-const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const request = require('request');
 const sharp = require('sharp');
-const AbortController = require('abort-controller');
 
 // modules
 const assetUtil = require('./asset-util.js');
@@ -14,6 +12,7 @@ const dateUtil = require('./date-util.js');
 const timedCacheUtil = require('./timed-cache-util.js');
 const awaitSemaphore = require('await-semaphore');
 const randomUtil = require('./random-util.js');
+const fetchWithTimeoutUtil = require('./fetch-with-timeout-util.js');
 
 // constants
 
@@ -121,90 +120,13 @@ const deactivate = () => {
   ready = false;
 };
 
-
-const fetchWithTimeout = async (url, options) => {
-  // loggingUtil.log('fetchWithTimeout', 'url', url);
-  if (options == undefined) {
-    options = {};
-  }
-  if (options.headers == undefined) {
-    options.headers = {};
-  }
-  options.headers['Content-Type'] = 'application/json';
-
-  const {timeout = config.fetchTimeout} = options;
-
-  const controller = new AbortController();
-  /* istanbul ignore next */
-  const controllerTimeoutFn = () => {
-    controller.abort();
-  };
-  const id = setTimeout(controllerTimeoutFn, timeout);
-  const responseWrapper = {};
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    responseWrapper.headers = response.headers;
-    responseWrapper.status = response.status;
-    // loggingUtil.log('fetchWithTimeout', 'options', options);
-    responseWrapper.json = async () => {
-      if (response.status != 200) {
-        throw Error(response.statusText);
-      }
-      const text = await response.text();
-      // loggingUtil.log('fetchWithTimeout', 'status', response.status);
-
-      const limit = response.headers.get('x-ratelimit-limit');
-      const remaining = response.headers.get('x-ratelimit-remaining');
-      const reset = response.headers.get('x-ratelimit-reset');
-      const resetDate = new Date(reset*1000);
-      const resetDiff = Math.round(((reset*1000) - Date.now()) / 1000);
-
-      if (remaining == 0) {
-        const message = `${remaining} of ${limit} left, reset in ${resetDiff} sec at ${resetDate} (${reset})`;
-        loggingUtil.log('fetchWithTimeout', message);
-        responseWrapper.status = 500;
-        return {message: message};
-      }
-
-      // loggingUtil.log('fetchWithTimeout', 'text', text);
-      try {
-        return JSON.parse(text);
-      } catch (error) {
-        const message = 'returned invalid json from ' + url;
-        loggingUtil.log('fetchWithTimeout', message);
-        responseWrapper.status = 500;
-        return {message: message};
-      }
-    };
-  } catch (error) {
-    // console.trace(error);
-    clearTimeout(id);
-    if (error.message == 'The user aborted a request.') {
-      error.message = `timeout waiting for response from url '${url}'`;
-    }
-    responseWrapper.status = 408;
-    responseWrapper.statusText = error.message;
-    responseWrapper.json = async () => {
-      if (responseWrapper.status != 200) {
-        throw Error(responseWrapper.statusText);
-      }
-    };
-  } finally {
-    clearTimeout(id);
-  }
-  return responseWrapper;
-};
-
 const getWaxApiUrl = () => {
   return randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
 };
 
 const getWaxApi = (url) => {
   try {
-    const waxApi = new ExplorerApi(url, 'atomicassets', {fetch: fetchWithTimeout});
+    const waxApi = new ExplorerApi(url, 'atomicassets', {fetch: fetchWithTimeoutUtil.fetchWithTimeout});
     return waxApi;
   } catch (error) {
     loggingUtil.log('FAILURE getWaxApi', url, error.message);

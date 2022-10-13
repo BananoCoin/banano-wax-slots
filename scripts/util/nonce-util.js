@@ -1,12 +1,15 @@
 'use strict';
 // libraries
 const blake = require('blakejs');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 // modules
 const randomUtil = require('./random-util.js');
+const fetchWithTimeoutUtil = require('./fetch-with-timeout-util.js');
 
 // constants
+const fetch = fetchWithTimeoutUtil.fetchWithTimeout;
+
 /** wax network, for both anchor and wax cloud wallet nonces. */
 const waxLastNonceHashByOwnerMap = new Map();
 
@@ -37,9 +40,9 @@ const init = (_config, _loggingUtil) => {
     if ((res.status !== 200)&&(res.status !== 202)) {
       throw Error(`url:'${url}' status:'${res.status}' statusText:'${res.statusText}'`);
     }
-    const text = await res.text();
+    const json = await res.json();
     // console.log('text',text)
-    return JSON.parse(text);
+    return json;
   };
 
   const newFetchPromise = async (url, method, body) => {

@@ -16,6 +16,7 @@ const sanitizeBodyUtil = require('./util/sanitize-body-util.js');
 const webPagePlayUtil = require('./web/pages/play-util.js');
 const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
+const fetchWithTimeoutUtil = require('./util/fetch-with-timeout-util.js');
 
 // constants
 const config = require('./config.json');
@@ -64,6 +65,7 @@ const init = async () => {
     }
   }
 
+  modules.push(fetchWithTimeoutUtil);
   modules.push(assetUtil);
   modules.push(bananojsCacheUtil);
   modules.push(dateUtil);

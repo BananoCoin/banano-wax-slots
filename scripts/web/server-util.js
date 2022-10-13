@@ -4,7 +4,7 @@ const http = require('http');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 // modules
 const dateUtil = require('../util/date-util.js');
@@ -16,8 +16,10 @@ const randomUtil = require('../util/random-util.js');
 const timedCacheUtil = require('../util/timed-cache-util.js');
 const sanitizeBodyUtil = require('../util/sanitize-body-util.js');
 const ownerAccountUtil = require('../util/owner-account-util.js');
+const fetchWithTimeoutUtil = require('../util/fetch-with-timeout-util.js');
 
 // constants
+const fetch = fetchWithTimeoutUtil.fetchWithTimeout;
 const version = require('../../package.json').version;
 const historyGetActionsCacheMap = new Map();
 
@@ -62,9 +64,9 @@ const toJson = async (url, res) => {
     // console.log(`cors`, originControl);
   }
   // console.log(`res.headers`, res.headers);
-  const text = await res.text();
+  const json = await res.json();
   // console.log('text',text)
-  return JSON.parse(text);
+  return json;
 };
 
 
