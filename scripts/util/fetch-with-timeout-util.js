@@ -1,6 +1,7 @@
 'use strict';
 // libraries
 const fetch = require('node-fetch');
+const dateUtil = require('./date-util.js');
 const AbortController = require('abort-controller');
 
 // constants
@@ -96,10 +97,10 @@ const fetchWithTimeout = async (url, options) => {
       await delay(pauseTime);
 
       // loggingUtil.log('fetchWithTimeout', `${remaining} of ${limit} left, reset in ${resetDiff} sec at ${resetDate} (${reset})`);
+      const message = `${remaining} of ${limit} left, delay ${pauseTime}, reset in ${resetDiff} sec at ${resetDate} (${reset})`;
+      loggingUtil.log(dateUtil.getDate(), 'fetchWithTimeout', message);
 
       if (remaining == 0) {
-        const message = `${remaining} of ${limit} left, reset in ${resetDiff} sec at ${resetDate} (${reset})`;
-        loggingUtil.log('fetchWithTimeout', message);
         responseWrapper.status = 500;
         return {message: message};
       }
