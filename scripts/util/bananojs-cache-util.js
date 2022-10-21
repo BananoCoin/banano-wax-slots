@@ -147,7 +147,7 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
     const mutexRelease = await mutex.acquire();
     try {
       if (fromAccount == toAccount) {
-        return 'cannot send to yourself';
+        return 'failure, cannot send to yourself';
       }
       const fromAccountData = getAccountData(fromAccount);
       const fromAccountBalance = BigInt(fromAccountData.balance);
@@ -177,6 +177,9 @@ const sendBananoWithdrawalFromSeed = async (seed, seedIx, toAccount, amountBanan
       }
       saveAccountDataJson(fromAccount, fromAccountData);
       saveAccountDataJson(toAccount, toAccountData);
+      if (message.length == 0) {
+        return `failure, blank hash returned sending ${amountBananos} to ${toAccount}`;
+      }
       return message;
     } finally {
       mutexRelease();

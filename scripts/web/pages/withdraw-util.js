@@ -139,7 +139,7 @@ const postWithoutCatch = async (context, req, res) => {
     const resp = {};
     resp.message = message;
     resp.success = true;
-    if (message == 'cannot send to yourself') {
+    if (message.startsWith('failure')) {
       resp.success = false;
     }
     // loggingUtil.log(dateUtil.getDate(), 'resp', resp);
