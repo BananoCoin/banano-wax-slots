@@ -86,6 +86,8 @@ const init = async () => {
     await item.init(config, loggingUtil);
   }
 
+  await bananojsCacheUtil.auditCache();
+
   await atomicassetsUtil.setWaxApiAndAddTemplates();
 
   webServerUtil.setCloseProgramFunction(closeProgram);

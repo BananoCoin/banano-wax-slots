@@ -214,6 +214,38 @@ const getActiveAccountCount = () => {
   return count;
 };
 
+const auditCache = async () => {
+  const centralAccount = await bananojs.getBananoAccountFromSeed(config.centralWalletSeed, config.walletSeedIx);
+  const accountInfo = await bananojs.getAccountInfo(centralAccount, true);
+
+  if (accountInfo.balance == undefined) {
+    loggingUtil.log(dateUtil.getDate(), 'auditCache', 'centralAccount', centralAccount, 'no balance in accountInfo', accountInfo);
+    return;
+  }
+  const balanceParts = await bananojs.getBananoPartsFromRaw(accountInfo.balance);
+  const bananoDecimal = Number(await bananojs.getBananoPartsAsDecimal(balanceParts));
+  let cacheBananoDecimal = 0;
+
+  const mutexRelease = await mutex.acquire();
+  try {
+    const files = fs.readdirSync(config.bananojsCacheDataDir);
+
+    loggingUtil.log(dateUtil.getDate(), 'STARTED', 'auditCache', 'account count', files.length);
+
+    for (const file of files) {
+      const fileNm = path.join(config.bananojsCacheDataDir, file);
+      const data = fs.readFileSync(fileNm, 'UTF-8');
+      const json = JSON.parse(data);
+      const cacheBalanceParts = await bananojs.getBananoPartsFromRaw(json.balance);
+      cacheBananoDecimal += Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
+    }
+    const excessInAccount = bananoDecimal - cacheBananoDecimal;
+    loggingUtil.log(dateUtil.getDate(), 'SUCCESS', 'auditCache', 'cacheBananoDecimal', cacheBananoDecimal, 'bananoDecimal', bananoDecimal, 'excessInAccount', excessInAccount);
+  } finally {
+    mutexRelease();
+  }
+};
+
 module.exports.init = init;
 module.exports.deactivate = deactivate;
 module.exports.getBananoDecimalAmountAsRaw = bananojs.getBananoDecimalAmountAsRaw;
@@ -229,3 +261,4 @@ module.exports.sendBananoWithdrawalFromSeed = sendBananoWithdrawalFromSeed;
 module.exports.receiveBananoDepositsForSeed = receiveBananoDepositsForSeed;
 module.exports.getTotalAccountCount = getTotalAccountCount;
 module.exports.getActiveAccountCount = getActiveAccountCount;
+module.exports.auditCache = auditCache;
