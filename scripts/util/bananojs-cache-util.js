@@ -235,9 +235,13 @@ const auditCache = async () => {
     for (const file of files) {
       const fileNm = path.join(config.bananojsCacheDataDir, file);
       const data = fs.readFileSync(fileNm, 'UTF-8');
-      const json = JSON.parse(data);
-      const cacheBalanceParts = await bananojs.getBananoPartsFromRaw(json.balance);
-      cacheBananoDecimal += Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
+      try {
+        const json = JSON.parse(data);
+        const cacheBalanceParts = await bananojs.getBananoPartsFromRaw(json.balance);
+        cacheBananoDecimal += Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
+      } catch (error) {
+        loggingUtil.trace(dateUtil.getDate(), 'ERROR', 'auditCache', 'error', error.message, `data:'${data}'`);
+      }
     }
     const excessInAccount = bananoDecimal - cacheBananoDecimal;
     loggingUtil.log(dateUtil.getDate(), 'SUCCESS', 'auditCache', 'cacheBananoDecimal', cacheBananoDecimal, 'bananoDecimal', bananoDecimal, 'excessInAccount', excessInAccount);
