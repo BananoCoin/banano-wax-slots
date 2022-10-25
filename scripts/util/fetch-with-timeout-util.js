@@ -133,6 +133,11 @@ const fetchWithTimeout = async (url, options) => {
     }
     responseWrapper.status = 408;
     responseWrapper.statusText = error.message;
+    responseWrapper.text = async () => {
+      if (responseWrapper.status != 200) {
+        throw Error(responseWrapper.statusText);
+      }
+    };
     responseWrapper.json = async () => {
       if (responseWrapper.status != 200) {
         throw Error(responseWrapper.statusText);
