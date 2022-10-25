@@ -73,11 +73,10 @@ const fetchWithTimeout = async (url, options) => {
     });
     responseWrapper.headers = response.headers;
     responseWrapper.status = response.status;
+    responseWrapper.statusText = response.statusText;
+    responseWrapper.remaining = 0;
     // loggingUtil.log('fetchWithTimeout', 'options', options);
-    responseWrapper.json = async () => {
-      if (response.status != 200) {
-        throw Error(`status:'${response.status}' statusText:'${response.statusText}'`);
-      }
+    responseWrapper.text = async () => {
       const text = await response.text();
       // loggingUtil.log('fetchWithTimeout', 'status', response.status);
 
@@ -100,7 +99,18 @@ const fetchWithTimeout = async (url, options) => {
       const message = `${remaining} of ${limit} left, delay ${pauseTime}, reset in ${resetDiff} sec at ${resetDate} (${reset})`;
       loggingUtil.debug(dateUtil.getDate(), 'fetchWithTimeout', message);
 
-      if (remaining == 0) {
+      responseWrapper.remaining = remaining;
+
+      return text;
+    };
+    responseWrapper.json = async () => {
+      if (response.status != 200) {
+        throw Error(`status:'${response.status}' statusText:'${response.statusText}'`);
+      }
+      const text = await responseWrapper.text();
+
+
+      if (responseWrapper.remaining == 0) {
         responseWrapper.status = 500;
         return {message: message};
       }

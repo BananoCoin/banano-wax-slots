@@ -405,8 +405,8 @@ const initWebServer = async () => {
     if (config.cryptomonkeysConnect.redirect_uri !== '') {
       tokenBodyForm += '&redirect_uri=' + config.cryptomonkeysConnect.redirect_uri;
     }
-    loggingUtil.debug('tokenUrl', tokenUrl);
-    loggingUtil.debug('tokenBodyForm', tokenBodyForm);
+    // loggingUtil.debug('tokenUrl', tokenUrl);
+    // loggingUtil.debug('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
