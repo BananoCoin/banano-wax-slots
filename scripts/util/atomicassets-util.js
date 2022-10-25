@@ -313,18 +313,27 @@ const getOwnedCardsToCache = async (owner) => {
       // loggingUtil.log('getOwnedCardsToCache', 'url', url);
       const waxApi = getWaxApi(url);
       // console.log('owner', owner, 'page', page, allAssets.length);
-      const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
-      pageAssets.forEach((asset) => {
-        // console.log('owner', owner, 'page', page, asset);
-        const templateId = asset.template.template_id.toString();
-        if (!excludedTemplateSet.has(templateId)) {
-          if (includedSchemaSet.has(asset.schema.schema_name)) {
-            allAssets.push(asset);
+      try {        
+        const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
+        pageAssets.forEach((asset) => {
+          // console.log('owner', owner, 'page', page, asset);
+          const templateId = asset.template.template_id.toString();
+          if (!excludedTemplateSet.has(templateId)) {
+            if (includedSchemaSet.has(asset.schema.schema_name)) {
+              allAssets.push(asset);
+            }
+          }
+        });
+        if (pageAssets.length < assetsPerPage) {
+          moreAssets = false;
+        }
+      } catch (error) {
+        if (error.message == 'Only absolute URLs are supported') {
+          const index = config.atomicAssetsEndpointsV2.indexOf(url);
+          if (index > -1) { // only splice array when item is found
+            config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
           }
         }
-      });
-      if (pageAssets.length < assetsPerPage) {
-        moreAssets = false;
       }
       page++;
     }
