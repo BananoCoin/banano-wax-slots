@@ -313,7 +313,7 @@ const getOwnedCardsToCache = async (owner) => {
       // loggingUtil.log('getOwnedCardsToCache', 'url', url);
       const waxApi = getWaxApi(url);
       // console.log('owner', owner, 'page', page, allAssets.length);
-      try {        
+      try {
         const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
         pageAssets.forEach((asset) => {
           // console.log('owner', owner, 'page', page, asset);

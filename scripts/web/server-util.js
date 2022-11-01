@@ -397,20 +397,33 @@ const initWebServer = async () => {
     loggingUtil.debug(dateUtil.getDate(), 'callback', 'state', state);
 
     const tokenUrl = config.cryptomonkeysConnect.token_url;
-    let tokenBodyForm = '';
-    tokenBodyForm += 'client_id=' + config.cryptomonkeysConnect.client_id;
-    tokenBodyForm += '&client_secret=' + config.cryptomonkeysConnect.client_secret;
-    tokenBodyForm += '&grant_type=authorization_code';
-    tokenBodyForm += '&code=' + code;
+
+    const details = {
+      client_id: config.cryptomonkeysConnect.client_id,
+      client_secret: config.cryptomonkeysConnect.client_secret,
+      grant_type: 'authorization_code',
+      code: 'code',
+    };
+
     if (config.cryptomonkeysConnect.redirect_uri !== '') {
-      tokenBodyForm += '&redirect_uri=' + config.cryptomonkeysConnect.redirect_uri;
+      details.redirect_uri = config.cryptomonkeysConnect.redirect_uri;
     }
+    const formBody = [];
+    for (const property in details) {
+      if (details.hasOwnProperty(property)) {
+        const encodedKey = encodeURIComponent(property);
+        const encodedValue = encodeURIComponent(details[property]);
+        formBody.push(encodedKey + '=' + encodedValue);
+      }
+    }
+    const tokenBodyForm = formBody.join('&');
+
     // loggingUtil.debug('tokenUrl', tokenUrl);
     // loggingUtil.debug('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
       body: tokenBodyForm,
     });
