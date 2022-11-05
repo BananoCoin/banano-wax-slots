@@ -402,7 +402,7 @@ const initWebServer = async () => {
       client_id: config.cryptomonkeysConnect.client_id,
       client_secret: config.cryptomonkeysConnect.client_secret,
       grant_type: 'authorization_code',
-      code: 'code',
+      code: code,
     };
 
     if (config.cryptomonkeysConnect.redirect_uri !== '') {
