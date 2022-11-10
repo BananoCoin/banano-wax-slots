@@ -416,7 +416,7 @@ const initWebServer = async () => {
         formBody.push(encodedKey + '=' + encodedValue);
       }
     }
-    const tokenBodyForm = formBody.join('&');
+    const tokenBodyForm = encodeURIComponent(formBody.join('&'));
 
     // loggingUtil.debug('tokenUrl', tokenUrl);
     // loggingUtil.debug('tokenBodyForm', tokenBodyForm);
@@ -441,6 +441,9 @@ const initWebServer = async () => {
       loggingUtil.log('tokenUrl', tokenUrl);
       loggingUtil.log('tokenBodyForm', tokenBodyForm);
       loggingUtil.log('tokenResponseText', tokenResponseText);
+
+      loggingUtil.log(`curl '${tokenUrl}' -H 'Content-Type: application/x-www-form-urlencoded;charset=UTF-8' --request POST --data '${tokenBodyForm}'`);
+
       res.redirect(302, '/');
       return;
     }
