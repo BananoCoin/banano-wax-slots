@@ -83,7 +83,7 @@ window.cryptomonkeyConnectWallet = async () => {
     redirectUrl += ':' + window.location.port;
   }
   redirectUrl += '/oauth/monkeyconnect/callback';
-  const url = `${authUrl}?response_type=code&client_id=${clientId}&scope=name&state=${window.localStorage.nonce}&redirect_uri=${redirectUrl}`;
+  const url = `${authUrl}?response_type=code&response_mode=query&client_id=${clientId}&scope=name&state=${window.localStorage.nonce}&redirect_uri=${redirectUrl}`;
   console.log('url', url);
   document.location = url;
 };

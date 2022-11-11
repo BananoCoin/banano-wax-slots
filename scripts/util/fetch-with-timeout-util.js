@@ -55,7 +55,9 @@ const fetchWithTimeout = async (url, options) => {
   if (options.headers == undefined) {
     options.headers = {};
   }
-  options.headers['Content-Type'] = 'application/json';
+  if (options.headers['Content-Type'] === undefined) {
+    options.headers['Content-Type'] = 'application/json';
+  }
 
   const {timeout = config.fetchTimeout} = options;
 

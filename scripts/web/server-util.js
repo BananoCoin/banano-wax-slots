@@ -411,19 +411,22 @@ const initWebServer = async () => {
     const formBody = [];
     for (const property in details) {
       if (details.hasOwnProperty(property)) {
-        const encodedKey = encodeURIComponent(property);
-        const encodedValue = encodeURIComponent(details[property]);
+        // const encodedKey = encodeURIComponent(property);
+        // const encodedValue = encodeURIComponent(details[property]);
+        const encodedKey = property;
+        const encodedValue = details[property];
         formBody.push(encodedKey + '=' + encodedValue);
       }
     }
-    const tokenBodyForm = encodeURIComponent(formBody.join('&'));
+    const tokenBodyForm = formBody.join('&');
+    // const tokenBodyForm = encodeURIComponent(formBody.join('&'));
 
     // loggingUtil.debug('tokenUrl', tokenUrl);
     // loggingUtil.debug('tokenBodyForm', tokenBodyForm);
     const tokenRes = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: tokenBodyForm,
     });
@@ -442,7 +445,7 @@ const initWebServer = async () => {
       loggingUtil.log('tokenBodyForm', tokenBodyForm);
       loggingUtil.log('tokenResponseText', tokenResponseText);
 
-      loggingUtil.log(`curl '${tokenUrl}' -H 'Content-Type: application/x-www-form-urlencoded;charset=UTF-8' --request POST --data '${tokenBodyForm}'`);
+      loggingUtil.log(`curl -Ss -X POST  '${tokenUrl}' -H 'Content-Type: application/x-www-form-urlencoded' -d '${tokenBodyForm}'`);
 
       res.redirect(302, '/');
       return;
