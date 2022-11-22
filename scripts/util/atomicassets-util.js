@@ -291,6 +291,10 @@ const getTotalActiveCardCount = () => {
   return timedCacheUtil.getCacheSize(ownerAssetCacheMap);
 };
 
+const getActiveCardHistogram = () => {
+  return timedCacheUtil.getCacheHistogram(ownerAssetCacheMap);
+};
+
 const getOwnedCards = async (owner) => {
   const getOwnedCardsCallback = () => {
     return getOwnedCardsToCache(owner);
@@ -554,6 +558,7 @@ module.exports.getPayoutInformation = getPayoutInformation;
 module.exports.isReady = isReady;
 module.exports.getTemplates = getTemplates;
 module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
+module.exports.getActiveCardHistogram = getActiveCardHistogram;
 module.exports.getActiveAccountList = getActiveAccountList;
 module.exports.loadWalletsForOwner = loadWalletsForOwner;
 module.exports.saveWalletsForOwner = saveWalletsForOwner;

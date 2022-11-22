@@ -91,6 +91,33 @@ const getCacheSize = (map) => {
   return cacheSize;
 };
 
+const roundToPowerOf = (number, base) => {
+  return Math.pow(base, Math.round(logBase(number, base)));
+};
+
+const logBase = (number, base) => {
+  return Math.log(number)/Math.log(base);
+};
+
+const getCacheHistogram = (map) => {
+  // console.log('getCacheHistogram', 'map', map);
+  const histogramMap = new Map();
+  for (const [key, cacheData] of map) {
+    if (key !== undefined) {
+      // take the number of cards, and round to nearest power of 2.
+      const histogramKey = `${roundToPowerOf(cacheData.data.length, 2)}`;
+      increment(histogramMap, histogramKey);
+    }
+  }
+  // console.log('getCacheHistogram', 'histogramMap', histogramMap);
+  const histogram = {};
+  for (const [key, count] of histogramMap) {
+    histogram[key] = count;
+  }
+  // console.log('getCacheHistogram', 'histogram', histogram);
+  return histogram;
+};
+
 const increment = (map, key) => {
   if (!map.has(key)) {
     map.set(key, 1);
@@ -113,3 +140,4 @@ module.exports.getUsingNamedCache = getUsingNamedCache;
 module.exports.getCacheSize = getCacheSize;
 module.exports.getCacheMissCountMap = getCacheMissCountMap;
 module.exports.getCacheHitCountMap = getCacheHitCountMap;
+module.exports.getCacheHistogram = getCacheHistogram;

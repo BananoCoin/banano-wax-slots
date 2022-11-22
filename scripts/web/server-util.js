@@ -265,6 +265,20 @@ const initWebServer = async () => {
     res.send(resp);
   });
 
+  app.get('/histogram', async (req, res) => {
+    try {
+      sanitizeBodyUtil.sanitizeBody(req.body);
+    } catch (error) /* istanbul ignore next */ {
+      const resp = {};
+      resp.error = error.message;
+      res.send(resp);
+      return;
+    }
+    const resp = {};
+    resp.histogram = await atomicassetsUtil.getActiveCardHistogram();
+    res.send(resp);
+  });
+
   app.post('/play', async (req, res) => {
     try {
       sanitizeBodyUtil.sanitizeBody(req.body);
