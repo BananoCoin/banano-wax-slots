@@ -165,7 +165,7 @@ const addAllTemplates = async (waxApi) => {
     loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates page', page);
     let lessThanMax = false;
     try {
-      const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys'}, page, max);
+      const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys'}, page, max);
       lessThanMax = pageTemplates.length < max;
       loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, pageTemplates.length, max);
 
@@ -249,7 +249,7 @@ const getTemplateCount = () => {
 };
 
 const getAssetOptions = (owner) => {
-  return {'collection_name': 'crptomonkeys', 'owner': owner};
+  return {'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys', 'owner': owner};
 };
 
 const hasOwnedCards = async (owner) => {
@@ -319,7 +319,8 @@ const getOwnedCardsToCache = async (owner) => {
       // console.log('owner', owner, 'page', page, allAssets.length);
       try {
         const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
-        pageAssets.forEach((asset) => {
+        pageAssets.forEach((rawAsset) => {
+          const asset = cloneAsset(rawAsset);
           // console.log('owner', owner, 'page', page, asset);
           const templateId = asset.template.template_id.toString();
           if (!excludedTemplateSet.has(templateId)) {
@@ -331,6 +332,7 @@ const getOwnedCardsToCache = async (owner) => {
         if (pageAssets.length < assetsPerPage) {
           moreAssets = false;
         }
+        page++;
       } catch (error) {
         if (error.message == 'Only absolute URLs are supported') {
           const index = config.atomicAssetsEndpointsV2.indexOf(url);
@@ -339,7 +341,6 @@ const getOwnedCardsToCache = async (owner) => {
           }
         }
       }
-      page++;
     }
   }
   return allAssets;
@@ -469,6 +470,78 @@ const getOwnerFile = (owner) => {
   return path.join(config.ownerWalletDataDir, fileNm);
 };
 
+const cloneAsset = (asset) => {
+  const assetData = {};
+  assetData.owner = asset.owner;
+  assetData.asset_id = asset.asset_id;
+  assetData.template = {};
+  assetData.template.template_id = asset.template.template_id;
+  assetData.template.immutable_data = {};
+  assetData.template.immutable_data.name = asset.template.immutable_data.name;
+  assetData.template.immutable_data.img = asset.template.immutable_data.img;
+  assetData.template.immutable_data.rarity = asset.template.immutable_data.rarity;
+  assetData.template.max_supply = asset.template.max_supply;
+  assetData.schema = {};
+  assetData.schema.schema_name = asset.schema.schema_name;
+  return assetData;
+};
+
+const loadAllAssets = async () => {
+  console.log(dateUtil.getDate(), 'STARTED loadAllAssets');
+  const assetOptions = {'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys'};
+  let page = 1;
+  let totalAssets = 0;
+  const assetsPerPage = config.maxAssetsPerPage;
+  let moreAssets = true;
+  const assetMap = {};
+
+  while (moreAssets) {
+    const url = getWaxApiUrl();
+    const waxApi = getWaxApi(url);
+    try {
+      const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
+      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'page', page, 'totalAssets', totalAssets, 'url', url, 'pageAssets.length', pageAssets.length);
+      pageAssets.forEach((rawAsset) => {
+        const asset = cloneAsset(rawAsset);
+        const owner = asset.owner;
+        // console.log('owner', owner, 'page', page, asset);
+        if (assetMap[owner] == undefined) {
+          assetMap[owner] = [];
+        }
+        const templateId = asset.template.template_id.toString();
+        if (!excludedTemplateSet.has(templateId)) {
+          if (includedSchemaSet.has(asset.schema.schema_name)) {
+            assetMap[owner].push(asset);
+            totalAssets++;
+          }
+        }
+      });
+      if (pageAssets.length < assetsPerPage) {
+        moreAssets = false;
+      }
+      page++;
+    } catch (error) {
+      if (error.message == 'Only absolute URLs are supported') {
+        const index = config.atomicAssetsEndpointsV2.indexOf(url);
+        if (index > -1) { // only splice array when item is found
+          config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
+        }
+      }
+    }
+  }
+  const owners = Object.keys(assetMap);
+  console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', owners.length, 'owners');
+
+  for (const owner of owners) {
+    const getOwnedCardsCallback = () => {
+      return assetMap[owner];
+    };
+    await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
+        config.assetCacheTimeMs, getOwnedCardsCallback);
+  }
+  loggingUtil.log(dateUtil.getDate(), 'SUCCESS loadAllAssets');
+};
+
 const loadWalletsForOwner = async (owner) => {
   const mutexRelease = await mutex.acquire();
   try {
@@ -481,11 +554,6 @@ const loadWalletsForOwner = async (owner) => {
     return json.wallets;
   } finally {
     mutexRelease();
-  }
-  if (walletsForOwner.has(owner)) {
-    return walletsForOwner.get(owner);
-  } else {
-    return [owner];
   }
 };
 
@@ -566,3 +634,4 @@ module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
 module.exports.getOwnersWithWalletsList = getOwnersWithWalletsList;
 module.exports.setWaxApiAndAddTemplates = setWaxApiAndAddTemplates;
 module.exports.getWaxApi = getWaxApi;
+module.exports.loadAllAssets = loadAllAssets;
