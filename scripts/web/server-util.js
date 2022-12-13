@@ -69,6 +69,13 @@ const toJson = async (url, res) => {
   return json;
 };
 
+const isKnownError = (error) => {
+  let knownError = false;
+  if (error.message.startsWith('content size at ') && error.message.endsWith(` over limit: ${config.fetchMaxResponseSizeBytes}`)) {
+    knownError = true;
+  }
+  return knownError;
+};
 
 const refreshAtomicAssetsEndpointList = async () => {
   loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'STARTING', 'count', config.atomicAssetsEndpointsV2.length);
@@ -110,7 +117,10 @@ const refreshAtomicAssetsEndpointList = async () => {
 
     loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'FINISHED', 'count', config.atomicAssetsEndpointsV2.length, 'distinct', distinct(config.atomicAssetsEndpointsV2).length);
   } catch (error) {
-    loggingUtil.trace(error);
+    const knownError = isKnownError(error);
+    if (!knownError) {
+      loggingUtil.trace(error);
+    }
     loggingUtil.log(dateUtil.getDate(), 'refreshAtomicAssetsEndpointList', 'FAILURE', 'error', error.message);
   }
 };
@@ -161,7 +171,10 @@ const refreshWaxEndpointList = async () => {
 
     loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FINISHED', 'count', config.waxEndpointsV2.length, 'distinct', distinct(config.waxEndpointsV2).length);
   } catch (error) {
-    loggingUtil.trace(error);
+    const knownError = isKnownError(error);
+    if (!knownError) {
+      loggingUtil.trace(error);
+    }
     loggingUtil.log(dateUtil.getDate(), 'refreshWaxEndpointList', 'FAILURE', 'error', error.message);
   }
   setTimeout(refreshWaxEndpointList, config.waxEndpointV2RefreshMs);

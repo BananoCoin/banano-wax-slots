@@ -58,6 +58,9 @@ const fetchWithTimeout = async (url, options) => {
   if (options.headers['Content-Type'] === undefined) {
     options.headers['Content-Type'] = 'application/json';
   }
+  if (options.size == undefined) {
+    options.size = config.fetchMaxResponseSizeBytes;
+  }
 
   const {timeout = config.fetchTimeout} = options;
 
@@ -117,7 +120,10 @@ const fetchWithTimeout = async (url, options) => {
         return {message: message};
       }
 
-      // loggingUtil.log('fetchWithTimeout', 'text', text);
+      if (config.fetchLogResponseSize) {
+
+      }
+      loggingUtil.log(dateUtil.getDate(), 'fetchWithTimeout', url, 'text.length', text.length, 'of', 'options.size', options.size);
       try {
         return JSON.parse(text);
       } catch (error) {

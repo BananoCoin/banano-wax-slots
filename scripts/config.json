@@ -16,6 +16,8 @@
   "centralWalletSeed": "",
   "autoplayCycleTime": 5000,
   "fetchTimeout": 5000,
+  "fetchMaxResponseSizeBytes": 50000000,
+  "fetchLogResponseSize": true,
   "houseWalletSeed": "",
   "cookieSecret": "",
   "historyGetActionsTimeMs": 30000,

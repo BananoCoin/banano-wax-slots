@@ -240,7 +240,7 @@ const auditCache = async () => {
         const cacheBalanceParts = await bananojs.getBananoPartsFromRaw(json.balance);
         cacheBananoDecimal += Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
       } catch (error) {
-        loggingUtil.trace(dateUtil.getDate(), 'ERROR', 'auditCache', 'error', error.message, `data:'${data}'`);
+        loggingUtil.trace(dateUtil.getDate(), 'ERROR', 'auditCache', 'file', file, 'error', error.message, `data:'${data}'`);
       }
     }
     const excessInAccount = bananoDecimal - cacheBananoDecimal;
