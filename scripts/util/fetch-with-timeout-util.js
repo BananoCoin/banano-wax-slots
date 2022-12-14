@@ -109,7 +109,7 @@ const fetchWithTimeout = async (url, options) => {
       return text;
     };
     responseWrapper.json = async () => {
-      if (response.status != 200) {
+      if ((response.status != 200) && (response.status != 202)) {
         throw Error(`status:'${response.status}' statusText:'${response.statusText}'`);
       }
       const text = await responseWrapper.text();
