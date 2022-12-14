@@ -316,7 +316,9 @@ const getOwnedCardsToCache = async (owner) => {
       const url = getWaxApiUrl();
       // loggingUtil.log('getOwnedCardsToCache', 'url', url);
       const waxApi = getWaxApi(url);
-      // console.log('owner', owner, 'page', page, allAssets.length);
+      if (config.atomicAssetsLogSize) {
+        console.log('owner', owner, 'page', page, 'allAssets.length', allAssets.length);
+      }
       try {
         const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
         pageAssets.forEach((rawAsset) => {
@@ -343,7 +345,11 @@ const getOwnedCardsToCache = async (owner) => {
       }
     }
   }
-  return allAssets;
+  const allAssetsStr = JSON.stringify(allAssets);
+  if (config.atomicAssetsLogSize) {
+    console.log('owner', owner, 'allAssets.length', allAssets.length, 'allAssetsStr.length', allAssetsStr.length);
+  }
+  return JSON.parse(allAssetsStr);
 };
 
 const getFrozenCount = async (ownedCards) => {
