@@ -317,7 +317,7 @@ const getOwnedCardsToCache = async (owner) => {
       // loggingUtil.log('getOwnedCardsToCache', 'url', url);
       const waxApi = getWaxApi(url);
       if (config.atomicAssetsLogSize) {
-        console.log('owner', owner, 'page', page, 'allAssets.length', allAssets.length);
+        console.log('owner', owner, 'wallet', wallet, 'page', page, 'allAssets.length', allAssets.length);
       }
       try {
         const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
@@ -336,8 +336,10 @@ const getOwnedCardsToCache = async (owner) => {
         }
         page++;
       } catch (error) {
+        console.log('owner', owner, 'error.message', error.message);
         if (error.message == 'Only absolute URLs are supported') {
           const index = config.atomicAssetsEndpointsV2.indexOf(url);
+          console.log('owner', owner, 'urle', url, 'index', index);
           if (index > -1) { // only splice array when item is found
             config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
           }
