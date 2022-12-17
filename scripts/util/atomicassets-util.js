@@ -46,6 +46,7 @@ const init = (_config, _loggingUtil) => {
   ready = false;
 
   mutex = new awaitSemaphore.Mutex();
+
   if (!fs.existsSync(config.ownerWalletDataDir)) {
     fs.mkdirSync(config.ownerWalletDataDir, {recursive: true});
   }

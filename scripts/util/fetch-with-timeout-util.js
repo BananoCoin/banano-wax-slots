@@ -1,5 +1,7 @@
 'use strict';
 // libraries
+const fs = require('fs');
+const path = require('path');
 const fetch = require('node-fetch');
 const dateUtil = require('./date-util.js');
 const AbortController = require('abort-controller');
@@ -22,6 +24,11 @@ const init = (_config, _loggingUtil) => {
   };
   config = _config;
   loggingUtil = _loggingUtil;
+
+  if (!fs.existsSync(config.fetchLogsDataDir)) {
+    fs.mkdirSync(config.fetchLogsDataDir, {recursive: true});
+  }
+  logFetchRotate(true);
 };
 
 const deactivate = () => {
@@ -72,6 +79,10 @@ const fetchWithTimeout = async (url, options) => {
   const id = setTimeout(controllerTimeoutFn, timeout);
   const responseWrapper = {};
   try {
+    if (config.fetchLogResponseSize) {
+      logFetchRequest(dateUtil.getDate(), url);
+    }
+
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -121,9 +132,8 @@ const fetchWithTimeout = async (url, options) => {
       }
 
       if (config.fetchLogResponseSize) {
-
+        logFetchResponse(dateUtil.getDate(), url, text.length, options.size);
       }
-      loggingUtil.log(dateUtil.getDate(), 'fetchWithTimeout', url, 'text.length', text.length, 'of', 'options.size', options.size);
       try {
         return JSON.parse(text);
       } catch (error) {
@@ -155,6 +165,70 @@ const fetchWithTimeout = async (url, options) => {
     clearTimeout(id);
   }
   return responseWrapper;
+};
+
+const logFetchRequest = (date, url) => {
+  // console.log('logFetchRequest', 'date', date, 'url', url);
+  const logFileNm = path.join(config.fetchLogsDataDir, `${date}-001-request.txt`);
+  if (!fs.existsSync(logFileNm)) {
+    const header = '"date","url"\r\n';
+    fs.appendFileSync(logFileNm, header);
+  }
+  const msg = `"${date}","${url}"\r\n`;
+  fs.appendFileSync(logFileNm, msg);
+  logFetchRotate(false);
+};
+
+const logFetchResponse = (date, url, length, max) => {
+  // console.log('logFetchResponse', 'date', date, 'url', url, 'length', length, 'max', max);
+  const logFileNm = path.join(config.fetchLogsDataDir, `${date}-002-response.txt`);
+  if (!fs.existsSync(logFileNm)) {
+    const header = '"date","url","length","max"\r\n';
+    fs.appendFileSync(logFileNm, header);
+  }
+  const msg = `"${date}","${url}","${length}","${max}"\r\n`;
+  fs.appendFileSync(logFileNm, msg);
+  logFetchRotate(false);
+};
+
+const logFetchRotate = (verbose) => {
+  if (fs.existsSync(config.fetchLogsDataDir)) {
+    const getFullFileName = (file) => {
+      return `${config.fetchLogsDataDir}/${file}`;
+    };
+    const files = fs.readdirSync(config.fetchLogsDataDir);
+    const sortedFiles = files.sort((a, b) => {
+      const aStat = fs.statSync(getFullFileName(a));
+      const bStat = fs.statSync(getFullFileName(b));
+      return new Date(bStat.birthtime).getTime() - new Date(aStat.birthtime).getTime();
+    });
+    if (verbose) {
+      for (let fileIx = 0; fileIx < sortedFiles.length; fileIx++) {
+        const file = sortedFiles[fileIx];
+        const data = fs.readFileSync(getFullFileName(file), {encoding: 'utf8', flag: 'r'});
+        const lines = data.split('\n');
+        for (let lineIx = 0; lineIx < lines.length; lineIx++) {
+          const line = lines[lineIx].trim();
+          if (line.length > 0) {
+            loggingUtil.log(dateUtil.getDate(), 'logFetchRotate', file, lineIx, line);
+          }
+        }
+      }
+    }
+
+    const maxFileCount = config.fetchLogResponseMaxFileCount;
+    for (let fileIx = 0; fileIx < sortedFiles.length; fileIx++) {
+      const file = sortedFiles[fileIx];
+      if (fileIx >= maxFileCount) {
+        fs.unlinkSync(getFullFileName(file));
+      }
+    }
+
+    // const remainingFiles = fs.readdirSync(config.fetchLogsDataDir);
+    // console.log('logFetchRotate', 'maxFileCount', maxFileCount,
+    //   'sortedFiles.length', sortedFiles.length,
+    //   'remainingFiles.length', remainingFiles.length);
+  }
 };
 
 module.exports.fetchWithTimeout = fetchWithTimeout;
