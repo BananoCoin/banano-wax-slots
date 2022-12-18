@@ -167,8 +167,8 @@ const addAllTemplates = async (waxApi) => {
     let moreTemplates = false;
     try {
       const pageTemplates = await waxApi.getTemplates({'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys'}, page, max);
-      moreTemplates = (pageTemplates.length == max) || (pageTemplates.length != 0);
-      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, pageTemplates.length, max);
+      moreTemplates = pageTemplates.length > 0;
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, 'pageTemplates.length', pageTemplates.length, 'max', max);
 
       for (let pageTemplateIx = 0; pageTemplateIx < pageTemplates.length; pageTemplateIx++) {
         const pageTemplate = pageTemplates[pageTemplateIx];
@@ -314,11 +314,12 @@ const getOwnedCardsToCache = async (owner) => {
     const assetsPerPage = config.maxAssetsPerPage;
     let moreAssets = true;
     while (moreAssets) {
+      moreAssets = false;
       const url = getWaxApiUrl();
       // loggingUtil.log(dateUtil.getDate(), 'getOwnedCardsToCache', 'url', url);
       const waxApi = getWaxApi(url);
       if (config.atomicAssetsLogSize) {
-        loggingUtil.log(dateUtil.getDate(), 'getOwnedCardsToCache', 'owner', owner, 'wallet', wallet, 'page', page, 'allAssets.length', allAssets.length);
+        loggingUtil.log(dateUtil.getDate(), 'INTERIM', 'getOwnedCardsToCache', 'owner', owner, 'wallet', wallet, 'page', page, 'allAssets.length', allAssets.length);
       }
       try {
         const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
@@ -332,20 +333,13 @@ const getOwnedCardsToCache = async (owner) => {
             }
           }
         });
-        if (config.atomicAssetsLogZeroAssetOwners) {
-          if (pageAssets.length == 0) {
-            loggingUtil.log(dateUtil.getDate(), 'getOwnedCardsToCache', 'WARNING', 'owner', owner, 'wallet', wallet, 'page', page, 'allAssets.length', allAssets.length);
-          }
-        }
-        if ((pageAssets.length < assetsPerPage) || (pageAssets.length != 0)) {
-          moreAssets = false;
-        }
+        moreAssets = pageAssets.length > 0;
         page++;
       } catch (error) {
-        loggingUtil.log(dateUtil.getDate(), 'getOwnedCardsToCache', 'ERROR', 'owner', owner, 'error.message', error.message);
+        loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'error.message', error.message);
         if (error.message == 'Only absolute URLs are supported') {
           const index = config.atomicAssetsEndpointsV2.indexOf(url);
-          loggingUtil.log(dateUtil.getDate(), 'getOwnedCardsToCache', 'ERROR', 'owner', owner, 'url', url, 'index', index);
+          loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'url', url, 'index', index);
           if (index > -1) { // only splice array when item is found
             config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
           }
@@ -613,7 +607,9 @@ const sleep = async (ms) => {
 
 const thawAllAssetsIfItIsTime = async () => {
   try {
-    loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
+    if (config.thawAllAssetsIfItIsTimeVerbose) {
+      loggingUtil.log(dateUtil.getDate(), 'STARTED thawAllAssetsIfItIsTime');
+    }
     const owners = await getOwnersWithWalletsList();
     for (let ownerIx = 0; ownerIx < owners.length; ownerIx++) {
       if (ownerIx > 0) {
@@ -621,14 +617,18 @@ const thawAllAssetsIfItIsTime = async () => {
       }
       const owner = owners[ownerIx];
       const ownedCards = await getOwnedCards(owner);
-      loggingUtil.log(dateUtil.getDate(), 'INTERIM thawAllAssetsIfItIsTime', 'owner', owner, 'ownedCards.length', ownedCards.length);
+      if (config.thawAllAssetsIfItIsTimeVerbose) {
+        loggingUtil.log(dateUtil.getDate(), 'INTERIM thawAllAssetsIfItIsTime', 'owner', owner, 'ownedCards.length', ownedCards.length);
+      }
       if (ownedCards.length == 0) {
         loggingUtil.log(dateUtil.getDate(), 'WARNING', 'thawAllAssetsIfItIsTime', 'can remove from owner wallet cache, no cards', owner);
       }
       const frozenCount = await getFrozenCount(ownedCards);
       await thawOwnerAssetsIfItIsTime(ownedCards, frozenCount);
     }
-    loggingUtil.log(dateUtil.getDate(), 'SUCCESS thawAllAssetsIfItIsTime');
+    if (config.thawAllAssetsIfItIsTimeVerbose) {
+      loggingUtil.log(dateUtil.getDate(), 'SUCCESS thawAllAssetsIfItIsTime');
+    }
   } catch (error) {
     loggingUtil.log(dateUtil.getDate(), 'FAILURE thawAllAssetsIfItIsTime');
     loggingUtil.trace(error);

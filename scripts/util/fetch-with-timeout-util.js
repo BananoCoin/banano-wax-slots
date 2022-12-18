@@ -28,7 +28,7 @@ const init = (_config, _loggingUtil) => {
   if (!fs.existsSync(config.fetchLogsDataDir)) {
     fs.mkdirSync(config.fetchLogsDataDir, {recursive: true});
   }
-  logFetchRotate(true);
+  logFetchRotate(config.fetchLogRotateVerbose);
 };
 
 const deactivate = () => {
