@@ -236,9 +236,17 @@ const auditCache = async () => {
       const fileNm = path.join(config.bananojsCacheDataDir, file);
       const data = fs.readFileSync(fileNm, 'UTF-8');
       try {
+        const isValid = bananojs.getBananoAccountValidationInfo(file);
         const json = JSON.parse(data);
         const cacheBalanceParts = await bananojs.getBananoPartsFromRaw(json.balance);
-        cacheBananoDecimal += Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
+        const cacheBalance = Number(await bananojs.getBananoPartsAsDecimal(cacheBalanceParts));
+        if (!isValid.valid) {
+          loggingUtil.log(dateUtil.getDate(), 'WARNING', 'auditCache', 'can remove from banano cache, not valid account', file);
+        }
+        if (cacheBalance == 0) {
+          loggingUtil.log(dateUtil.getDate(), 'WARNING', 'auditCache', 'can remove from banano cache, no balance', file);
+        }
+        cacheBananoDecimal += cacheBalance;
       } catch (error) {
         loggingUtil.trace(dateUtil.getDate(), 'ERROR', 'auditCache', 'file', file, 'error', error.message, `data:'${data}'`);
       }
