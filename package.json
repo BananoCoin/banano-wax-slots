@@ -1,6 +1,6 @@
 {
   "name": "wax-slots",
-  "version": "1.7.35",
+  "version": "1.7.36",
   "description": "wax-slots",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
     "npm-check-updates": "npm-check-updates --target minor -u",
     "preflight": "npm update && npm run npm-check-updates && npm i && npm audit fix && npm run eslint && npm run prettier && npm outdated",
     "prettier": "prettier \"**/**.{ts,json,css,scss,html,xml}\" --write",
-    "start": "node -max-old-space-size=1700 --trace-warnings scripts/index.js",
+    "start": "node --heapsnapshot-near-heap-limit=3 -max-old-space-size=1700 --trace-warnings scripts/index.js",
     "screenstart": "screen -dmSL banano_wax_slots npm start;screen -x banano_wax_slots",
     "screenrestart": "npm stop;screen -x banano_wax_slots;screen -dmSL banano_wax_slots npm start;screen -x banano_wax_slots",
     "stop": "node scripts/stop.js"
