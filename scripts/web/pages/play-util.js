@@ -2,6 +2,7 @@
 // libraries
 const fs = require('fs');
 const path = require('path');
+const awaitSemaphore = require('await-semaphore');
 
 // modules
 const randomUtil = require('../../util/random-util.js');
@@ -19,6 +20,7 @@ const ownerAccountUtil = require('../../util/owner-account-util.js');
 /* eslint-disable no-unused-vars */
 let config;
 let loggingUtil;
+let mutex;
 // const checkPendingSeeds = new Set();
 let totalWinsSinceRestart = 0;
 let totalLossesSinceRestart = 0;
@@ -36,6 +38,7 @@ const init = async (_config, _loggingUtil) => {
   }
   config = _config;
   loggingUtil = _loggingUtil;
+  mutex = new awaitSemaphore.Mutex();
 
   bananojsCacheUtil.setBananodeApiUrl(config.bananodeApiUrl);
   setTimeout(centralAccountReceivePending, 0);
@@ -51,10 +54,12 @@ const deactivate = async () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
+  mutex = undefined;
   /* eslint-enable no-unused-vars */
 };
 
 const post = async (context, req, res) => {
+  const mutexRelease = await mutex.acquire();
   try {
     return await postWithoutCatch(context, req, res);
   } catch (error) {
@@ -65,6 +70,8 @@ const post = async (context, req, res) => {
     resp.ready = false;
     resp.errorMessage = error.message;
     res.send(resp);
+  } finally {
+    mutexRelease();
   }
 };
 
