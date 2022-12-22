@@ -319,6 +319,10 @@ const initWebServer = async () => {
   });
 
   app.get('/v2/history/get_actions', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     const account = req.query.account;
     const skip = req.query.skip;
     const limit = req.query.limit;
@@ -339,12 +343,20 @@ const initWebServer = async () => {
   });
 
   app.post('/v1/chain/get_info', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_info');
     const resp = await nonceUtil.getWaxRpc().chain_get_info();
     res.send(resp);
   });
 
   app.post('/v1/chain/get_block', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -357,6 +369,10 @@ const initWebServer = async () => {
   });
 
   app.post('/v1/chain/get_raw_code_and_abi', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -369,6 +385,10 @@ const initWebServer = async () => {
   });
 
   app.post('/v1/chain/get_required_keys', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();
@@ -381,6 +401,10 @@ const initWebServer = async () => {
   });
 
   app.post('/v1/chain/push_transaction', async (req, res) => {
+    if (config.waxEndpointDisabled) {
+      res.send({});
+      return;
+    }
     let bodyStr = '';
     req.on('data', (chunk) => {
       bodyStr += chunk.toString();

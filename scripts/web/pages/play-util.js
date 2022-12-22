@@ -59,6 +59,16 @@ const deactivate = async () => {
 };
 
 const post = async (context, req, res) => {
+  if (mutex.count == 0) {
+    const owner = req.body.owner;
+    loggingUtil.log(dateUtil.getDate(), 'mutex lock', owner);
+    const resp = {};
+    resp.intermittentError = true;
+    resp.ready = false;
+    resp.errorMessage = `mutex lock, retry`;
+    res.send(resp);
+    return;
+  }
   const mutexRelease = await mutex.acquire();
   try {
     return await postWithoutCatch(context, req, res);
