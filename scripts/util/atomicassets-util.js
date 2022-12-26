@@ -51,6 +51,10 @@ const init = (_config, _loggingUtil) => {
     fs.mkdirSync(config.ownerWalletDataDir, {recursive: true});
   }
 
+  if (!fs.existsSync(config.ownerAssetDataDir)) {
+    fs.mkdirSync(config.ownerAssetDataDir, {recursive: true});
+  }
+
   ExplorerApi = class ExplorerApi {
     /**
      * constructor
@@ -336,6 +340,8 @@ const getOwnedCardsToCache = async (owner) => {
         moreAssets = pageAssets.length > 0;
         page++;
       } catch (error) {
+        // if an error occurs, still look for mroe assets.
+        moreAssets = true;
         loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'error.message', error.message);
         if (error.message == 'Only absolute URLs are supported') {
           const index = config.atomicAssetsEndpointsV2.indexOf(url);
@@ -465,16 +471,20 @@ const getActiveAccountList = () => {
   return [...ownerAssetCacheMap.keys()];
 };
 
-const getOwnerFile = (owner) => {
+const getOwnerHash = (owner) => {
   if (owner === undefined) {
-    throw new Error('account is required.');
+    throw new Error('owner is required.');
   };
 
   const seedHash = crypto.createHash('sha256')
       .update(`${owner}`)
       .digest();
-  const fileNm = seedHash.toString('hex') + '.json';
+  const fileNm = seedHash.toString('hex');
+  return fileNm;
+};
 
+const getOwnerFile = (owner) => {
+  const fileNm = getOwnerHash(owner) + '.json';
   return path.join(config.ownerWalletDataDir, fileNm);
 };
 
@@ -503,6 +513,35 @@ const loadAllAssets = async () => {
   let moreAssets = true;
   const assetMap = {};
 
+  // first read all the currently owned cards, and refresh the cache.
+  const oldOwners = await getOwnersWithWalletsList();
+  const readMutexRelease = await mutex.acquire();
+  try {
+    for (let ownerIx = 0; ownerIx < oldOwners.length; ownerIx++) {
+      const owner = oldOwners[ownerIx];
+      const ownerDirNm = getOwnerHash(owner);
+      const ownerDirFullNm = path.join(config.ownerAssetDataDir, ownerDirNm);
+      const assets = [];
+      if (fs.existsSync(ownerDirFullNm)) {
+        const list = fs.readdirSync(ownerDirFullNm);
+        for (let ix = 0; ix < list.length; ix++) {
+          const nm = list[ix];
+          const file = path.join(ownerDirFullNm, nm);
+          const data = fs.readFileSync(file, 'UTF-8');
+          const json = JSON.parse(data);
+          assets.push(json);
+        }
+      }
+      const getOwnedCardsCallback = () => {
+        return assets;
+      };
+      await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
+          config.assetCacheTimeMs, getOwnedCardsCallback);
+    }
+  } finally {
+    readMutexRelease();
+  }
+  // next, read all cards in the collection, and update the cache.
   while (moreAssets) {
     const url = getWaxApiUrl();
     const waxApi = getWaxApi(url);
@@ -539,6 +578,39 @@ const loadAllAssets = async () => {
   }
   const owners = Object.keys(assetMap);
   console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', owners.length, 'owners');
+  const startTimeMs = Date.now();
+
+  // next, write all cards in the collection, and update the cache.
+  const writeMutexRelease = await mutex.acquire();
+  try {
+    for (const owner of owners) {
+      const ownerDirNm = getOwnerHash(owner);
+      const ownerDirFullNm = path.join(config.ownerAssetDataDir, ownerDirNm);
+      if (!fs.existsSync(ownerDirFullNm)) {
+        fs.mkdirSync(ownerDirFullNm, {recursive: true});
+      }
+      const assets = assetMap[owner];
+      for (const asset of assets) {
+        const assetId = asset.asset_id;
+        const assetFileNm = path.join(ownerDirFullNm, `${assetId}.json`);
+        // loggingUtil.log(dateUtil.getDate(), 'caching owner asset', owner, assetId);
+        const filePtr = fs.openSync(assetFileNm, 'w');
+        fs.writeSync(filePtr, JSON.stringify(asset));
+        fs.closeSync(filePtr);
+      }
+      const list = fs.readdirSync(ownerDirFullNm);
+      for (let ix = 0; ix < list.length; ix++) {
+        const nm = list[ix];
+        const file = path.join(ownerDirFullNm, nm);
+        const {birthtimeMs} = fs.statSync(file);
+        if (birthtimeMs < startTimeMs) {
+          fs.unlinkSync(file);
+        }
+      }
+    }
+  } finally {
+    writeMutexRelease();
+  }
 
   for (const owner of owners) {
     const getOwnedCardsCallback = () => {
