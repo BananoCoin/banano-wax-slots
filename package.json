@@ -19,7 +19,7 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.7.11",
+    "@bananocoin/bananojs": "^2.7.12",
     "abort-controller": "^3.0.0",
     "await-semaphore": "^0.1.3",
     "blakejs": "^1.2.1",
@@ -38,12 +38,12 @@
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.7",
-    "eslint": "^8.30.0",
+    "eslint": "^8.31.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
     "npm-check-updates": "^16.6.2",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.1",
+    "prettier": "^2.8.2",
     "xml2json": "^0.12.0"
   }
 }

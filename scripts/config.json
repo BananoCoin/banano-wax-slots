@@ -56,7 +56,7 @@
   "activeTimeMs": 28800000,
   "walletSeedIx": 0,
   "waxIdSeed": "",
-  "waxEndpointDisabled": true,
+  "waxEndpointDisabled": false,
   "waxEndpointVersion": "v2proxy",
   "waxEndpointsV1": [],
   "waxEndpointsV2": ["https://api-wax.eosarabia.net", "https://api.wax.alohaeos.com", "https://api.wax.greeneosio.com", "https://api.wax.liquidstudios.io", "https://api.waxsweden.org", "https://wax-bp.wizardsguild.one", "https://wax.blokcrafters.io", "https://wax.cryptolions.io", "https://wax.eoseoul.io", "https://wax.eosn.io", "https://wax.eosphere.io", "https://wax.eosrio.io", "https://wax.eu.eosamsterdam.net", "https://wax.greymass.com"],
