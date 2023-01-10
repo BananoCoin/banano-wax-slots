@@ -323,17 +323,16 @@ const initWebServer = async () => {
       res.send({});
       return;
     }
-    const account = req.query.account;
-    const skip = req.query.skip;
-    const limit = req.query.limit;
-    loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', account, skip, limit);
-
-    const historyGetActionsCallback = async () => {
-      return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
-    };
-
     try {
-      const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
+      const account = req.query.account;
+      const skip = req.query.skip;
+      const limit = req.query.limit;
+      loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', account, skip, limit);
+  
+      const historyGetActionsCallback = async () => {
+        return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
+      };
+        const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
           historyGetActionsCacheMap, account,
           config.historyGetActionsTimeMs, historyGetActionsCallback);
       res.send(resp);
@@ -348,8 +347,13 @@ const initWebServer = async () => {
       return;
     }
     loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_info');
-    const resp = await nonceUtil.getWaxRpc().chain_get_info();
-    res.send(resp);
+    
+    try {
+      const resp = await nonceUtil.getWaxRpc().chain_get_info();
+      res.send(resp);
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.post('/v1/chain/get_block', async (req, res) => {
@@ -357,15 +361,19 @@ const initWebServer = async () => {
       res.send({});
       return;
     }
-    let bodyStr = '';
-    req.on('data', (chunk) => {
-      bodyStr += chunk.toString();
-    });
-    req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_block', req.method, req.url, req.body, bodyStr);
-      const resp = await nonceUtil.getWaxRpc().chain_get_block(bodyStr);
-      res.send(resp);
-    });
+    try {
+      let bodyStr = '';
+      req.on('data', (chunk) => {
+        bodyStr += chunk.toString();
+      });
+      req.on('end', async () => {
+        loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_block', req.method, req.url, req.body, bodyStr);
+        const resp = await nonceUtil.getWaxRpc().chain_get_block(bodyStr);
+        res.send(resp);
+      });
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.post('/v1/chain/get_raw_code_and_abi', async (req, res) => {
@@ -373,15 +381,19 @@ const initWebServer = async () => {
       res.send({});
       return;
     }
-    let bodyStr = '';
-    req.on('data', (chunk) => {
-      bodyStr += chunk.toString();
-    });
-    req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_raw_code_and_abi', bodyStr);
-      const resp = await nonceUtil.getWaxRpc().chain_get_raw_code_and_abi(bodyStr);
-      res.send(resp);
-    });
+    try {
+      let bodyStr = '';
+      req.on('data', (chunk) => {
+        bodyStr += chunk.toString();
+      });
+      req.on('end', async () => {
+        loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_raw_code_and_abi', bodyStr);
+        const resp = await nonceUtil.getWaxRpc().chain_get_raw_code_and_abi(bodyStr);
+        res.send(resp);
+      });
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.post('/v1/chain/get_required_keys', async (req, res) => {
@@ -389,15 +401,19 @@ const initWebServer = async () => {
       res.send({});
       return;
     }
-    let bodyStr = '';
-    req.on('data', (chunk) => {
-      bodyStr += chunk.toString();
-    });
-    req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_required_keys', bodyStr);
-      const resp = await nonceUtil.getWaxRpc().chain_get_required_keys(bodyStr);
-      res.send(resp);
-    });
+    try {
+      let bodyStr = '';
+      req.on('data', (chunk) => {
+        bodyStr += chunk.toString();
+      });
+      req.on('end', async () => {
+        loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_required_keys', bodyStr);
+        const resp = await nonceUtil.getWaxRpc().chain_get_required_keys(bodyStr);
+        res.send(resp);
+      });
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.post('/v1/chain/push_transaction', async (req, res) => {
@@ -405,15 +421,19 @@ const initWebServer = async () => {
       res.send({});
       return;
     }
-    let bodyStr = '';
-    req.on('data', (chunk) => {
-      bodyStr += chunk.toString();
-    });
-    req.on('end', async () => {
-      loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/push_transaction', bodyStr);
-      const resp = await nonceUtil.getWaxRpc().chain_push_transaction(bodyStr);
-      res.send(resp);
-    });
+    try {
+      let bodyStr = '';
+      req.on('data', (chunk) => {
+        bodyStr += chunk.toString();
+      });
+      req.on('end', async () => {
+        loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/push_transaction', bodyStr);
+        const resp = await nonceUtil.getWaxRpc().chain_push_transaction(bodyStr);
+        res.send(resp);
+      });
+    } catch (error) {
+      res.send({});
+    }
   });
 
   app.get('/cmc_nonce_hash', async (req, res) => {
