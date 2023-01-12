@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const request = require('request');
 const sharp = require('sharp');
+const rocksdb = require('rocksdb');
 
 // modules
 const assetUtil = require('./asset-util.js');
@@ -24,6 +25,7 @@ const templates = [];
 let ready = false;
 let mutex;
 let ExplorerApi;
+let ownerAssetDb;
 /* eslint-enable no-unused-vars */
 
 const ownerAssetCacheMap = new Map();
@@ -31,7 +33,7 @@ const excludedTemplateSet = new Set();
 const includedSchemaSet = new Set();
 
 // functions
-const init = (_config, _loggingUtil) => {
+const init = async (_config, _loggingUtil) => {
   /* istanbul ignore if */
   if (_config === undefined) {
     throw new Error('config is required.');
@@ -54,6 +56,10 @@ const init = (_config, _loggingUtil) => {
   if (!fs.existsSync(config.ownerAssetDataDir)) {
     fs.mkdirSync(config.ownerAssetDataDir, {recursive: true});
   }
+
+  ownerAssetDb = rocksdb(config.ownerAssetDataDir);
+
+  await ownerAssetDbOpen();
 
   ExplorerApi = class ExplorerApi {
     /**
@@ -115,14 +121,29 @@ const init = (_config, _loggingUtil) => {
   // setTimeout(setWaxApiAndAddTemplates, 0);
 };
 
-const deactivate = () => {
+const deactivate = async () => {
   /* eslint-disable no-unused-vars */
   config = undefined;
   loggingUtil = undefined;
   mutex = undefined;
   /* eslint-enable no-unused-vars */
   templates.length = 0;
+  await ownerAssetDbClose();
+  ownerAssetDb = undefined;
   ready = false;
+};
+
+
+const ownerAssetDbOpen = async () => {
+  return new Promise((resolve, reject) => {
+    ownerAssetDb.open((error) => error ? reject(error) : resolve());
+  });
+};
+
+const ownerAssetDbClose = async () => {
+  return new Promise((resolve, reject) => {
+    ownerAssetDb.close((error) => error ? reject(error) : resolve());
+  });
 };
 
 const getWaxApiUrl = () => {
@@ -513,25 +534,90 @@ const loadAllAssets = async () => {
   let moreAssets = true;
   const assetMap = {};
 
+  const getOwnerAssetListLengthKey = (ownerHash) => {
+    return ownerHash + '.ListLengthKey';
+  };
+  const getOwnerAssetListKey = (ownerHash, ix) => {
+    return ownerHash + '.ListKey.' + ix;
+  };
+  const getOwnerAssetListTsKey = (ownerHash, ix) => {
+    return ownerHash + '.ListTsKey.' + ix;
+  };
+
+  const ownerAssetDbGet = async (key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        ownerAssetDb.get(key, function(err, value) {
+          if (err && err.code === 'LEVEL_NOT_FOUND') {
+            resolve({error: err.code, value: null});
+          } else {
+            resolve({error: null, value: value});
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  const ownerAssetDbPut = async (key, value) => {
+    return new Promise((resolve, reject) => {
+      try {
+        ownerAssetDb.put(key, value, function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(null);
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  const ownerAssetDbDel = async (key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        ownerAssetDb.del(key, function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(null);
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
   // first read all the currently owned cards, and refresh the cache.
   const oldOwners = await getOwnersWithWalletsList();
   const readMutexRelease = await mutex.acquire();
   try {
     for (let ownerIx = 0; ownerIx < oldOwners.length; ownerIx++) {
       const owner = oldOwners[ownerIx];
-      const ownerDirNm = getOwnerHash(owner);
-      const ownerDirFullNm = path.join(config.ownerAssetDataDir, ownerDirNm);
+      const ownerHash = getOwnerHash(owner);
+
+      const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
+      const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
+      const ownerAssetListLengthError = ownerAssetListLengthResp.error;
+      const ownerAssetListLength = ownerAssetListLengthResp.value;
       const assets = [];
-      if (fs.existsSync(ownerDirFullNm)) {
-        const list = fs.readdirSync(ownerDirFullNm);
-        for (let ix = 0; ix < list.length; ix++) {
-          const nm = list[ix];
-          const file = path.join(ownerDirFullNm, nm);
-          const data = fs.readFileSync(file, 'UTF-8');
-          const json = JSON.parse(data);
-          assets.push(json);
+      if (ownerAssetListLengthError == null) {
+        for (let ix = 0; ix < ownerAssetListLength; ix++) {
+          const nm = getOwnerAssetListKey(ownerHash, ix);
+          const dataResp = await ownerAssetDbGet(nm);
+          const dataError = dataResp.error;
+          const data = dataResp.value;
+          if (dataError == null) {
+            const json = JSON.parse(data);
+            assets.push(json);
+          }
         }
       }
+
       const getOwnedCardsCallback = () => {
         return assets;
       };
@@ -584,29 +670,41 @@ const loadAllAssets = async () => {
   const writeMutexRelease = await mutex.acquire();
   try {
     for (const owner of owners) {
-      const ownerDirNm = getOwnerHash(owner);
-      const ownerDirFullNm = path.join(config.ownerAssetDataDir, ownerDirNm);
-      if (!fs.existsSync(ownerDirFullNm)) {
-        fs.mkdirSync(ownerDirFullNm, {recursive: true});
-      }
+      const ownerHash = getOwnerHash(owner);
+      const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
       const assets = assetMap[owner];
       for (const asset of assets) {
-        const assetId = asset.asset_id;
-        const assetFileNm = path.join(ownerDirFullNm, `${assetId}.json`);
-        // loggingUtil.log(dateUtil.getDate(), 'caching owner asset', owner, assetId);
-        const filePtr = fs.openSync(assetFileNm, 'w');
-        fs.writeSync(filePtr, JSON.stringify(asset));
-        fs.closeSync(filePtr);
-      }
-      const list = fs.readdirSync(ownerDirFullNm);
-      for (let ix = 0; ix < list.length; ix++) {
-        const nm = list[ix];
-        const file = path.join(ownerDirFullNm, nm);
-        const {birthtimeMs} = fs.statSync(file);
-        if (birthtimeMs < startTimeMs) {
-          fs.unlinkSync(file);
+        const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
+        const ownerAssetListLengthError = ownerAssetListLengthResp.error;
+        const ownerAssetListLength = ownerAssetListLengthResp.value;
+        if (ownerAssetListLengthError == null) {
+          const nm = getOwnerAssetListKey(ownerHash, ownerAssetListLength);
+          const tsNm = getOwnerAssetListTsKey(ownerHash, ownerAssetListLength);
+          await ownerAssetDbPut(nm, JSON.stringify(asset));
+          await ownerAssetDbPut(tsNm, Date.now());
+          await ownerAssetDbPut(ownerAssetListLengthKey, ownerAssetListLength+1);
         }
       }
+      const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
+      const ownerAssetListLengthError = ownerAssetListLengthResp.error;
+      const ownerAssetListLength = ownerAssetListLengthResp.value;
+      if (ownerAssetListLengthError == null) {
+        for (let ix = 0; ix < ownerAssetListLength; ix++) {
+          const nm = getOwnerAssetListKey(ownerHash, ix);
+          const tsNm = getOwnerAssetListTsKey(ownerHash, ix);
+          const tsResp = await ownerAssetDbGet(tsNm);
+          const tsError = tsResp.error;
+          const ts = tsResp.value;
+          if (tsError == null) {
+            if (ts < startTimeMs) {
+              await ownerAssetDbDel(nm);
+              await ownerAssetDbDel(tsNm);
+            }
+          }
+        }
+      }
+      // TODO, the deletion will leave holes in the lists
+      // so we need to defragment the lists eventually.
     }
   } finally {
     writeMutexRelease();

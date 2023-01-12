@@ -328,11 +328,11 @@ const initWebServer = async () => {
       const skip = req.query.skip;
       const limit = req.query.limit;
       loggingUtil.log(dateUtil.getDate(), '/v2/history/get_actions', account, skip, limit);
-  
+
       const historyGetActionsCallback = async () => {
         return await nonceUtil.getWaxRpc().history_get_actions(account, skip, limit);
       };
-        const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
+      const resp = await timedCacheUtil.getUsingNamedCache('History Get Actions',
           historyGetActionsCacheMap, account,
           config.historyGetActionsTimeMs, historyGetActionsCallback);
       res.send(resp);
@@ -347,7 +347,7 @@ const initWebServer = async () => {
       return;
     }
     loggingUtil.log(dateUtil.getDate(), 'post', 'v1/chain/get_info');
-    
+
     try {
       const resp = await nonceUtil.getWaxRpc().chain_get_info();
       res.send(resp);

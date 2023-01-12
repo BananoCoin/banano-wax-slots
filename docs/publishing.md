@@ -1,5 +1,9 @@
 ## to check for outdated deps
 
+## to check file size of db
+
+    du -hs * | sort -hr
+
 ## to update to a major version update:
 
     npm install package@latest;
