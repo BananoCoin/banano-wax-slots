@@ -90,7 +90,7 @@ const init = async () => {
 
   await atomicassetsUtil.setWaxApiAndAddTemplates();
 
-  await atomicassetsUtil.loadAllAssets();
+  // await atomicassetsUtil.loadAllAssets();
 
   webServerUtil.setCloseProgramFunction(closeProgram);
 

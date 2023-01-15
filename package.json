@@ -19,7 +19,7 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.7.12",
+    "@bananocoin/bananojs": "^2.7.13",
     "abort-controller": "^3.0.0",
     "abstract-level": "^1.0.3",
     "await-semaphore": "^0.1.3",
@@ -30,7 +30,7 @@
     "eosjs": "^22.1.0",
     "express": "^4.18.2",
     "express-handlebars": "^6.0.6",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^2.6.8",
     "request": "^2.88.2",
     "rocksdb": "^5.2.1",
     "sharp": "^0.31.3",
@@ -45,7 +45,7 @@
     "mocha": "^10.2.0",
     "npm-check-updates": "^16.6.2",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.2",
+    "prettier": "^2.8.3",
     "xml2json": "^0.12.0"
   }
 }

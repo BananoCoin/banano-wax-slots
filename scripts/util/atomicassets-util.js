@@ -133,6 +133,14 @@ const deactivate = async () => {
   ready = false;
 };
 
+const removeErrorUrl = () => {
+  const index = config.atomicAssetsEndpointsV2.indexOf(url);
+  loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache',
+      'owner', owner, 'url', url, 'index', index, 'of', config.atomicAssetsEndpointsV2.length);
+  if (index > -1) { // only splice array when item is found
+    config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
+  }
+};
 
 const ownerAssetDbOpen = async () => {
   return new Promise((resolve, reject) => {
@@ -147,7 +155,13 @@ const ownerAssetDbClose = async () => {
 };
 
 const getWaxApiUrl = () => {
-  return randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
+  const waxApiUrl = randomUtil.getRandomArrayElt(config.atomicAssetsEndpointsV2);
+  if (waxApiUrl == undefined) {
+    throw new Error('waxApiUrl undefined config.atomicAssetsEndpointsV2:' +
+      JSON.stringify(config.atomicAssetsEndpointsV2));
+    ready = false;
+  }
+  return waxApiUrl;
 };
 
 const getWaxApi = (url) => {
@@ -161,10 +175,8 @@ const getWaxApi = (url) => {
 };
 
 const setWaxApiAndAddTemplates = async () => {
-  const url = getWaxApiUrl();
   try {
-    const waxApi = getWaxApi(url);
-    await addAllTemplates(waxApi);
+    await addAllTemplates();
   } catch (error) {
     // console.trace(error);
     loggingUtil.log('INTERIM setWaxApiAndAddTemplates', url, error.message);
@@ -173,7 +185,7 @@ const setWaxApiAndAddTemplates = async () => {
   }
 };
 
-const addAllTemplates = async (waxApi) => {
+const addAllTemplates = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED addAllTemplates');
 
   config.excludedTemplates.forEach((templateId) => {
@@ -188,6 +200,8 @@ const addAllTemplates = async (waxApi) => {
   const max = config.maxTemplatesPerPage;
 
   const addTemplates = async () => {
+    const url = getWaxApiUrl();
+    const waxApi = getWaxApi(url);
     loggingUtil.log(dateUtil.getDate(), 'STARTED addTemplates page', page);
     let moreTemplates = false;
     try {
@@ -224,6 +238,7 @@ const addAllTemplates = async (waxApi) => {
         setTimeout(cacheAllCardImages, 0);
       }
     } catch (error) {
+      // removeErrorUrl(url);
       loggingUtil.log(dateUtil.getDate(), 'INTERIM addTemplates page', page, error.message);
       setTimeout(addTemplates, 1000);
     }
@@ -365,11 +380,9 @@ const getOwnedCardsToCache = async (owner) => {
         moreAssets = true;
         loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'error.message', error.message);
         if (error.message == 'Only absolute URLs are supported') {
-          const index = config.atomicAssetsEndpointsV2.indexOf(url);
-          loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'url', url, 'index', index);
-          if (index > -1) { // only splice array when item is found
-            config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
-          }
+          removeErrorUrl(url);
+        } else {
+          throw error;
         }
       }
     }
@@ -511,6 +524,7 @@ const getOwnerFile = (owner) => {
 
 const cloneAsset = (asset) => {
   const assetData = {};
+  assetData.updated_at_time = asset.updated_at_time;
   assetData.owner = asset.owner;
   assetData.asset_id = asset.asset_id;
   assetData.template = {};
@@ -527,197 +541,228 @@ const cloneAsset = (asset) => {
 
 const loadAllAssets = async () => {
   console.log(dateUtil.getDate(), 'STARTED loadAllAssets');
-  const assetOptions = {'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys'};
-  let page = 1;
-  let totalAssets = 0;
-  const assetsPerPage = config.maxAssetsPerPage;
-  let moreAssets = true;
-  const assetMap = {};
-
-  const getOwnerAssetListLengthKey = (ownerHash) => {
-    return ownerHash + '.ListLengthKey';
-  };
-  const getOwnerAssetListKey = (ownerHash, ix) => {
-    return ownerHash + '.ListKey.' + ix;
-  };
-  const getOwnerAssetListTsKey = (ownerHash, ix) => {
-    return ownerHash + '.ListTsKey.' + ix;
-  };
-
-  const ownerAssetDbGet = async (key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        ownerAssetDb.get(key, function(err, value) {
-          if (err && err.code === 'LEVEL_NOT_FOUND') {
-            resolve({error: err.code, value: null});
-          } else {
-            resolve({error: null, value: value});
-          }
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  const ownerAssetDbPut = async (key, value) => {
-    return new Promise((resolve, reject) => {
-      try {
-        ownerAssetDb.put(key, value, function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(null);
-          }
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  const ownerAssetDbDel = async (key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        ownerAssetDb.del(key, function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(null);
-          }
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  // first read all the currently owned cards, and refresh the cache.
-  const oldOwners = await getOwnersWithWalletsList();
-  const readMutexRelease = await mutex.acquire();
   try {
-    for (let ownerIx = 0; ownerIx < oldOwners.length; ownerIx++) {
-      const owner = oldOwners[ownerIx];
-      const ownerHash = getOwnerHash(owner);
+    const assetOptions = {'collection_name': 'crptomonkeys', 'schema_name': 'crptomonkeys'};
+    let page = 1;
+    let totalAssets = 0;
+    const assetsPerPage = config.maxAssetsPerPage;
+    let moreAssets = true;
+    const assetMap = {};
 
-      const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
-      const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
-      const ownerAssetListLengthError = ownerAssetListLengthResp.error;
-      const ownerAssetListLength = ownerAssetListLengthResp.value;
-      const assets = [];
-      if (ownerAssetListLengthError == null) {
-        for (let ix = 0; ix < ownerAssetListLength; ix++) {
-          const nm = getOwnerAssetListKey(ownerHash, ix);
-          const dataResp = await ownerAssetDbGet(nm);
-          const dataError = dataResp.error;
-          const data = dataResp.value;
-          if (dataError == null) {
-            const json = JSON.parse(data);
-            assets.push(json);
-          }
-        }
-      }
+    const getOwnerAssetListLengthKey = (ownerHash) => {
+      return ownerHash + '.ListLengthKey';
+    };
+    const getOwnerAssetListKey = (ownerHash, ix) => {
+      return ownerHash + '.ListKey.' + ix;
+    };
+    const getOwnerAssetListTsKey = (ownerHash, ix) => {
+      return ownerHash + '.ListTsKey.' + ix;
+    };
 
-      const getOwnedCardsCallback = () => {
-        return assets;
-      };
-      await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
-          config.assetCacheTimeMs, getOwnedCardsCallback);
-    }
-  } finally {
-    readMutexRelease();
-  }
-  // next, read all cards in the collection, and update the cache.
-  while (moreAssets) {
-    const url = getWaxApiUrl();
-    const waxApi = getWaxApi(url);
-    try {
-      const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
-      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'page', page, 'totalAssets', totalAssets, 'url', url, 'pageAssets.length', pageAssets.length);
-      pageAssets.forEach((rawAsset) => {
-        const asset = cloneAsset(rawAsset);
-        const owner = asset.owner;
-        // console.log('owner', owner, 'page', page, asset);
-        if (assetMap[owner] == undefined) {
-          assetMap[owner] = [];
-        }
-        const templateId = asset.template.template_id.toString();
-        if (!excludedTemplateSet.has(templateId)) {
-          if (includedSchemaSet.has(asset.schema.schema_name)) {
-            assetMap[owner].push(asset);
-            totalAssets++;
-          }
+    const ownerAssetDbGet = async (key) => {
+      return new Promise((resolve, reject) => {
+        try {
+          ownerAssetDb.get(key, function(err, value) {
+            if (err && err.code === 'LEVEL_NOT_FOUND') {
+              resolve({error: err.code, value: null});
+            } else if (value === undefined) {
+              resolve({error: 'UNDEFINED;', value: value});
+            } else {
+              resolve({error: null, value: value});
+            }
+          });
+        } catch (error) {
+          reject(error);
         }
       });
-      if (pageAssets.length < assetsPerPage) {
-        moreAssets = false;
+    };
+
+    const ownerAssetDbPut = async (key, value) => {
+      return new Promise((resolve, reject) => {
+        try {
+          ownerAssetDb.put(key, value, function(err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(null);
+            }
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    };
+
+    const ownerAssetDbDel = async (key) => {
+      return new Promise((resolve, reject) => {
+        try {
+          ownerAssetDb.del(key, function(err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(null);
+            }
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    };
+
+    // first read all the currently owned cards, and refresh the cache.
+    const oldOwners = await getOwnersWithWalletsList();
+    const readMutexRelease = await mutex.acquire();
+    try {
+      for (let ownerIx = 0; ownerIx < oldOwners.length; ownerIx++) {
+        const owner = oldOwners[ownerIx];
+        const ownerHash = getOwnerHash(owner);
+
+        const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
+        const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
+        const ownerAssetListLengthError = ownerAssetListLengthResp.error;
+        const ownerAssetListLength = ownerAssetListLengthResp.value;
+        const assets = [];
+        if (ownerAssetListLengthError == null) {
+          for (let ix = 0; ix < ownerAssetListLength; ix++) {
+            const nm = getOwnerAssetListKey(ownerHash, ix);
+            const dataResp = await ownerAssetDbGet(nm);
+            const dataError = dataResp.error;
+            const data = dataResp.value;
+            if (dataError == null) {
+              const json = JSON.parse(data);
+              assets.push(json);
+            }
+          }
+        }
+
+        const getOwnedCardsCallback = () => {
+          return assets;
+        };
+        await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
+            config.assetCacheTimeMs, getOwnedCardsCallback);
       }
-      page++;
-    } catch (error) {
-      if (error.message == 'Only absolute URLs are supported') {
-        const index = config.atomicAssetsEndpointsV2.indexOf(url);
-        if (index > -1) { // only splice array when item is found
-          config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
+    } finally {
+      readMutexRelease();
+    }
+    // next, read all cards in the collection, and update the cache.
+    const ownerAsseTimestampResp = await ownerAssetDbGet('afterUpdatedAtTime');
+    const ownerAsseTimestampError = ownerAsseTimestampResp.error;
+    const ownerAsseTimestamp = ownerAsseTimestampResp.value;
+    console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'ownerAsseTimestampResp', ownerAsseTimestampResp);
+    let afterUpdatedAtTime = BigInt(0);
+    if (ownerAsseTimestampError == null) {
+      assetOptions.after = ownerAsseTimestamp;
+      afterUpdatedAtTime = BigInt(ownerAsseTimestamp);
+    }
+    console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'assetOptions', assetOptions);
+    // ownerAssetDbPut
+    console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'GET afterUpdatedAtTime', afterUpdatedAtTime);
+
+    while (moreAssets) {
+      const url = getWaxApiUrl();
+      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'url', url);
+      const waxApi = getWaxApi(url);
+      try {
+        // console.log(dateUtil.getDate(), 'INTERIM loadAllAssets',
+        //     'page', page, 'totalAssets', totalAssets, 'url', url);
+        const pageAssets = await waxApi.getAssets(assetOptions, page, assetsPerPage);
+        console.log(dateUtil.getDate(), 'INTERIM loadAllAssets',
+            'page', page, 'totalAssets', totalAssets, 'url', url, 'pageAssets.length', pageAssets.length);
+        for (const rawAsset of pageAssets) {
+          const asset = cloneAsset(rawAsset);
+          const owner = asset.owner;
+          // console.log('owner', owner, 'page', page, 'asset', asset);
+          if (asset.updated_at_time !== undefined) {
+            // console.log('owner', owner, 'page', page, 'asset.updated_at_time', asset.updated_at_time, asset.schema.schema_name);
+            const updatedAtTime = BigInt(asset.updated_at_time);
+            if (updatedAtTime > afterUpdatedAtTime) {
+              afterUpdatedAtTime = updatedAtTime;
+            }
+          }
+          if (assetMap[owner] == undefined) {
+            assetMap[owner] = [];
+          }
+          const templateId = asset.template.template_id.toString();
+          if (!excludedTemplateSet.has(templateId)) {
+            if (includedSchemaSet.has(asset.schema.schema_name)) {
+              assetMap[owner].push(asset);
+              totalAssets++;
+            }
+          }
+        }
+        if (pageAssets.length < assetsPerPage) {
+          moreAssets = false;
+        }
+        page++;
+      } catch (error) {
+        if (error.message == 'Only absolute URLs are supported') {
+          removeErrorUrl(url);
+        } else {
+          throw error;
         }
       }
     }
-  }
-  const owners = Object.keys(assetMap);
-  console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', owners.length, 'owners');
-  const startTimeMs = Date.now();
+    const owners = Object.keys(assetMap);
+    console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', owners.length, 'owners');
+    const startTimeMs = Date.now();
 
-  // next, write all cards in the collection, and update the cache.
-  const writeMutexRelease = await mutex.acquire();
-  try {
-    for (const owner of owners) {
-      const ownerHash = getOwnerHash(owner);
-      const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
-      const assets = assetMap[owner];
-      for (const asset of assets) {
+    // next, write all cards in the collection, and update the cache.
+    const writeMutexRelease = await mutex.acquire();
+    try {
+      for (const owner of owners) {
+        const ownerHash = getOwnerHash(owner);
+        const ownerAssetListLengthKey = getOwnerAssetListLengthKey(ownerHash);
+        const assets = assetMap[owner];
+        for (const asset of assets) {
+          const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
+          const ownerAssetListLengthError = ownerAssetListLengthResp.error;
+          const ownerAssetListLength = ownerAssetListLengthResp.value;
+          if (ownerAssetListLengthError == null) {
+            const nm = getOwnerAssetListKey(ownerHash, ownerAssetListLength);
+            const tsNm = getOwnerAssetListTsKey(ownerHash, ownerAssetListLength);
+            await ownerAssetDbPut(nm, JSON.stringify(asset));
+            await ownerAssetDbPut(tsNm, Date.now());
+            await ownerAssetDbPut(ownerAssetListLengthKey, ownerAssetListLength+1);
+          }
+        }
         const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
         const ownerAssetListLengthError = ownerAssetListLengthResp.error;
         const ownerAssetListLength = ownerAssetListLengthResp.value;
         if (ownerAssetListLengthError == null) {
-          const nm = getOwnerAssetListKey(ownerHash, ownerAssetListLength);
-          const tsNm = getOwnerAssetListTsKey(ownerHash, ownerAssetListLength);
-          await ownerAssetDbPut(nm, JSON.stringify(asset));
-          await ownerAssetDbPut(tsNm, Date.now());
-          await ownerAssetDbPut(ownerAssetListLengthKey, ownerAssetListLength+1);
-        }
-      }
-      const ownerAssetListLengthResp = await ownerAssetDbGet(ownerAssetListLengthKey);
-      const ownerAssetListLengthError = ownerAssetListLengthResp.error;
-      const ownerAssetListLength = ownerAssetListLengthResp.value;
-      if (ownerAssetListLengthError == null) {
-        for (let ix = 0; ix < ownerAssetListLength; ix++) {
-          const nm = getOwnerAssetListKey(ownerHash, ix);
-          const tsNm = getOwnerAssetListTsKey(ownerHash, ix);
-          const tsResp = await ownerAssetDbGet(tsNm);
-          const tsError = tsResp.error;
-          const ts = tsResp.value;
-          if (tsError == null) {
-            if (ts < startTimeMs) {
-              await ownerAssetDbDel(nm);
-              await ownerAssetDbDel(tsNm);
+          for (let ix = 0; ix < ownerAssetListLength; ix++) {
+            const nm = getOwnerAssetListKey(ownerHash, ix);
+            const tsNm = getOwnerAssetListTsKey(ownerHash, ix);
+            const tsResp = await ownerAssetDbGet(tsNm);
+            const tsError = tsResp.error;
+            const ts = tsResp.value;
+            if (tsError == null) {
+              if (ts < startTimeMs) {
+                await ownerAssetDbDel(nm);
+                await ownerAssetDbDel(tsNm);
+              }
             }
           }
         }
-      }
       // TODO, the deletion will leave holes in the lists
       // so we need to defragment the lists eventually.
+      }
+      await ownerAssetDbPut('afterUpdatedAtTime', afterUpdatedAtTime.toString());
+      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'PUT afterUpdatedAtTime', afterUpdatedAtTime);
+    } finally {
+      writeMutexRelease();
     }
-  } finally {
-    writeMutexRelease();
-  }
 
-  for (const owner of owners) {
-    const getOwnedCardsCallback = () => {
-      return assetMap[owner];
-    };
-    await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
-        config.assetCacheTimeMs, getOwnedCardsCallback);
+    for (const owner of owners) {
+      const getOwnedCardsCallback = () => {
+        return assetMap[owner];
+      };
+      await timedCacheUtil.getUsingNamedCache('Owned Cards', ownerAssetCacheMap, owner,
+          config.assetCacheTimeMs, getOwnedCardsCallback);
+    }
+    loggingUtil.log(dateUtil.getDate(), 'SUCCESS loadAllAssets');
+  } catch (error) {
+    loggingUtil.log(dateUtil.getDate(), 'ERROR loadAllAssets', error.message);
   }
-  loggingUtil.log(dateUtil.getDate(), 'SUCCESS loadAllAssets');
 };
 
 const loadWalletsForOwner = async (owner) => {
