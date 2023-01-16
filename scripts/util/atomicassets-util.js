@@ -565,9 +565,9 @@ const loadAllAssets = async () => {
             if (err && err.code === 'LEVEL_NOT_FOUND') {
               resolve({error: err.code, value: null});
             } else if (value === undefined) {
-              resolve({error: 'UNDEFINED;', value: value});
+              resolve({error: 'UNDEFINED;', value: undefined});
             } else {
-              resolve({error: null, value: value});
+              resolve({error: null, value: value.toString()});
             }
           });
         } catch (error) {
