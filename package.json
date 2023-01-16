@@ -40,7 +40,7 @@
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.7",
-    "eslint": "^8.31.0",
+    "eslint": "^8.32.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
     "npm-check-updates": "^16.6.2",

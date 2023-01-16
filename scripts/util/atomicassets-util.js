@@ -133,10 +133,9 @@ const deactivate = async () => {
   ready = false;
 };
 
-const removeErrorUrl = () => {
+const removeErrorUrl = (url) => {
   const index = config.atomicAssetsEndpointsV2.indexOf(url);
-  loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache',
-      'owner', owner, 'url', url, 'index', index, 'of', config.atomicAssetsEndpointsV2.length);
+  loggingUtil.log(dateUtil.getDate(), 'ERROR', 'removeErrorUrl', 'url', url, 'index', index, 'of', config.atomicAssetsEndpointsV2.length);
   if (index > -1) { // only splice array when item is found
     config.atomicAssetsEndpointsV2.splice(index, 1); // 2nd parameter means remove one item only
   }
@@ -697,8 +696,15 @@ const loadAllAssets = async () => {
       } catch (error) {
         if (error.message == 'Only absolute URLs are supported') {
           removeErrorUrl(url);
+        } else if (error.message == `status:'400' statusText:'Bad Request'`) {
+          removeErrorUrl(url);
+        } else if (error.message == `status:'408' statusText:'Request Timeout'`) {
+          removeErrorUrl(url);
+        } else if (error.message.startsWith('timeout waiting for response from url')) {
+          removeErrorUrl(url);
         } else {
-          throw error;
+          loggingUtil.trace('unknown error', `|${error.message}|`, error);
+          // throw error;
         }
       }
     }
@@ -746,8 +752,9 @@ const loadAllAssets = async () => {
       // TODO, the deletion will leave holes in the lists
       // so we need to defragment the lists eventually.
       }
-      await ownerAssetDbPut('afterUpdatedAtTime', afterUpdatedAtTime.toString());
-      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'PUT afterUpdatedAtTime', afterUpdatedAtTime);
+      const afterUpdatedAtTimeStr = afterUpdatedAtTime.toString();
+      await ownerAssetDbPut('afterUpdatedAtTime', afterUpdatedAtTimeStr);
+      console.log(dateUtil.getDate(), 'INTERIM loadAllAssets', 'PUT afterUpdatedAtTime', afterUpdatedAtTimeStr);
     } finally {
       writeMutexRelease();
     }
@@ -761,6 +768,7 @@ const loadAllAssets = async () => {
     }
     loggingUtil.log(dateUtil.getDate(), 'SUCCESS loadAllAssets');
   } catch (error) {
+    loggingUtil.trace(error);
     loggingUtil.log(dateUtil.getDate(), 'ERROR loadAllAssets', error.message);
   }
 };
