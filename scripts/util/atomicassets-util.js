@@ -133,6 +133,21 @@ const deactivate = async () => {
   ready = false;
 };
 
+const removeStandardErrorUrl = (url, error) => {
+  if (error.message == 'Only absolute URLs are supported') {
+    removeErrorUrl(url);
+  } else if (error.message == `status:'400' statusText:'Bad Request'`) {
+    removeErrorUrl(url);
+  } else if (error.message == `status:'408' statusText:'Request Timeout'`) {
+    removeErrorUrl(url);
+  } else if (error.message.startsWith('timeout waiting for response from url')) {
+    removeErrorUrl(url);
+  } else {
+    loggingUtil.trace('unknown error', `|${error.message}|`, error);
+    // throw error;
+  }
+}
+
 const removeErrorUrl = (url) => {
   const index = config.atomicAssetsEndpointsV2.indexOf(url);
   loggingUtil.log(dateUtil.getDate(), 'ERROR', 'removeErrorUrl', 'url', url, 'index', index, 'of', config.atomicAssetsEndpointsV2.length);
@@ -378,11 +393,7 @@ const getOwnedCardsToCache = async (owner) => {
         // if an error occurs, still look for mroe assets.
         moreAssets = true;
         loggingUtil.log(dateUtil.getDate(), 'ERROR', 'getOwnedCardsToCache', 'owner', owner, 'error.message', error.message);
-        if (error.message == 'Only absolute URLs are supported') {
-          removeErrorUrl(url);
-        } else {
-          throw error;
-        }
+        removeStandardErrorUrl(url, error);
       }
     }
   }
@@ -694,18 +705,7 @@ const loadAllAssets = async () => {
         }
         page++;
       } catch (error) {
-        if (error.message == 'Only absolute URLs are supported') {
-          removeErrorUrl(url);
-        } else if (error.message == `status:'400' statusText:'Bad Request'`) {
-          removeErrorUrl(url);
-        } else if (error.message == `status:'408' statusText:'Request Timeout'`) {
-          removeErrorUrl(url);
-        } else if (error.message.startsWith('timeout waiting for response from url')) {
-          removeErrorUrl(url);
-        } else {
-          loggingUtil.trace('unknown error', `|${error.message}|`, error);
-          // throw error;
-        }
+        removeStandardErrorUrl(url, error);
       }
     }
     const owners = Object.keys(assetMap);
