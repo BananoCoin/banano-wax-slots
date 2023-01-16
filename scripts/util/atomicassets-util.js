@@ -146,7 +146,7 @@ const removeStandardErrorUrl = (url, error) => {
     loggingUtil.trace('unknown error', `|${error.message}|`, error);
     // throw error;
   }
-}
+};
 
 const removeErrorUrl = (url) => {
   const index = config.atomicAssetsEndpointsV2.indexOf(url);
