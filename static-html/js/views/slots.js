@@ -1343,8 +1343,8 @@ const getOwnedAssetHtml = (ownedAsset) => {
 };
 
 const asOrderedList = (list, activeCheckList, giveawayCheckList) => {
-  let eligibleHtml = '<h4>Elgible for Giveaway</h4><ol>';
-  let ineligibleHtml = '<h4>Inelgible for Giveaway</h4><ol>';
+  let eligibleHtml = '<h4>Eligible for Giveaway</h4><ol>';
+  let ineligibleHtml = '<h4>Ineligible for Giveaway</h4><ol>';
   if (list != undefined) {
     for (let ix = 0; ix < list.length; ix++) {
       const elt = list[ix];
