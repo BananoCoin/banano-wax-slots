@@ -12,8 +12,6 @@
 
     npm run preflight;
 
-## commit and push
-
     git commit -a -m 'updating dependencies';
     npm version patch;
     git pull;
