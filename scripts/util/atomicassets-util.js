@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const request = require('request');
 const sharp = require('sharp');
 const rocksdb = require('rocksdb');
+const fetch = require('node-fetch');
 
 // modules
 const assetUtil = require('./asset-util.js');
@@ -16,6 +16,7 @@ const randomUtil = require('./random-util.js');
 const fetchWithTimeoutUtil = require('./fetch-with-timeout-util.js');
 
 // constants
+const DEBUG = false;
 
 // variables
 /* eslint-disable no-unused-vars */
@@ -268,22 +269,20 @@ const cacheAllCardImages = async () => {
     const tempFileName = `static-html/ipfs/${ipfs}-temp.webp`;
     const fileName = `static-html/ipfs/${ipfs}.webp`;
     if (!fs.existsSync(fileName)) {
-      return new Promise((resolve, reject) => {
-        const shrink = () => {
-          loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', fileName);
-          sharp(tempFileName)
-              .resize(265, 370)
-              .toFile(fileName, (err, info) => {
-                if (err != null) {
-                  loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'err', err);
-                }
-                // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'info', info);
-                // fs.unlinkSync(tempFileName);
-                resolve();
-              });
-        };
-        request(url).pipe(fs.createWriteStream(tempFileName)).on('close', shrink);
-      });
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'url', url);
+      const response = await fetch(url);
+      // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'response');
+      const responseBuf = await response.buffer();
+      // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'responseBuf');
+      fs.writeFileSync(tempFileName, responseBuf, 'binary');
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', 'STARTED', fileName);
+      const sharpInst = sharp(tempFileName);
+      // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'sharpInst', sharpInst);
+      sharpInst.resize(265, 370);
+      const sharpBuf = await sharpInst.toBuffer();
+      // loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'sharpBuf', sharpBuf);
+      fs.writeFileSync(fileName, sharpBuf, 'binary');
+      loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', 'SUCCESS', fileName);
     }
   };
 
@@ -805,6 +804,7 @@ const saveWalletsForOwner = async (owner, wallets) => {
 };
 
 const getOwnersWithWalletsList = async () => {
+  const nowTimeMs = Date.now();
   const mutexRelease = await mutex.acquire();
   try {
     const owners = [];
@@ -813,9 +813,18 @@ const getOwnersWithWalletsList = async () => {
       for (let ix = 0; ix < list.length; ix++) {
         const nm = list[ix];
         const file = path.join(config.ownerWalletDataDir, nm);
-        const data = fs.readFileSync(file, 'UTF-8');
-        const json = JSON.parse(data);
-        owners.push(json.owner);
+        const {birthtimeMs} = fs.statSync(file);
+        const thawTimeMs = birthtimeMs + config.thawTimeMs;
+        if (thawTimeMs < nowTimeMs) {
+          if (DEBUG) {
+            loggingUtil.log(dateUtil.getDate(), 'thawing wallet', nm);
+          }
+          fs.unlinkSync(file);
+        } else {
+          const data = fs.readFileSync(file, 'UTF-8');
+          const json = JSON.parse(data);
+          owners.push(json.owner);
+        }
       }
     }
     return owners;
