@@ -284,6 +284,9 @@ const cacheAllCardImages = async () => {
       fs.writeFileSync(fileName, sharpBuf, 'binary');
       loggingUtil.log(dateUtil.getDate(), 'INTERIM cacheAllCardImages', 'shrink', 'SUCCESS', fileName);
     }
+    if (fs.existsSync(tempFileName)) {
+      fs.unlinkSync(tempFileName);
+    }
   };
 
   for (let templateIx = 0; templateIx < templates.length; templateIx++) {
@@ -804,26 +807,38 @@ const saveWalletsForOwner = async (owner, wallets) => {
 };
 
 const getOwnersWithWalletsList = async () => {
-  const nowTimeMs = Date.now();
   const mutexRelease = await mutex.acquire();
   try {
+    const walletFileSetMap = new Map();
     const owners = [];
     if (fs.existsSync(config.ownerWalletDataDir)) {
       const list = fs.readdirSync(config.ownerWalletDataDir);
       for (let ix = 0; ix < list.length; ix++) {
         const nm = list[ix];
         const file = path.join(config.ownerWalletDataDir, nm);
-        const {birthtimeMs} = fs.statSync(file);
-        const thawTimeMs = birthtimeMs + config.thawTimeMs;
-        if (thawTimeMs < nowTimeMs) {
-          if (DEBUG) {
-            loggingUtil.log(dateUtil.getDate(), 'thawing wallet', nm);
+        const data = fs.readFileSync(file, 'UTF-8');
+        const json = JSON.parse(data);
+
+        for (const wallet of json.wallets) {
+          if (!walletFileSetMap.has(wallet)) {
+            walletFileSetMap.set(wallet, new Set());
           }
+          const walletFileSet = walletFileSetMap.get(wallet);
+          walletFileSet.add(file);
+        }
+        owners.push(json.owner);
+      }
+    }
+    for (const [wallet, walletFileSet] of walletFileSetMap) {
+      if (DEBUG) {
+        loggingUtil.log(dateUtil.getDate(), 'getOwnersWithWalletsList',
+            'wallet', wallet,
+            'walletFileSet.size', walletFileSet.size, 'walletFileSet', walletFileSet);
+      }
+      if (walletFileSet.size > 1) {
+        loggingUtil.log(dateUtil.getDate(), 'getOwnersWithWalletsList removing multiple files for wallet', wallet);
+        for (const file of walletFileSet) {
           fs.unlinkSync(file);
-        } else {
-          const data = fs.readFileSync(file, 'UTF-8');
-          const json = JSON.parse(data);
-          owners.push(json.owner);
         }
       }
     }
