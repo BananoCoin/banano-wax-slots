@@ -319,7 +319,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];
       resp.scoreError = true;
     } else {
-      won = false;
+      won = true;
       resp.score = ['Lost'];
       resp.scoreError = false;
       const templates = atomicassetsUtil.getTemplates();

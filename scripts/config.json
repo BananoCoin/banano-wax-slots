@@ -34,15 +34,15 @@
   "payoutMultiplier": 1.0,
   "referredByBonusPercent": 0.05,
   "cappedHouseBalance": 10000,
-  "betBonusPct": 0.00001,
+  "betBonusPct": 0.0,
   "minGiveawayBetCount": 5,
   "minLowBalance": 200,
   "minBet": 0.0,
   "betsPct": {
-    "1ban": 0.00001,
-    "5ban": 0.00001,
-    "10ban": 0.00001,
-    "50ban": 0.00001
+    "1ban": 0.00002,
+    "5ban": 0.00002,
+    "10ban": 0.00002,
+    "50ban": 0.00002
   },
   "thawTimeByRarityMs": {
     "common": -1,
