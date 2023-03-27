@@ -219,7 +219,7 @@ const postWithoutCatch = async (context, req, res) => {
     resp.withdrawAccount = withdrawAccount;
   }
 
-  let won = false;
+  let won = true;
   let maxBet = 0;
 
   const updateBalances = async () => {
