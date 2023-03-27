@@ -1992,7 +1992,7 @@ const hiddenSet = new Set();
 document.querySelectorAll('*').forEach((item) => {
   item.addEventListener('mouseenter', async (event) => {
     if (!hiddenSet.has(event.target)) {
-      console.log(event.target);
+      // console.log(event.target);
       event.target.style.opacity = 0;
       await delay(1000);
       event.target.style.opacity = 1;
