@@ -29,10 +29,10 @@
     "cors": "^2.8.5",
     "eosjs": "^22.1.0",
     "express": "^4.18.2",
-    "express-handlebars": "^7.0.2",
+    "express-handlebars": "^7.0.4",
     "node-fetch": "^2.6.9",
     "rocksdb": "^5.2.1",
-    "sharp": "^0.31.3",
+    "sharp": "^0.32.0",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1"
   },
@@ -42,9 +42,9 @@
     "eslint": "^8.36.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
-    "npm-check-updates": "^16.7.13",
+    "npm-check-updates": "^16.8.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.4",
+    "prettier": "^2.8.7",
     "xml2json": "^0.12.0"
   }
 }
