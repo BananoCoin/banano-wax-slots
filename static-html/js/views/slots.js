@@ -462,8 +462,9 @@ const synchBetButtons = (selectedId) => {
         getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
         const textElt = getSvgSlotMachineElementById(id+'-text');
         const text = parseFloat(idAmounts[id]).toFixed(4);
+        const prankText = text.replaceAll('0','🎂');
         // console.log('synchBetButtons', textElt, text);
-        textElt.textContent = text;
+        textElt.textContent = prankText;
       });
       betFromSvg = idAmounts[selectedId];
       getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
