@@ -219,7 +219,7 @@ const postWithoutCatch = async (context, req, res) => {
     resp.withdrawAccount = withdrawAccount;
   }
 
-  let won = true;
+  let won = false;
   let maxBet = 0;
 
   const updateBalances = async () => {
@@ -319,12 +319,12 @@ const postWithoutCatch = async (context, req, res) => {
       resp.score = ['Low House Balance.', `${winPayment} = Bet:${bet} X odds:${resp.payoutAmount} X mult:${resp.payoutMultiplier}`, `${houseBanano} = House balance`];
       resp.scoreError = true;
     } else {
-      won = true;
+      won = false;
       resp.score = ['Lost'];
       resp.scoreError = false;
       const templates = atomicassetsUtil.getTemplates();
       let card1 = undefined;
-      if (bet == 0) {
+      if ((bet == 0) || true) {
         for (let templateIx = 0; ((templateIx < templates.length) &&
             (card1 == undefined)); templateIx++) {
           const card = templates[templateIx];
