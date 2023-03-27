@@ -1505,7 +1505,10 @@ const resetScoreText = async () => {
     const betLoss = bet;
     const betWin = (bet * cardData.payoutMultiplier) + cardData.betBonus;
     // const chanceWin = cardData.cardCount / cardData.templateCount;
-    const chanceWin = 1;
+    let chanceWin = 1;
+    if(cardData.cardCount = 0) {
+      chanceWin = 0;
+    }
     const expectedPctLoss = Math.pow(1 - chanceWin, 3);
     const expectedPctWin = 1 - expectedPctLoss;
     const expectedChanceToProfitPct = (betWin*expectedPctWin)/((betWin*expectedPctWin) + (betLoss*expectedPctLoss));
