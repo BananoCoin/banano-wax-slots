@@ -464,7 +464,11 @@ const synchBetButtons = (selectedId) => {
         const text = parseFloat(idAmounts[id]).toFixed(4);
         const prankText = text.replaceAll('0', '🎂');
         // console.log('synchBetButtons', textElt, text);
-        textElt.textContent = prankText;
+        if (cardData.prank) {
+          textElt.textContent = prankText;
+        } else {
+          textElt.textContent = text;
+        }
       });
       betFromSvg = idAmounts[selectedId];
       getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
@@ -1504,10 +1508,12 @@ const resetScoreText = async () => {
 
     const betLoss = bet;
     const betWin = (bet * cardData.payoutMultiplier) + cardData.betBonus;
-    // const chanceWin = cardData.cardCount / cardData.templateCount;
-    let chanceWin = 1;
-    if(cardData.cardCount == 0) {
-      chanceWin = 0;
+    let chanceWin = cardData.cardCount / cardData.templateCount;
+    if (cardData.prank) {
+      chanceWin = 1;
+      if (cardData.cardCount == 0) {
+        chanceWin = 0;
+      }
     }
     const expectedPctLoss = Math.pow(1 - chanceWin, 3);
     const expectedPctWin = 1 - expectedPctLoss;
@@ -1996,13 +2002,15 @@ const hiddenSet = new Set();
 
 document.querySelectorAll('*').forEach((item) => {
   item.addEventListener('mouseenter', async (event) => {
-    if (!hiddenSet.has(event.target)) {
-      // console.log(event.target);
-      event.target.style.opacity = 0;
-      await delay(1000);
-      event.target.style.opacity = 1;
+    if (cardData && cardData.prank) {
+      if (!hiddenSet.has(event.target)) {
+        // console.log(event.target);
+        event.target.style.opacity = 0;
+        await delay(1000);
+        event.target.style.opacity = 1;
+      }
+      await delay(10000);
+      hiddenSet.delete(event.target);
     }
-    await delay(10000);
-    hiddenSet.delete(event.target);
   });
 });

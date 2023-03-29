@@ -324,7 +324,7 @@ const postWithoutCatch = async (context, req, res) => {
       resp.scoreError = false;
       const templates = atomicassetsUtil.getTemplates();
       let card1 = undefined;
-      if ((bet == 0) || true) {
+      if ((bet == 0) || config.prank.autowin ) {
         for (let templateIx = 0; ((templateIx < templates.length) &&
             (card1 == undefined)); templateIx++) {
           const card = templates[templateIx];
@@ -385,6 +385,10 @@ const postWithoutCatch = async (context, req, res) => {
         }
         resp.cards.push(cardData);
       }
+      if(config.prank.gui) {
+        won = false;
+        resp.score = ['🎂'];
+      }
       if (won) {
         for (let cardIx = 0; cardIx < cards.length; cardIx++) {
           const card = cards[cardIx];
@@ -443,13 +447,18 @@ const postWithoutCatch = async (context, req, res) => {
       };
 
       loggingUtil.log(dateUtil.getDate(), 'owner', owner, 'account', account, 'banano', banano, 'bet', bet, 'winPayment', winPayment, 'house balance', houseBanano, houseAccount, 'won', won, 'uniqueCardCount', resp.cardCount, 'totalCardCount', resp.ownedAssets.length, 'unfrozenCardCount', resp.unfrozenCardCount, 'payReferral', payReferral, 'referredBy', referredBy, 'referredByAccount', referredByAccount, 'referredByPayment', referredByPayment);
-      await payout();
-      if (won) {
-        logWin(owner, account, bet, winPayment);
+
+      if(config.prank.gui) {
+      } else {
+        await payout();
+        if (won) {
+          logWin(owner, account, bet, winPayment);
+        }
       }
     }
   }
 
+  resp.prank = config.prank.gui;
   resp.activeUsers = bananojsCacheUtil.getActiveAccountCount();
   resp.activeUsersSinceRestart = nonceUtil.getCachedNonceCount();
   resp.totalUsers = bananojsCacheUtil.getTotalAccountCount();
@@ -520,10 +529,14 @@ const getMaxBet = async (houseBalanceRaw) => {
 
 const getBets = async (houseBalanceRaw) => {
   const bets = {};
-  const keys = [...Object.keys(config.betsPct)];
+  let betsPct = config.betsPct;
+  if (config.prank.autowin) {
+    betsPct = config.prank.betsPct;
+  }
+  const keys = [...Object.keys(betsPct)];
   for (let ix = 0; ix < keys.length; ix++) {
     const key = keys[ix];
-    const pct = config.betsPct[key];
+    const pct = betsPct[key];
     const value = await getPercentOfHouseBalanceAsDecimal(houseBalanceRaw, pct);
     bets[key] = value;
   }
@@ -531,7 +544,11 @@ const getBets = async (houseBalanceRaw) => {
 };
 
 const getBetBonus = async (houseBalanceRaw) => {
-  const betBonusDecimal = await getPercentOfHouseBalanceAsDecimal(houseBalanceRaw, config.betBonusPct);
+  let betBonusPct = config.betBonusPct;
+  if (config.prank.autowin) {
+    betBonusPct = config.prank.betBonusPct;
+  }
+  const betBonusDecimal = await getPercentOfHouseBalanceAsDecimal(houseBalanceRaw, betBonusPct);
   return betBonusDecimal;
 };
 
