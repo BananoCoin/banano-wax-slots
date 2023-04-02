@@ -39,10 +39,10 @@
   "preferGlobal": true,
   "devDependencies": {
     "chai": "^4.3.7",
-    "eslint": "^8.36.0",
+    "eslint": "^8.37.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
-    "npm-check-updates": "^16.8.0",
+    "npm-check-updates": "^16.10.0",
     "nyc": "^15.1.0",
     "prettier": "^2.8.7",
     "xml2json": "^0.12.0"

@@ -4,6 +4,10 @@
 
     du -hs * | sort -hr
 
+## to check if prank was removed completely
+
+    git diff origin/preprank... -- ':!package-lock.json' ':!package.json'
+
 ## to update to a major version update:
 
     npm install package@latest;
