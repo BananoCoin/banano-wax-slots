@@ -462,13 +462,8 @@ const synchBetButtons = (selectedId) => {
         getSvgSlotMachineElementById(id).setAttribute('stroke', 'black');
         const textElt = getSvgSlotMachineElementById(id+'-text');
         const text = parseFloat(idAmounts[id]).toFixed(4);
-        const prankText = text.replaceAll('0', '🎂');
         // console.log('synchBetButtons', textElt, text);
-        if (cardData.prank) {
-          textElt.textContent = prankText;
-        } else {
-          textElt.textContent = text;
-        }
+        textElt.textContent = text;
       });
       betFromSvg = idAmounts[selectedId];
       getSvgSlotMachineElementById(selectedId).setAttribute('fill', 'cyan');
@@ -1508,13 +1503,7 @@ const resetScoreText = async () => {
 
     const betLoss = bet;
     const betWin = (bet * cardData.payoutMultiplier) + cardData.betBonus;
-    let chanceWin = cardData.cardCount / cardData.templateCount;
-    if (cardData.prank) {
-      chanceWin = 1;
-      if (cardData.cardCount == 0) {
-        chanceWin = 0;
-      }
-    }
+    const chanceWin = cardData.cardCount / cardData.templateCount;
     const expectedPctLoss = Math.pow(1 - chanceWin, 3);
     const expectedPctWin = 1 - expectedPctLoss;
     const expectedChanceToProfitPct = (betWin*expectedPctWin)/((betWin*expectedPctWin) + (betLoss*expectedPctLoss));
@@ -1982,35 +1971,3 @@ const winConfetti = () => {
     }
   }
 };
-
-const delay = (time) => {
-  // console.log('rate-limit', 'calling', 'delay');
-  if (!isNaN(time)) {
-    if (isFinite(time)) {
-      return new Promise((resolve) => {
-        const fn = () => {
-          // console.log('rate-limit', 'done waiting', 'time', time);
-          resolve();
-        };
-        setTimeout(fn, time);
-      });
-    }
-  }
-};
-
-const hiddenSet = new Set();
-
-document.querySelectorAll('*').forEach((item) => {
-  item.addEventListener('mouseenter', async (event) => {
-    if (cardData && cardData.prank) {
-      if (!hiddenSet.has(event.target)) {
-        // console.log(event.target);
-        event.target.style.opacity = 0;
-        await delay(1000);
-        event.target.style.opacity = 1;
-      }
-      await delay(10000);
-      hiddenSet.delete(event.target);
-    }
-  });
-});
