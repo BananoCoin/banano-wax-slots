@@ -44,17 +44,6 @@
     "10ban": 0.00005,
     "50ban": 0.0001
   },
-  "prank": {
-    "gui":false,
-    "autowin":false,
-    "betBonusPct": 0.0,
-    "betsPct": {
-      "1ban": 0.00002,
-      "5ban": 0.00002,
-      "10ban": 0.00002,
-      "50ban": 0.00002
-    }
-  },
   "thawTimeByRarityMs": {
     "common": -1,
     "uncommon": 2880000,
