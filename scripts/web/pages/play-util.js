@@ -14,6 +14,7 @@ const atomicassetsUtil = require('../../util/atomicassets-util.js');
 const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
 const timedCacheUtil = require('../../util/timed-cache-util.js');
 const ownerAccountUtil = require('../../util/owner-account-util.js');
+const ipUtil = require('../../util/ip-util.js');
 
 // variables
 
@@ -21,6 +22,7 @@ const ownerAccountUtil = require('../../util/owner-account-util.js');
 let config;
 let loggingUtil;
 let mutex;
+let mutexHolderIp;
 // const checkPendingSeeds = new Set();
 let totalWinsSinceRestart = 0;
 let totalLossesSinceRestart = 0;
@@ -55,13 +57,15 @@ const deactivate = async () => {
   config = undefined;
   loggingUtil = undefined;
   mutex = undefined;
+  mutexHolderIp = undefined;
   /* eslint-enable no-unused-vars */
 };
 
 const post = async (context, req, res) => {
+  const ip = ipUtil.getIp(req);
   if (mutex.count == 0) {
     const owner = req.body.owner;
-    loggingUtil.log(dateUtil.getDate(), 'mutex lock', owner);
+    loggingUtil.log(dateUtil.getDate(), 'mutex lock', owner, 'ip', ip, 'mutexHolderIp', mutexHolderIp);
     const resp = {};
     resp.intermittentError = true;
     resp.ready = false;
@@ -71,6 +75,7 @@ const post = async (context, req, res) => {
   }
   const mutexRelease = await mutex.acquire();
   try {
+    mutexHolderIp = ip;
     return await postWithoutCatch(context, req, res);
   } catch (error) {
     console.log(dateUtil.getDate(), 'playUtil error', error.message);
@@ -81,6 +86,7 @@ const post = async (context, req, res) => {
     resp.errorMessage = error.message;
     res.send(resp);
   } finally {
+    mutexHolderIp = undefined;
     mutexRelease();
   }
 };

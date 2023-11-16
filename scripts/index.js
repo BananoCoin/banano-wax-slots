@@ -17,6 +17,7 @@ const webPagePlayUtil = require('./web/pages/play-util.js');
 const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
 const webServerUtil = require('./web/server-util.js');
 const fetchWithTimeoutUtil = require('./util/fetch-with-timeout-util.js');
+const ipUtil = require('./util/ip-util.js');
 
 // constants
 const config = require('./config.json');
@@ -80,6 +81,7 @@ const init = async () => {
   modules.push(webPagePlayUtil);
   modules.push(webPageWithdrawUtil);
   modules.push(webServerUtil);
+  modules.push(ipUtil);
 
   for (let moduleIx = 0; moduleIx < modules.length; moduleIx++) {
     const item = modules[moduleIx];
