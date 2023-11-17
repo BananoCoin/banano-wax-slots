@@ -74,6 +74,7 @@ const fetchWithTimeout = async (url, options) => {
   const controller = new AbortController();
   /* istanbul ignore next */
   const controllerTimeoutFn = () => {
+    loggingUtil.log('fetchWithTimeout', 'abort', 'url', url);
     controller.abort();
   };
   const id = setTimeout(controllerTimeoutFn, timeout);
