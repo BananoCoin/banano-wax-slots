@@ -5,7 +5,7 @@ import {readFile} from 'node:fs/promises';
 const run = async () => {
   const CONFIG_URL = new URL('../config.json', import.meta.url);
   const config = JSON.parse(await readFile(CONFIG_URL, 'utf8'));
-  const webPort = config.webPort;
+  const webPort = config.web.port;
 
   if (webPort == undefined) {
     throw Error('webPort is required in ./config.json');
