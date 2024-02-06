@@ -1,14 +1,14 @@
 'use strict';
 
 // libraries
-const bananojs = require('@bananocoin/bananojs');
+import bananojs from '@bananocoin/bananojs';
 
 // modules
-const dateUtil = require('../../util/date-util.js');
-const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
-const seedUtil = require('../../util/seed-util.js');
-const nonceUtil = require('../../util/nonce-util.js');
-const ownerAccountUtil = require('../../util/owner-account-util.js');
+import dateUtil from '../../util/date-util.js';
+import bananojsCacheUtil from '../../util/bananojs-cache-util.js';
+import seedUtil from '../../util/seed-util.js';
+import nonceUtil from '../../util/nonce-util.js';
+import ownerAccountUtil from '../../util/owner-account-util.js';
 
 // constants
 
@@ -159,6 +159,8 @@ const postWithoutCatch = async (context, req, res) => {
 };
 
 // exports
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.post = post;
+export default {
+  init,
+  deactivate,
+  post,
+};

@@ -116,6 +116,8 @@ const sanitizeBody = (body) => {
   loggingUtil.debug('FINISHED sanitizeBody');
 };
 
-exports.init = init;
-exports.deactivate = deactivate;
-exports.sanitizeBody = sanitizeBody;
+export default {
+  init,
+  deactivate,
+  sanitizeBody,
+};

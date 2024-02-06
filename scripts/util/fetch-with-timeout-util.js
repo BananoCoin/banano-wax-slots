@@ -1,10 +1,10 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
-const dateUtil = require('./date-util.js');
-const AbortController = require('abort-controller');
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import dateUtil from './date-util.js';
+import AbortController from 'abort-controller';
 
 // constants
 
@@ -232,6 +232,8 @@ const logFetchRotate = (verbose) => {
   }
 };
 
-module.exports.fetchWithTimeout = fetchWithTimeout;
-module.exports.init = init;
-module.exports.deactivate = deactivate;
+export default {
+  init,
+  deactivate,
+  fetchWithTimeout,
+};

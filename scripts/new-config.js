@@ -1,12 +1,12 @@
 'use strict';
 
-const randomUtil = require('./util/random-util.js');
+import {getRandomHex32} from './util/random-util.js';
 
 const newConfig = {};
-newConfig.cookieSecret = randomUtil.getRandomHex32();
-newConfig.waxIdSeed = randomUtil.getRandomHex32();
-newConfig.centralWalletSeed = randomUtil.getRandomHex32();
-newConfig.houseWalletSeed = randomUtil.getRandomHex32();
+newConfig.cookieSecret = getRandomHex32();
+newConfig.waxIdSeed = getRandomHex32();
+newConfig.centralWalletSeed = getRandomHex32();
+newConfig.houseWalletSeed = getRandomHex32();
 newConfig.burnAccount = 'crptomonkeys';
 newConfig.underMaintenance = false;
 

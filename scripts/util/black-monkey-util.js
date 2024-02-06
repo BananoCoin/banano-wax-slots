@@ -1,6 +1,6 @@
 'use strict';
 // libraries
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // modules
 
@@ -51,7 +51,8 @@ const getImages = async () => {
         });
   });
 };
-
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getImages = getImages;
+export default {
+  init,
+  deactivate,
+  getImages,
+};

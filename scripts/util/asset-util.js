@@ -1,11 +1,11 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const awaitSemaphore = require('await-semaphore');
+import fs from 'fs';
+import path from 'path';
+import awaitSemaphore from 'await-semaphore';
 
 // modules
-const dateUtil = require('./date-util.js');
+import dateUtil from './date-util.js';
 
 // constants
 const DEBUG = false;
@@ -214,12 +214,14 @@ const getTotalFrozenAssetCount = async () => {
   }
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.isAssetFrozen = isAssetFrozen;
-module.exports.freezeAsset = freezeAsset;
-module.exports.getThawTimeMs = getThawTimeMs;
-module.exports.thawAssetIfItIsTime = thawAssetIfItIsTime;
-module.exports.getTotalFrozenAssetCount = getTotalFrozenAssetCount;
-module.exports.getThawTimeByRarityMs = getThawTimeByRarityMs;
-module.exports.getFrozenAssetCountByRarityMap = getFrozenAssetCountByRarityMap;
+export default {
+  init,
+  deactivate,
+  isAssetFrozen,
+  freezeAsset,
+  getThawTimeMs,
+  thawAssetIfItIsTime,
+  getTotalFrozenAssetCount,
+  getThawTimeByRarityMs,
+  getFrozenAssetCountByRarityMap,
+};

@@ -1,11 +1,11 @@
 'use strict';
 // libraries
-const blake = require('blakejs');
-// const fetch = require('node-fetch');
+import blake from 'blakejs';
+// const fetch from 'node-fetch');
 
 // modules
-const randomUtil = require('./random-util.js');
-const fetchWithTimeoutUtil = require('./fetch-with-timeout-util.js');
+import randomUtil from './random-util.js';
+import fetchWithTimeoutUtil from './fetch-with-timeout-util.js';
 
 // constants
 const fetch = fetchWithTimeoutUtil.fetchWithTimeout;
@@ -259,11 +259,13 @@ const getCmcLastNonceHashByOwner = (owner) => {
   return '';
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.isBadNonce = isBadNonce;
-module.exports.getWaxRpc = getWaxRpc;
-module.exports.getCachedNonceCount = getCachedNonceCount;
-module.exports.setCmcLastNonceHashByOwner = setCmcLastNonceHashByOwner;
-module.exports.getCmcLastNonceHashByOwner = getCmcLastNonceHashByOwner;
-module.exports.getNonceHash = getNonceHash;
+export default {
+  init,
+  deactivate,
+  isBadNonce,
+  getWaxRpc,
+  getCachedNonceCount,
+  setCmcLastNonceHashByOwner,
+  getCmcLastNonceHashByOwner,
+  getNonceHash,
+};

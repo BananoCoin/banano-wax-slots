@@ -1,6 +1,6 @@
 'use strict';
 // libraries
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // modules
 
@@ -40,7 +40,8 @@ const getSeedFromOwner = (owner) => {
       .digest();
   return seedHash.toString('hex');
 };
-
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getSeedFromOwner = getSeedFromOwner;
+export default {
+  init,
+  deactivate,
+  getSeedFromOwner,
+};

@@ -1,6 +1,6 @@
 'use strict';
 // libraries
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // modules
 
@@ -130,12 +130,14 @@ const getRandomHex33 = () => {
   return crypto.randomBytes(33).toString('hex');
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getRandomArrayElt = getRandomArrayElt;
-module.exports.getTwoRandomArrayElts = getTwoRandomArrayElts;
-module.exports.shuffle = shuffle;
-module.exports.getRandom = getRandom;
-module.exports.getRandomInt = getRandomInt;
-module.exports.getRandomHex32 = getRandomHex32;
-module.exports.getRandomHex33 = getRandomHex33;
+export default {
+  init,
+  deactivate,
+  getRandomArrayElt,
+  getTwoRandomArrayElts,
+  shuffle,
+  getRandom,
+  getRandomInt,
+  getRandomHex32,
+  getRandomHex33,
+};

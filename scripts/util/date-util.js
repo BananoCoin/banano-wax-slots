@@ -36,6 +36,8 @@ const getDate = () => {
   return new Date().toISOString();
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getDate = getDate;
+export default {
+  init,
+  deactivate,
+  getDate,
+};

@@ -1,11 +1,12 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const bananojs = require('@bananocoin/bananojs');
-const awaitSemaphore = require('await-semaphore');
+import fs from 'fs';
+import path from 'path';
+import bananojs from '@bananocoin/bananojs';
+import awaitSemaphore from 'await-semaphore';
+
 // modules
-const dateUtil = require('./date-util.js');
+import dateUtil from './date-util.js';
 
 // constants
 
@@ -258,19 +259,28 @@ const auditCache = async () => {
   }
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getBananoDecimalAmountAsRaw = bananojs.getBananoDecimalAmountAsRaw;
-module.exports.getRawStrFromBananoStr = bananojs.getRawStrFromBananoStr;
-module.exports.setBananodeApiUrl = bananojs.setBananodeApiUrl;
-module.exports.getBananoPartsFromRaw = bananojs.getBananoPartsFromRaw;
-module.exports.getBananoPartsDescription = bananojs.getBananoPartsDescription;
-module.exports.getBananoPartsAsDecimal = bananojs.getBananoPartsAsDecimal;
-module.exports.getBananoAccountFromSeed = getBananoAccountFromSeed;
-module.exports.getAccountsPending = getAccountsPending;
-module.exports.getAccountInfo = getAccountInfo;
-module.exports.sendBananoWithdrawalFromSeed = sendBananoWithdrawalFromSeed;
-module.exports.receiveBananoDepositsForSeed = receiveBananoDepositsForSeed;
-module.exports.getTotalAccountCount = getTotalAccountCount;
-module.exports.getActiveAccountCount = getActiveAccountCount;
-module.exports.auditCache = auditCache;
+const getBananoDecimalAmountAsRaw = bananojs.getBananoDecimalAmountAsRaw;
+const getRawStrFromBananoStr = bananojs.getRawStrFromBananoStr;
+const setBananodeApiUrl = bananojs.setBananodeApiUrl;
+const getBananoPartsFromRaw = bananojs.getBananoPartsFromRaw;
+const getBananoPartsDescription = bananojs.getBananoPartsDescription;
+const getBananoPartsAsDecimal = bananojs.getBananoPartsAsDecimal;
+
+export default {
+  init,
+  deactivate,
+  getBananoDecimalAmountAsRaw,
+  getRawStrFromBananoStr,
+  setBananodeApiUrl,
+  getBananoPartsFromRaw,
+  getBananoPartsDescription,
+  getBananoPartsAsDecimal,
+  getBananoAccountFromSeed,
+  getAccountsPending,
+  getAccountInfo,
+  sendBananoWithdrawalFromSeed,
+  receiveBananoDepositsForSeed,
+  getTotalAccountCount,
+  getActiveAccountCount,
+  auditCache,
+};

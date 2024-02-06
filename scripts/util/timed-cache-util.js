@@ -133,11 +133,12 @@ const getCacheMissCountMap = () => {
 const getCacheHitCountMap = () => {
   return cacheHitCountMap;
 };
-
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getUsingNamedCache = getUsingNamedCache;
-module.exports.getCacheSize = getCacheSize;
-module.exports.getCacheMissCountMap = getCacheMissCountMap;
-module.exports.getCacheHitCountMap = getCacheHitCountMap;
-module.exports.getCacheHistogram = getCacheHistogram;
+export default {
+  init,
+  deactivate,
+  getUsingNamedCache,
+  getCacheSize,
+  getCacheMissCountMap,
+  getCacheHitCountMap,
+  getCacheHistogram,
+};

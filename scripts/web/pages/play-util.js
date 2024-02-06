@@ -1,20 +1,20 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const awaitSemaphore = require('await-semaphore');
+import fs from 'fs';
+import path from 'path';
+import awaitSemaphore from 'await-semaphore';
 
 // modules
-const randomUtil = require('../../util/random-util.js');
-const dateUtil = require('../../util/date-util.js');
-const seedUtil = require('../../util/seed-util.js');
-const nonceUtil = require('../../util/nonce-util.js');
-const assetUtil = require('../../util/asset-util.js');
-const atomicassetsUtil = require('../../util/atomicassets-util.js');
-const bananojsCacheUtil = require('../../util/bananojs-cache-util.js');
-const timedCacheUtil = require('../../util/timed-cache-util.js');
-const ownerAccountUtil = require('../../util/owner-account-util.js');
-const ipUtil = require('../../util/ip-util.js');
+import randomUtil from '../../util/random-util.js';
+import dateUtil from '../../util/date-util.js';
+import seedUtil from '../../util/seed-util.js';
+import nonceUtil from '../../util/nonce-util.js';
+import assetUtil from '../../util/asset-util.js';
+import atomicassetsUtil from '../../util/atomicassets-util.js';
+import bananojsCacheUtil from '../../util/bananojs-cache-util.js';
+import timedCacheUtil from '../../util/timed-cache-util.js';
+import ownerAccountUtil from '../../util/owner-account-util.js';
+import ipUtil from '../../util/ip-util.js';
 
 // variables
 
@@ -552,6 +552,8 @@ const logWin = (owner, account, bet, winPayment) => {
 };
 
 // exports
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.post = post;
+export default {
+  init,
+  deactivate,
+  post,
+};

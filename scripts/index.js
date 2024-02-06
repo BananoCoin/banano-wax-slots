@@ -2,26 +2,26 @@
 // libraries
 
 // modules
-const assetUtil = require('./util/asset-util.js');
-const bananojsCacheUtil = require('./util/bananojs-cache-util.js');
-const dateUtil = require('./util/date-util.js');
-const seedUtil = require('./util/seed-util.js');
-const nonceUtil = require('./util/nonce-util.js');
-const randomUtil = require('./util/random-util.js');
-const timedCacheUtil = require('./util/timed-cache-util.js');
-const atomicassetsUtil = require('./util/atomicassets-util.js');
-const ownerAccountUtil = require('./util/owner-account-util.js');
-const blackMonkeyUtil = require('./util/black-monkey-util.js');
-const sanitizeBodyUtil = require('./util/sanitize-body-util.js');
-const webPagePlayUtil = require('./web/pages/play-util.js');
-const webPageWithdrawUtil = require('./web/pages/withdraw-util.js');
-const webServerUtil = require('./web/server-util.js');
-const fetchWithTimeoutUtil = require('./util/fetch-with-timeout-util.js');
-const ipUtil = require('./util/ip-util.js');
+import assetUtil from './util/asset-util.js';
+import bananojsCacheUtil from './util/bananojs-cache-util.js';
+import dateUtil from './util/date-util.js';
+import seedUtil from './util/seed-util.js';
+import nonceUtil from './util/nonce-util.js';
+import randomUtil from './util/random-util.js';
+import timedCacheUtil from './util/timed-cache-util.js';
+import atomicassetsUtil from './util/atomicassets-util.js';
+import ownerAccountUtil from './util/owner-account-util.js';
+import blackMonkeyUtil from './util/black-monkey-util.js';
+import sanitizeBodyUtil from './util/sanitize-body-util.js';
+import webPagePlayUtil from './web/pages/play-util.js';
+import webPageWithdrawUtil from './web/pages/withdraw-util.js';
+import webServerUtil from './web/server-util.js';
+import fetchWithTimeoutUtil from './util/fetch-with-timeout-util.js';
+import ipUtil from './util/ip-util.js';
+import {readFile} from 'node:fs/promises';
 
 // constants
-const config = require('./config.json');
-const configOverride = require('../config.json');
+let config;
 
 const modules = [];
 
@@ -37,7 +37,11 @@ loggingUtil.trace = console.trace;
 const init = async () => {
   loggingUtil.log(dateUtil.getDate(), 'STARTED init');
 
-  overrideConfig();
+  const CONFIG_URL = new URL('./config.json', import.meta.url);
+  config = JSON.parse(await readFile(CONFIG_URL, 'utf8'));
+  const CONFIG_OVERRIDE_URL = new URL('../config.json', import.meta.url);
+  const configOverride = JSON.parse(await readFile(CONFIG_OVERRIDE_URL, 'utf8'));
+  overrideConfig(configOverride, config);
 
   if (config.cookieSecret == '') {
     throw Error('cookieSecret is required in ./config.json');
@@ -134,7 +138,7 @@ const overrideValues = (src, dest) => {
   });
 };
 
-const overrideConfig = () => {
+const overrideConfig = (configOverride, config) => {
   loggingUtil.debug('STARTED overrideConfig', config);
   overrideValues(configOverride, config);
   loggingUtil.debug('SUCCESS overrideConfig', config);

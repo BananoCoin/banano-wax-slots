@@ -1,9 +1,9 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const awaitSemaphore = require('await-semaphore');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import awaitSemaphore from 'await-semaphore';
 
 // modules
 
@@ -106,8 +106,10 @@ const saveOwnerAccount = async (owner, account) => {
 };
 
 // exports
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.saveOwnerAccount = saveOwnerAccount;
-module.exports.loadOwnerAccount = loadOwnerAccount;
-module.exports.getOwnersWithAccountsList = getOwnersWithAccountsList;
+export default {
+  init,
+  deactivate,
+  saveOwnerAccount,
+  loadOwnerAccount,
+  getOwnersWithAccountsList,
+};

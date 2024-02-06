@@ -1,19 +1,19 @@
 'use strict';
 // libraries
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const sharp = require('sharp');
-const rocksdb = require('rocksdb');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import sharp from 'sharp';
+import rocksdb from 'rocksdb';
+import fetch from 'node-fetch';
 
 // modules
-const assetUtil = require('./asset-util.js');
-const dateUtil = require('./date-util.js');
-const timedCacheUtil = require('./timed-cache-util.js');
-const awaitSemaphore = require('await-semaphore');
-const randomUtil = require('./random-util.js');
-const fetchWithTimeoutUtil = require('./fetch-with-timeout-util.js');
+import assetUtil from './asset-util.js';
+import dateUtil from './date-util.js';
+import timedCacheUtil from './timed-cache-util.js';
+import awaitSemaphore from 'await-semaphore';
+import randomUtil from './random-util.js';
+import fetchWithTimeoutUtil from './fetch-with-timeout-util.js';
 
 // constants
 const DEBUG = false;
@@ -882,21 +882,23 @@ const thawAllAssetsIfItIsTime = async () => {
   }
 };
 
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.getTemplateCount = getTemplateCount;
-module.exports.hasOwnedCards = hasOwnedCards;
-module.exports.getOwnedCards = getOwnedCards;
-module.exports.getPayoutInformation = getPayoutInformation;
-module.exports.isReady = isReady;
-module.exports.getTemplates = getTemplates;
-module.exports.getTotalActiveCardCount = getTotalActiveCardCount;
-module.exports.getActiveCardHistogram = getActiveCardHistogram;
-module.exports.getActiveAccountList = getActiveAccountList;
-module.exports.loadWalletsForOwner = loadWalletsForOwner;
-module.exports.saveWalletsForOwner = saveWalletsForOwner;
-module.exports.isOwnerEligibleForGiveaway = isOwnerEligibleForGiveaway;
-module.exports.getOwnersWithWalletsList = getOwnersWithWalletsList;
-module.exports.setWaxApiAndAddTemplates = setWaxApiAndAddTemplates;
-module.exports.getWaxApi = getWaxApi;
-module.exports.loadAllAssets = loadAllAssets;
+export default {
+  init,
+  deactivate,
+  getTemplateCount,
+  hasOwnedCards,
+  getOwnedCards,
+  getPayoutInformation,
+  isReady,
+  getTemplates,
+  getTotalActiveCardCount,
+  getActiveCardHistogram,
+  getActiveAccountList,
+  loadWalletsForOwner,
+  saveWalletsForOwner,
+  isOwnerEligibleForGiveaway,
+  getOwnersWithWalletsList,
+  setWaxApiAndAddTemplates,
+  getWaxApi,
+  loadAllAssets,
+};

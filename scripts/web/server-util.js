@@ -1,26 +1,27 @@
 'use strict';
 // libraries
-const http = require('http');
-const express = require('express');
-const exphbs = require('express-handlebars');
-const cookieParser = require('cookie-parser');
-// const fetch = require('node-fetch');
+import http from 'http';
+import express from 'express';
+import exphbs from 'express-handlebars';
+import cookieParser from 'cookie-parser';
+import {Server} from 'socket.io';
+// const fetch from 'node-fetch');
 
 // modules
-const dateUtil = require('../util/date-util.js');
-const atomicassetsUtil = require('../util/atomicassets-util.js');
-const nonceUtil = require('../util/nonce-util.js');
-const webPagePlayUtil = require('./pages/play-util.js');
-const webPageWithdrawUtil = require('./pages/withdraw-util.js');
-const randomUtil = require('../util/random-util.js');
-const timedCacheUtil = require('../util/timed-cache-util.js');
-const sanitizeBodyUtil = require('../util/sanitize-body-util.js');
-const ownerAccountUtil = require('../util/owner-account-util.js');
-const fetchWithTimeoutUtil = require('../util/fetch-with-timeout-util.js');
+import dateUtil from '../util/date-util.js';
+import atomicassetsUtil from '../util/atomicassets-util.js';
+import nonceUtil from '../util/nonce-util.js';
+import webPagePlayUtil from './pages/play-util.js';
+import webPageWithdrawUtil from './pages/withdraw-util.js';
+import randomUtil from '../util/random-util.js';
+import timedCacheUtil from '../util/timed-cache-util.js';
+import sanitizeBodyUtil from '../util/sanitize-body-util.js';
+import ownerAccountUtil from '../util/owner-account-util.js';
+import fetchWithTimeoutUtil from '../util/fetch-with-timeout-util.js';
+import {readFile} from 'node:fs/promises';
 
 // constants
 const fetch = fetchWithTimeoutUtil.fetchWithTimeout;
-const version = require('../../package.json').version;
 const historyGetActionsCacheMap = new Map();
 
 // variables
@@ -28,6 +29,7 @@ let config;
 let loggingUtil;
 let instance;
 let closeProgramFn;
+let version;
 
 
 // functions
@@ -42,6 +44,10 @@ const init = async (_config, _loggingUtil) => {
   }
   config = _config;
   loggingUtil = _loggingUtil;
+
+  const PACKAGE_URL = new URL('../../package.json', import.meta.url);
+  const PACKAGE = JSON.parse(await readFile(PACKAGE_URL, 'utf8'));
+  version = PACKAGE.version;
 
   await initWebServer();
 
@@ -571,7 +577,7 @@ const initWebServer = async () => {
     loggingUtil.log(dateUtil.getDate(), 'wax-slots listening on PORT', config.web.port);
   });
 
-  const io = require('socket.io')(server);
+  const io = new Server(server);
   io.on('connection', (socket) => {
     socket.on('npmStop', () => {
       socket.emit('npmStopAck');
@@ -681,6 +687,8 @@ const distinct = (array) => {
 };
 
 // exports
-module.exports.init = init;
-module.exports.deactivate = deactivate;
-module.exports.setCloseProgramFunction = setCloseProgramFunction;
+export default {
+  init,
+  deactivate,
+  setCloseProgramFunction,
+};

@@ -43,6 +43,8 @@ const getIp = (req) => {
   return ip;
 };
 
-exports.init = init;
-exports.deactivate = deactivate;
-exports.getIp = getIp;
+export default {
+  init,
+  deactivate,
+  getIp,
+};

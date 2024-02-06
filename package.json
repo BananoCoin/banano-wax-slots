@@ -1,11 +1,12 @@
 {
   "name": "wax-slots",
-  "version": "1.7.66",
+  "version": "2.0.0",
   "description": "wax-slots",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BananoCoin/banano-wax-slots.git"
   },
+  "type": "module",
   "scripts": {
     "eslint": "eslint --fix '**/*.js'",
     "npm-check-updates": "npm-check-updates --target minor -u",
@@ -19,9 +20,9 @@
   "author": "Coranos",
   "license": "MIT",
   "dependencies": {
-    "@bananocoin/bananojs": "^2.10.4",
+    "@bananocoin/bananojs": "^2.10.5",
     "abort-controller": "^3.0.0",
-    "abstract-level": "^1.0.3",
+    "abstract-level": "^2.0.0",
     "await-semaphore": "^0.1.3",
     "blakejs": "^1.2.1",
     "body-parser": "^1.20.2",
@@ -30,21 +31,21 @@
     "eosjs": "^22.1.0",
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "rocksdb": "^5.2.1",
-    "sharp": "^0.32.6",
-    "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2"
+    "sharp": "^0.33.2",
+    "socket.io": "^4.7.4",
+    "socket.io-client": "^4.7.4"
   },
   "preferGlobal": true,
   "devDependencies": {
-    "chai": "^4.3.10",
-    "eslint": "^8.53.0",
+    "chai": "^5.0.3",
+    "eslint": "^8.56.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^10.2.0",
-    "npm-check-updates": "^16.14.6",
+    "npm-check-updates": "^16.14.14",
     "nyc": "^15.1.0",
-    "prettier": "^3.1.0",
+    "prettier": "^3.2.5",
     "xml2json": "^0.12.0"
   }
 }
